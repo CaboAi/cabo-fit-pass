@@ -1,0 +1,41 @@
+{
+  "name": "cabo-fit-final",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@supabase/ssr": "0.6.1",
+    "@supabase/supabase-js": "^2.54.0",
+    "@vercel/speed-insights": "^1.2.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.400.0",
+    "next": "14.2.20",
+    "next-auth": "4.24.10",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.62.0",
+    "tailwind-merge": "3.3.1",
+    "zod": "^4.0.16"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.0",
+    "@types/react": "18.2.8",
+    "@types/react-dom": "18.2.6",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.20",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "5.1.3"
+  }
+}
