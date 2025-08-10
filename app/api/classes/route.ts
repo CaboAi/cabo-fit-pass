@@ -27,7 +27,22 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassIt
 
     // If we have real data, use it
     if (classes && classes.length > 0 && !error) {
-      const transformedClasses: ClassItem[] = classes.map((classData: any) => ({
+      const transformedClasses: ClassItem[] = classes.map((classData: {
+        id: string
+        studio_id: string
+        name: string
+        instructor_id?: string
+        class_type: string
+        description?: string
+        start_time: string
+        duration: number
+        max_capacity: number
+        credit_cost: number
+        difficulty_level: 'beginner' | 'intermediate' | 'advanced'
+        created_at?: string
+        studios?: { id: string; name: string; location: string | { lat: number; lng: number; address: string; neighborhood: string } }
+        bookings?: { id: string }[]
+      }) => ({
         id: classData.id,
         studio_id: classData.studio_id,
         name: classData.name,
@@ -80,7 +95,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassIt
         data: { classes: demoData.classes },
         message: 'Using demo data due to server error'
       })
-    } catch (demoError) {
+    } catch {
       return NextResponse.json({
         success: false,
         error: 'Failed to load classes'

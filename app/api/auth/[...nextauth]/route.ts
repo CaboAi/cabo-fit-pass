@@ -3,7 +3,7 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { createClient } from '@/lib/supabase/server'
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id as string
       }
-      return session
+      return token
     }
   },
   pages: {
