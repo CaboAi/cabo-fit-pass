@@ -87,6 +87,34 @@ export const DEMO_CLASSES: Omit<ClassItem, 'id' | 'studio'>[] = [
     difficulty_level: 'advanced',
     created_at: new Date().toISOString(),
     current_bookings: 0
+  },
+  {
+    studio_id: 'studio-1',
+    name: 'Sunset Beach Bootcamp',
+    instructor_id: 'instructor-5',
+    class_type: 'Bootcamp',
+    description: 'Full-body workout with ocean views at sunset',
+    start_time: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    duration: 55,
+    max_capacity: 20,
+    credit_cost: 3,
+    difficulty_level: 'intermediate',
+    created_at: new Date().toISOString(),
+    current_bookings: 0
+  },
+  {
+    studio_id: 'studio-2',
+    name: 'Mindful Mobility',
+    instructor_id: 'instructor-6',
+    class_type: 'Mobility',
+    description: 'Improve flexibility and reduce soreness with guided mobility',
+    start_time: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+    duration: 40,
+    max_capacity: 14,
+    credit_cost: 2,
+    difficulty_level: 'beginner',
+    created_at: new Date().toISOString(),
+    current_bookings: 0
   }
 ]
 
