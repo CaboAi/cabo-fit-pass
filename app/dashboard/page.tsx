@@ -10,9 +10,16 @@ import { ClassCard } from '@/components/business/class-card'
 import { useToast } from '@/hooks/use-toast'
 import { ClassItem } from '@/types'
 
+interface Profile {
+  id: string
+  email: string
+  name?: string
+  credits: number
+}
+
 export default function Dashboard() {
   const router = useRouter()
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [classes, setClasses] = useState<ClassItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -59,10 +66,10 @@ export default function Dashboard() {
     // Simulate booking process
     setTimeout(() => {
       const newCredits = profile.credits - classItem.credit_cost
-      setProfile(prev => prev ? { ...prev, credits: newCredits } : null)
+      setProfile((prev: Profile | null) => prev ? { ...prev, credits: newCredits } : null)
       
       // Update class booking count
-      setClasses(prev => prev.map(cls => 
+      setClasses((prev: ClassItem[]) => prev.map(cls => 
         cls.id === classItem.id 
           ? { ...cls, current_bookings: (cls.current_bookings || 0) + 1 }
           : cls
@@ -74,7 +81,7 @@ export default function Dashboard() {
   }
 
   const handlePurchaseComplete = async (creditsAdded: number) => {
-    setProfile(prev => prev ? { ...prev, credits: prev.credits + creditsAdded } : null)
+    setProfile((prev: Profile | null) => prev ? { ...prev, credits: prev.credits + creditsAdded } : null)
     setShowPaymentModal(false)
     showPaymentSuccess(`Added ${creditsAdded} credits!`)
   }
