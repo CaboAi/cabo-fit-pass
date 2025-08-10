@@ -23,7 +23,7 @@ export function CreditDisplay({
       const newCredits = currentCredits + amount
       onCreditsUpdate?.(newCredits)
       setIsLoading(false)
-      alert(Added  credits! Total: )
+      alert(`Added ${amount} credits! Total: ${newCredits}`)
     }, 1000)
   }
 
@@ -71,7 +71,7 @@ export function CreditDisplay({
             <Coins className="h-5 w-5 text-orange-600" />
             Your Credits
           </h3>
-          <span className={inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border }>
+          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border ${status.color}`}>
             {status.text}
           </span>
         </div>
@@ -115,10 +115,10 @@ export function CreditDisplay({
 
           {/* Credit Status Messages */}
           {currentCredits === 0 && (
-            <div className={p-3 rounded-lg border  border-red-200}>
+            <div className={`p-3 rounded-lg border ${status.bgColor} border-red-200`}>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500"></div>
-                <p className={	ext-sm font-medium }>
+                <p className={`text-sm font-medium ${status.textColor}`}>
                   You need credits to book classes
                 </p>
               </div>
@@ -129,10 +129,10 @@ export function CreditDisplay({
           )}
 
           {currentCredits > 0 && currentCredits <= 2 && (
-            <div className={p-3 rounded-lg border  border-yellow-200}>
+            <div className={`p-3 rounded-lg border ${status.bgColor} border-yellow-200`}>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
-                <p className={	ext-sm font-medium }>
+                <p className={`text-sm font-medium ${status.textColor}`}>
                   Running low on credits
                 </p>
               </div>
@@ -143,11 +143,11 @@ export function CreditDisplay({
           )}
 
           {currentCredits >= 10 && (
-            <div className={p-3 rounded-lg border  border-green-200}>
+            <div className={`p-3 rounded-lg border ${status.bgColor} border-green-200`}>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                <p className={	ext-sm font-medium }>
-                  You're all set for the week!
+                <p className={`text-sm font-medium ${status.textColor}`}>
+                  You&apos;re all set for the week!
                 </p>
               </div>
               <p className="text-xs text-green-600 mt-1">
@@ -179,16 +179,16 @@ export function CreditDisplay({
                 key={index}
                 onClick={() => handleQuickAdd(pkg.credits + pkg.bonus)}
                 disabled={isLoading}
-                className={p-3 rounded-lg border text-left transition-all hover:shadow-sm disabled:opacity-50 }
+                className={`p-3 rounded-lg border text-left transition-all hover:shadow-sm disabled:opacity-50 ${pkg.popular ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-white'}`}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={ont-semibold }>
+                      <span className={`font-semibold ${pkg.popular ? 'text-orange-800' : 'text-gray-800'}`}>
                         {pkg.credits} Credits
                       </span>
                       {pkg.bonus > 0 && (
-                        <span className={inline-flex items-center px-2 py-0.5 rounded text-xs font-medium }>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${pkg.popular ? 'bg-orange-200 text-orange-800' : 'bg-blue-100 text-blue-800'}`}>
                           <Zap className="h-3 w-3 mr-1" />
                           +{pkg.bonus} Bonus
                         </span>
@@ -200,12 +200,12 @@ export function CreditDisplay({
                         </span>
                       )}
                     </div>
-                    <div className={	ext-sm }>
-                       MXN {pkg.bonus > 0 &&  Total:  credits}
+                    <div className={`text-sm ${pkg.popular ? 'text-orange-700' : 'text-gray-600'}`}>
+                      MXN ${pkg.price} {pkg.bonus > 0 && `Total: ${pkg.credits + pkg.bonus} credits`}
                     </div>
                   </div>
-                  <div className={	ext-lg font-bold }>
-                    {isLoading ? '...' : ''}
+                  <div className={`text-lg font-bold ${pkg.popular ? 'text-orange-800' : 'text-gray-800'}`}>
+                    {isLoading ? '...' : `${pkg.credits + pkg.bonus}`}
                   </div>
                 </div>
               </button>
@@ -213,7 +213,7 @@ export function CreditDisplay({
           </div>
           
           <p className="text-xs text-orange-700 mt-3 text-center">
-            All purchases are processed instantly  Secure payment
+            All purchases are processed instantly • Secure payment
           </p>
         </div>
       )}

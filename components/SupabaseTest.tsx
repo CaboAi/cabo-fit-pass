@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import { useState } from 'react'
-import { testConnection, getClasses } from '@/lib/supabase'
+import { testConnection, getAllClasses } from '@/lib/supabase'
 
 export default function SupabaseTest() {
   const [testResult, setTestResult] = useState<string>('')
@@ -12,7 +12,7 @@ export default function SupabaseTest() {
     setLoading(true)
     try {
       const connectionResult = await testConnection()
-      const classesResult = await getClasses()
+      const classesResult = await getAllClasses()
       
       if (connectionResult.success && classesResult.success) {
         setTestResult('✅ Connected to Supabase!')
