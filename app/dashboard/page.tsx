@@ -61,7 +61,10 @@ export default function Dashboard() {
     // Simulate booking process
     setTimeout(() => {
       const newCredits = profile.credits - classItem.credit_cost
-      setProfile(prev => prev ? { ...prev, credits: newCredits } : null)
+      setProfile(prev => {
+        if (!prev) return null
+        return { ...prev, credits: newCredits }
+      })
       
       // Update class booking count
       setClasses((prev: ClassItem[]) => prev.map(cls => 
@@ -74,7 +77,6 @@ export default function Dashboard() {
       showBookingSuccess(classItem.name, newCredits)
     }, 1000)
   }
-
 
   const handlePurchaseComplete = async (creditsAdded: number) => {
     if (!profile) return
@@ -135,7 +137,7 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Welcome Section with Stats */}
-        <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Welcome Card */}
           <div className="lg:col-span-2">
             <div className="relative group">
@@ -188,62 +190,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Navigation */}
-        <div className="mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all group text-left"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-gradient-to-r from-green-400 to-blue-600 rounded-lg group-hover:scale-110 transition-transform">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-semibold text-white">Classes</span>
-              </div>
-              <p className="text-sm text-purple-300">Book fitness classes</p>
-            </button>
-            
-            <button
-              onClick={() => router.push('/studio')}
-              className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all group text-left"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-gradient-to-r from-purple-400 to-pink-600 rounded-lg group-hover:scale-110 transition-transform">
-                  <Activity className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-semibold text-white">Studios</span>
-              </div>
-              <p className="text-sm text-purple-300">Explore fitness studios</p>
-            </button>
-            
-            <button 
-              onClick={() => router.push('/pricing')}
-              className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all group text-left"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-lg group-hover:scale-110 transition-transform">
-                  <CreditCard className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-semibold text-white">Pricing</span>
-              </div>
-              <p className="text-sm text-purple-300">Plans &amp; credits</p>
-            </button>
-            
-            <button 
-              onClick={() => router.push('/profile')}
-              className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all group text-left"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-gradient-to-r from-red-400 to-pink-600 rounded-lg group-hover:scale-110 transition-transform">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-semibold text-white">Profile</span>
-              </div>
-              <p className="text-sm text-purple-300">Manage your account</p>
-            </button>
-          </div>
-        </div>
+        {/* Quick Navigation removed to reduce redundancy; use header nav */}
 
         {/* Search and Filter Bar */}
         <div className="mb-8">
