@@ -1,59 +1,70 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   MapPin, 
   Star, 
-  Phone, 
   Clock, 
-  Users, 
-  Award, 
-  Wifi, 
-  Car, 
-  Dumbbell, 
-  Heart, 
-  Camera,
-  Filter,
-  Search,
+  Phone, 
+  Mail, 
+  Globe, 
+  Filter, 
+  Search, 
   ArrowLeft,
-  ExternalLink
+  Dumbbell,
+  Award,
+  Wifi,
+  Car,
+  Heart,
+  Users,
+  Zap,
+  TrendingUp,
+  Shield,
+  Crown
 } from 'lucide-react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { LoadingSpinner } from '@/components/layout/loading-spinner'
+import { EmptyState } from '@/components/layout/empty-state'
 
+// Use the Studio type from types/index.ts
 interface Studio {
   id: string
   name: string
-  description: string
+  owner_id?: string
+  description?: string
   location: {
-    address: string
-    neighborhood: string
     lat: number
     lng: number
+    address: string
+    neighborhood: string
   }
-  rating: number
-  reviewCount: number
   amenities: string[]
-  contact: {
+  rating: number
+  created_at?: string
+  // Additional properties for UI
+  specialties?: string[]
+  featured?: boolean
+  verified?: boolean
+  priceRange?: string
+  openingHours?: { [key: string]: string }
+  contact?: {
     phone: string
     email: string
     website?: string
   }
-  images: string[]
-  specialties: string[]
-  priceRange: string
-  openingHours: {
-    [key: string]: string
-  }
-  featured: boolean
-  verified: boolean
+  images?: string[]
+  reviewCount?: number
 }
 
 // Mock studio data for Los Cabos
 const STUDIOS: Studio[] = [
   {
     id: '1',
+    owner_id: 'owner-1',
     name: 'Cabo Wellness Studio',
     description: 'Premium wellness center offering yoga, pilates, and meditation classes with breathtaking ocean views. Our experienced instructors guide you through transformative fitness journeys.',
     location: {
@@ -87,6 +98,7 @@ const STUDIOS: Studio[] = [
   },
   {
     id: '2',
+    owner_id: 'owner-2',
     name: 'Iron Paradise Gym',
     description: 'State-of-the-art fitness facility with professional-grade equipment, personal training, and group fitness classes. Perfect for serious fitness enthusiasts.',
     location: {
@@ -119,6 +131,7 @@ const STUDIOS: Studio[] = [
   },
   {
     id: '3',
+    owner_id: 'owner-3',
     name: 'Serenity Spa & Fitness',
     description: 'Luxury spa and fitness center combining wellness, beauty, and fitness. Enjoy our pool, spa services, and boutique fitness classes in an exclusive setting.',
     location: {
@@ -152,6 +165,7 @@ const STUDIOS: Studio[] = [
   },
   {
     id: '4',
+    owner_id: 'owner-4',
     name: 'Desert Fitness Hub',
     description: 'Community-focused fitness center offering functional training, group classes, and outdoor workouts. Embrace the desert landscape while achieving your fitness goals.',
     location: {
@@ -184,6 +198,7 @@ const STUDIOS: Studio[] = [
   },
   {
     id: '5',
+    owner_id: 'owner-5',
     name: 'Beachside Yoga Retreat',
     description: 'Tranquil beachfront yoga studio offering sunrise and sunset sessions with the sound of waves as your soundtrack. Connect with nature and find inner peace.',
     location: {
@@ -232,8 +247,8 @@ export default function StudioPage() {
     if (searchQuery) {
       filtered = filtered.filter(studio =>
         studio.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        studio.neighborhood.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        studio.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+        studio.location.neighborhood.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        studio.specialties?.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     }
 
@@ -246,11 +261,11 @@ export default function StudioPage() {
           case 'verified':
             return studio.verified
           case 'yoga':
-            return studio.specialties.some(s => s.toLowerCase().includes('yoga'))
+            return studio.specialties?.some(s => s.toLowerCase().includes('yoga'))
           case 'gym':
-            return studio.specialties.some(s => s.toLowerCase().includes('training') || s.toLowerCase().includes('crossfit'))
+            return studio.specialties?.some(s => s.toLowerCase().includes('training') || s.toLowerCase().includes('crossfit'))
           case 'wellness':
-            return studio.specialties.some(s => s.toLowerCase().includes('spa') || s.toLowerCase().includes('wellness'))
+            return studio.specialties?.some(s => s.toLowerCase().includes('spa') || s.toLowerCase().includes('wellness'))
           default:
             return true
         }
@@ -260,7 +275,7 @@ export default function StudioPage() {
     setFilteredStudios(filtered)
   }, [searchQuery, selectedFilter, studios])
 
-  const getPriceRangeColor = (priceRange: string) => {
+  const getPriceRangeColor = (priceRange?: string) => {
     switch (priceRange) {
       case '$': return 'text-green-400'
       case '$$': return 'text-yellow-400'
@@ -401,7 +416,7 @@ export default function StudioPage() {
                       <div className="flex gap-6">
                         {/* Studio Image */}
                         <div className="w-48 h-32 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10">
-                          <Camera className="w-8 h-8 text-purple-400" />
+                          <Dumbbell className="w-8 h-8 text-purple-400" />
                           <span className="sr-only">Studio photo</span>
                         </div>
 
@@ -442,7 +457,7 @@ export default function StudioPage() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            {studio.specialties.slice(0, 3).map((specialty) => (
+                            {studio.specialties?.slice(0, 3).map((specialty) => (
                               <Badge key={specialty} variant="outline" className="bg-white/5 text-purple-300 border-white/10">
                                 {specialty}
                               </Badge>
@@ -465,11 +480,10 @@ export default function StudioPage() {
           </h2>
           
           {filteredStudios.length === 0 ? (
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-12 border border-white/10 text-center">
-              <Dumbbell className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No studios found</h3>
-              <p className="text-purple-200">Try adjusting your search or filters</p>
-            </div>
+            <EmptyState
+              title="No studios found"
+              description="Try adjusting your search or filters"
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredStudios.map((studio) => (
@@ -477,7 +491,7 @@ export default function StudioPage() {
                   <Card className="bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden h-full">
                     {/* Studio Image */}
                     <div className="relative h-48 bg-gradient-to-r from-purple-600/20 to-pink-600/20 flex items-center justify-center border-b border-white/10">
-                      <Camera className="w-12 h-12 text-purple-400" />
+                      <Dumbbell className="w-12 h-12 text-purple-400" />
                       {studio.featured && (
                         <Badge className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold">
                           FEATURED
@@ -500,7 +514,7 @@ export default function StudioPage() {
                               <span>{studio.location.neighborhood}</span>
                             </div>
                           </div>
-                          <span className={`text-lg font-bold ${getPriceRangeColor(studio.priceRange)}`}>
+                          <span className={`text-lg font-bold ${getPriceRangeColor(studio.priceRange || '')}`}>
                             {studio.priceRange}
                           </span>
                         </div>
@@ -527,7 +541,7 @@ export default function StudioPage() {
 
                       {/* Specialties */}
                       <div className="flex flex-wrap gap-1">
-                        {studio.specialties.slice(0, 3).map((specialty) => (
+                        {studio.specialties?.slice(0, 3).map((specialty) => (
                           <Badge key={specialty} variant="outline" className="bg-white/5 text-purple-300 border-white/10 text-xs">
                             {specialty}
                           </Badge>
@@ -552,15 +566,15 @@ export default function StudioPage() {
                         <div className="space-y-2">
                           <div className="flex items-center gap-2 text-sm text-purple-300">
                             <Phone className="w-4 h-4" />
-                            <span>{studio.contact.phone}</span>
+                            <span>{studio.contact?.phone}</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-purple-300">
                             <Clock className="w-4 h-4" />
-                            <span>Open today: {studio.openingHours.Monday}</span>
+                            <span>Open today: {studio.openingHours?.Monday}</span>
                           </div>
-                          {studio.contact.website && (
+                          {studio.contact?.website && (
                             <div className="flex items-center gap-2 text-sm text-purple-400">
-                              <ExternalLink className="w-4 h-4" />
+                              <Globe className="w-4 h-4" />
                               <span>{studio.contact.website}</span>
                             </div>
                           )}
