@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   MapPin, 
   Star, 
   Clock, 
   Phone, 
-  Mail, 
   Globe, 
   Filter, 
   Search, 
@@ -17,18 +16,10 @@ import {
   Wifi,
   Car,
   Heart,
-  Users,
-  Zap,
-  TrendingUp,
-  Shield,
-  Crown
+  Users
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { LoadingSpinner } from '@/components/layout/loading-spinner'
-import { EmptyState } from '@/components/layout/empty-state'
 
 // Use the Studio type from types/index.ts
 interface Studio {
@@ -480,10 +471,11 @@ export default function StudioPage() {
           </h2>
           
           {filteredStudios.length === 0 ? (
-            <EmptyState
-              title="No studios found"
-              description="Try adjusting your search or filters"
-            />
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-12 border border-white/10 text-center">
+              <Dumbbell className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">No studios found</h3>
+              <p className="text-purple-200">Try adjusting your search or filters</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredStudios.map((studio) => (
