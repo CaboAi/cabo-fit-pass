@@ -76,14 +76,14 @@ export default function Dashboard() {
       ))
       
       setBookingInProgress(null)
-      showBookingSuccess(`Booked ${classItem.name}!`)
+      showBookingSuccess(classItem.name, newCredits)
     }, 1000)
   }
 
   const handlePurchaseComplete = async (creditsAdded: number) => {
     setProfile((prev: Profile | null) => prev ? { ...prev, credits: prev.credits + creditsAdded } : null)
     setShowPaymentModal(false)
-    showPaymentSuccess(`Added ${creditsAdded} credits!`)
+    showPaymentSuccess(creditsAdded)
   }
 
   const handleSignOut = () => {
@@ -119,8 +119,9 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold text-gray-900">Cabo Fit Pass</h1>
             <div className="flex items-center space-x-4">
               <CreditDisplay 
-                credits={profile.credits} 
-                onPurchase={() => setShowPaymentModal(true)}
+                currentCredits={profile.credits}
+                onPurchaseCredits={() => setShowPaymentModal(true)}
+                onCreditsUpdate={handlePurchaseComplete}
               />
               <button
                 onClick={handleSignOut}
@@ -155,9 +156,9 @@ export default function Dashboard() {
               <ClassCard
                 key={classItem.id}
                 classItem={classItem}
-                onBook={() => handleBookClass(classItem)}
+                userCredits={profile.credits}
+                onBook={handleBookClass}
                 isBooking={bookingInProgress === classItem.id}
-                canBook={profile.credits >= classItem.credit_cost}
               />
             ))}
           </div>
