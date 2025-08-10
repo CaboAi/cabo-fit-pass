@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CreditDisplay } from '@/components/business/credit-display'
 import { PaymentModal } from '@/components/business/payment-modal'
@@ -8,7 +8,7 @@ import { ClassCard } from '@/components/business/class-card'
 import { NavigationHeader } from '@/components/layout/navigation-header'
 import { useToast } from '@/hooks/use-toast'
 import { ClassItem } from '@/types'
-import { Activity, TrendingUp, Award, Calendar, Search, CreditCard, User } from 'lucide-react'
+import { Activity, TrendingUp, Award, Calendar, Search, BarChart3, Trophy } from 'lucide-react'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -166,6 +166,76 @@ export default function Dashboard() {
                     <p className="text-xs text-purple-200">Achievements</p>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Engagement & Insights */}
+          <div className="lg:col-span-3 grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Peak Times Chart (mock) */}
+            <div className="xl:col-span-2 relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
+              <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-purple-300" />
+                    <h3 className="text-lg font-semibold text-white">Peak Booking Times</h3>
+                  </div>
+                  <span className="text-xs text-purple-300">Last 7 days</span>
+                </div>
+                {/* Simple bar visualization */}
+                <div className="grid grid-cols-7 items-end gap-3 h-40">
+                  {[
+                    { d: 'Mon', v: 35 },
+                    { d: 'Tue', v: 55 },
+                    { d: 'Wed', v: 70 },
+                    { d: 'Thu', v: 45 },
+                    { d: 'Fri', v: 85 },
+                    { d: 'Sat', v: 95 },
+                    { d: 'Sun', v: 60 }
+                  ].map(({ d, v }) => (
+                    <div key={d} className="flex flex-col items-center gap-2">
+                      <div
+                        className="w-8 rounded-xl bg-gradient-to-b from-pink-600 to-purple-600 border border-white/10"
+                        style={{ height: `${Math.max(10, v)}%` }}
+                        title={`${d}: ${v}`}
+                      />
+                      <span className="text-xs text-purple-300">{d}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-sm text-purple-200">
+                  Highest demand around <span className="text-white font-medium">Sat 6–8pm</span>. Consider booking early.
+                </p>
+              </div>
+            </div>
+
+            {/* Leaderboard (mock) */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
+              <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+                <div className="flex items-center gap-2 mb-4">
+                  <Trophy className="w-5 h-5 text-yellow-300" />
+                  <h3 className="text-lg font-semibold text-white">Weekly Leaderboard</h3>
+                </div>
+                <ol className="space-y-3">
+                  {[
+                    { name: 'Alex M.', classes: 6 },
+                    { name: 'Jordan R.', classes: 5 },
+                    { name: 'You', classes: 3 }
+                  ].map((p, i) => (
+                    <li key={p.name} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-sm text-white font-semibold">
+                          {i + 1}
+                        </span>
+                        <span className="text-white font-medium">{p.name}</span>
+                      </div>
+                      <span className="text-purple-200 text-sm">{p.classes} classes</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-4 text-sm text-purple-200">Keep booking to climb the board!</p>
               </div>
             </div>
           </div>
