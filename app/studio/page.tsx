@@ -1,0 +1,583 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { 
+  MapPin, 
+  Star, 
+  Phone, 
+  Clock, 
+  Users, 
+  Award, 
+  Wifi, 
+  Car, 
+  Dumbbell, 
+  Heart, 
+  Camera,
+  Filter,
+  Search,
+  ArrowLeft,
+  ExternalLink
+} from 'lucide-react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+
+interface Studio {
+  id: string
+  name: string
+  description: string
+  location: {
+    address: string
+    neighborhood: string
+    lat: number
+    lng: number
+  }
+  rating: number
+  reviewCount: number
+  amenities: string[]
+  contact: {
+    phone: string
+    email: string
+    website?: string
+  }
+  images: string[]
+  specialties: string[]
+  priceRange: string
+  openingHours: {
+    [key: string]: string
+  }
+  featured: boolean
+  verified: boolean
+}
+
+// Mock studio data for Los Cabos
+const STUDIOS: Studio[] = [
+  {
+    id: '1',
+    name: 'Cabo Wellness Studio',
+    description: 'Premium wellness center offering yoga, pilates, and meditation classes with breathtaking ocean views. Our experienced instructors guide you through transformative fitness journeys.',
+    location: {
+      address: 'Blvd. Marina 15, Centro',
+      neighborhood: 'Marina District',
+      lat: 22.8905,
+      lng: -109.9167
+    },
+    rating: 4.9,
+    reviewCount: 127,
+    amenities: ['Ocean View', 'Yoga Mats', 'Meditation Room', 'Changing Rooms', 'Parking', 'AC'],
+    contact: {
+      phone: '+52 624 105 1234',
+      email: 'info@cabowellness.com',
+      website: 'cabowellness.com'
+    },
+    images: ['/api/placeholder/400/300', '/api/placeholder/400/300'],
+    specialties: ['Yoga', 'Pilates', 'Meditation', 'Breathwork'],
+    priceRange: '$$$',
+    openingHours: {
+      'Monday': '6:00 AM - 9:00 PM',
+      'Tuesday': '6:00 AM - 9:00 PM',
+      'Wednesday': '6:00 AM - 9:00 PM',
+      'Thursday': '6:00 AM - 9:00 PM',
+      'Friday': '6:00 AM - 9:00 PM',
+      'Saturday': '7:00 AM - 8:00 PM',
+      'Sunday': '7:00 AM - 7:00 PM'
+    },
+    featured: true,
+    verified: true
+  },
+  {
+    id: '2',
+    name: 'Iron Paradise Gym',
+    description: 'State-of-the-art fitness facility with professional-grade equipment, personal training, and group fitness classes. Perfect for serious fitness enthusiasts.',
+    location: {
+      address: 'Carr. Transpeninsular Km 4.5',
+      neighborhood: 'San José del Cabo',
+      lat: 23.0545,
+      lng: -109.6970
+    },
+    rating: 4.7,
+    reviewCount: 89,
+    amenities: ['Free Weights', 'Cardio Equipment', 'Personal Training', 'Locker Rooms', 'Protein Bar', 'AC'],
+    contact: {
+      phone: '+52 624 142 5678',
+      email: 'contact@ironparadisecabo.com'
+    },
+    images: ['/api/placeholder/400/300', '/api/placeholder/400/300'],
+    specialties: ['Weight Training', 'CrossFit', 'HIIT', 'Personal Training'],
+    priceRange: '$$',
+    openingHours: {
+      'Monday': '5:00 AM - 10:00 PM',
+      'Tuesday': '5:00 AM - 10:00 PM',
+      'Wednesday': '5:00 AM - 10:00 PM',
+      'Thursday': '5:00 AM - 10:00 PM',
+      'Friday': '5:00 AM - 10:00 PM',
+      'Saturday': '6:00 AM - 9:00 PM',
+      'Sunday': '6:00 AM - 8:00 PM'
+    },
+    featured: false,
+    verified: true
+  },
+  {
+    id: '3',
+    name: 'Serenity Spa & Fitness',
+    description: 'Luxury spa and fitness center combining wellness, beauty, and fitness. Enjoy our pool, spa services, and boutique fitness classes in an exclusive setting.',
+    location: {
+      address: 'Paseo de los Cabos, Zona Hotelera',
+      neighborhood: 'Hotel Zone',
+      lat: 22.8889,
+      lng: -109.9081
+    },
+    rating: 4.8,
+    reviewCount: 156,
+    amenities: ['Pool', 'Spa Services', 'Sauna', 'Steam Room', 'Juice Bar', 'Valet Parking'],
+    contact: {
+      phone: '+52 624 163 9012',
+      email: 'reservations@serenitycabo.com',
+      website: 'serenitycabo.com'
+    },
+    images: ['/api/placeholder/400/300', '/api/placeholder/400/300'],
+    specialties: ['Aqua Fitness', 'Spa Yoga', 'Barre', 'Wellness Retreats'],
+    priceRange: '$$$$',
+    openingHours: {
+      'Monday': '6:00 AM - 9:00 PM',
+      'Tuesday': '6:00 AM - 9:00 PM',
+      'Wednesday': '6:00 AM - 9:00 PM',
+      'Thursday': '6:00 AM - 9:00 PM',
+      'Friday': '6:00 AM - 9:00 PM',
+      'Saturday': '7:00 AM - 8:00 PM',
+      'Sunday': '7:00 AM - 8:00 PM'
+    },
+    featured: true,
+    verified: true
+  },
+  {
+    id: '4',
+    name: 'Desert Fitness Hub',
+    description: 'Community-focused fitness center offering functional training, group classes, and outdoor workouts. Embrace the desert landscape while achieving your fitness goals.',
+    location: {
+      address: 'Ave. Lázaro Cárdenas 1789',
+      neighborhood: 'Centro',
+      lat: 23.0644,
+      lng: -109.6953
+    },
+    rating: 4.5,
+    reviewCount: 73,
+    amenities: ['Outdoor Training Area', 'Functional Training', 'Group Classes', 'Smoothie Bar', 'Bike Parking'],
+    contact: {
+      phone: '+52 624 128 3456',
+      email: 'hello@desertfitnesshub.com'
+    },
+    images: ['/api/placeholder/400/300', '/api/placeholder/400/300'],
+    specialties: ['Functional Training', 'Bootcamp', 'Outdoor Workouts', 'TRX'],
+    priceRange: '$',
+    openingHours: {
+      'Monday': '5:30 AM - 9:00 PM',
+      'Tuesday': '5:30 AM - 9:00 PM',
+      'Wednesday': '5:30 AM - 9:00 PM',
+      'Thursday': '5:30 AM - 9:00 PM',
+      'Friday': '5:30 AM - 9:00 PM',
+      'Saturday': '6:00 AM - 8:00 PM',
+      'Sunday': '7:00 AM - 7:00 PM'
+    },
+    featured: false,
+    verified: true
+  },
+  {
+    id: '5',
+    name: 'Beachside Yoga Retreat',
+    description: 'Tranquil beachfront yoga studio offering sunrise and sunset sessions with the sound of waves as your soundtrack. Connect with nature and find inner peace.',
+    location: {
+      address: 'Playa El Médano, Beachfront',
+      neighborhood: 'El Médano',
+      lat: 22.8908,
+      lng: -109.9125
+    },
+    rating: 4.9,
+    reviewCount: 94,
+    amenities: ['Beachfront Location', 'Sunrise Classes', 'Sunset Sessions', 'Yoga Props', 'Meditation Garden'],
+    contact: {
+      phone: '+52 624 157 7890',
+      email: 'namaste@beachsideyoga.com',
+      website: 'beachsideyoga.com'
+    },
+    images: ['/api/placeholder/400/300', '/api/placeholder/400/300'],
+    specialties: ['Beach Yoga', 'Sunrise Yoga', 'Meditation', 'Sound Healing'],
+    priceRange: '$$',
+    openingHours: {
+      'Monday': '6:00 AM - 8:00 PM',
+      'Tuesday': '6:00 AM - 8:00 PM',
+      'Wednesday': '6:00 AM - 8:00 PM',
+      'Thursday': '6:00 AM - 8:00 PM',
+      'Friday': '6:00 AM - 8:00 PM',
+      'Saturday': '6:00 AM - 8:00 PM',
+      'Sunday': '6:00 AM - 8:00 PM'
+    },
+    featured: true,
+    verified: true
+  }
+]
+
+export default function StudioPage() {
+  const router = useRouter()
+  const studios = STUDIOS
+  const [filteredStudios, setFilteredStudios] = useState<Studio[]>(STUDIOS)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedFilter, setSelectedFilter] = useState('all')
+
+  useEffect(() => {
+    // Filter studios based on search and filter
+    let filtered = studios
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(studio =>
+        studio.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        studio.neighborhood.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        studio.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    }
+
+    // Category filter
+    if (selectedFilter !== 'all') {
+      filtered = filtered.filter(studio => {
+        switch (selectedFilter) {
+          case 'featured':
+            return studio.featured
+          case 'verified':
+            return studio.verified
+          case 'yoga':
+            return studio.specialties.some(s => s.toLowerCase().includes('yoga'))
+          case 'gym':
+            return studio.specialties.some(s => s.toLowerCase().includes('training') || s.toLowerCase().includes('crossfit'))
+          case 'wellness':
+            return studio.specialties.some(s => s.toLowerCase().includes('spa') || s.toLowerCase().includes('wellness'))
+          default:
+            return true
+        }
+      })
+    }
+
+    setFilteredStudios(filtered)
+  }, [searchQuery, selectedFilter, studios])
+
+  const getPriceRangeColor = (priceRange: string) => {
+    switch (priceRange) {
+      case '$': return 'text-green-400'
+      case '$$': return 'text-yellow-400'
+      case '$$$': return 'text-orange-400'
+      case '$$$$': return 'text-red-400'
+      default: return 'text-gray-400'
+    }
+  }
+
+  const getAmenityIcon = (amenity: string) => {
+    const lower = amenity.toLowerCase()
+    if (lower.includes('wifi') || lower.includes('internet')) return <Wifi className="w-4 h-4" />
+    if (lower.includes('parking') || lower.includes('car')) return <Car className="w-4 h-4" />
+    if (lower.includes('equipment') || lower.includes('weights')) return <Dumbbell className="w-4 h-4" />
+    if (lower.includes('spa') || lower.includes('sauna')) return <Heart className="w-4 h-4" />
+    if (lower.includes('pool') || lower.includes('water')) return <Users className="w-4 h-4" />
+    return <Award className="w-4 h-4" />
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Header */}
+      <div className="relative bg-black/20 backdrop-blur-xl border-b border-white/10">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
+        <div className="relative max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <button
+              onClick={() => router.back()}
+              className="p-2 text-purple-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-600 rounded-full blur-xl opacity-50"></div>
+                <div className="relative bg-gradient-to-r from-orange-400 to-pink-600 text-white p-3 rounded-full">
+                  <Dumbbell className="w-8 h-8" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                  Fitness Studios
+                </h1>
+                <p className="text-purple-300 text-lg">Discover premium fitness experiences in Los Cabos</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
+              <p className="text-2xl font-bold text-white">{studios.length}</p>
+              <p className="text-xs text-purple-300">Total Studios</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
+              <p className="text-2xl font-bold text-white">{studios.filter(s => s.verified).length}</p>
+              <p className="text-xs text-purple-300">Verified Partners</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
+              <p className="text-2xl font-bold text-white">4.8</p>
+              <p className="text-xs text-purple-300">Avg Rating</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
+              <p className="text-2xl font-bold text-white">500+</p>
+              <p className="text-xs text-purple-300">Weekly Classes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Search and Filter Bar */}
+        <div className="mb-8">
+          <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Search */}
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search studios, neighborhoods, or specialties..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all"
+                />
+              </div>
+              
+              {/* Filters */}
+              <div className="flex gap-2 flex-wrap">
+                {['all', 'featured', 'verified', 'yoga', 'gym', 'wellness'].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setSelectedFilter(filter)}
+                    className={`px-4 py-3 rounded-xl font-medium transition-all capitalize ${
+                      selectedFilter === filter
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-white/5 text-purple-300 hover:bg-white/10 border border-white/10'
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="mt-4 flex items-center justify-between text-sm">
+              <p className="text-purple-200">
+                {filteredStudios.length} studio{filteredStudios.length !== 1 ? 's' : ''} found
+              </p>
+              <div className="flex items-center gap-2 text-purple-300">
+                <Filter className="w-4 h-4" />
+                <span>Sorted by rating</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured Studios Section */}
+        {selectedFilter === 'all' && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <Award className="w-6 h-6 text-yellow-400" />
+              Featured Studios
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {studios.filter(s => s.featured).slice(0, 2).map((studio) => (
+                <div key={studio.id} className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                  <Card className="relative bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+                    {/* Featured Badge */}
+                    <div className="absolute top-4 right-4 z-10">
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold">
+                        FEATURED
+                      </Badge>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="flex gap-6">
+                        {/* Studio Image */}
+                        <div className="w-48 h-32 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10">
+                          <Camera className="w-8 h-8 text-purple-400" />
+                          <span className="sr-only">Studio photo</span>
+                        </div>
+
+                        {/* Studio Info */}
+                        <div className="flex-1 space-y-4">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-2xl font-bold text-white">{studio.name}</h3>
+                              {studio.verified && (
+                                <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs">
+                                  <Award className="w-3 h-3" />
+                                  Verified
+                                </div>
+                              )}
+                            </div>
+                            <p className="text-purple-200 line-clamp-2">{studio.description}</p>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <div className="flex">
+                                {Array(5).fill(0).map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${
+                                      i < Math.floor(studio.rating) ? 'text-yellow-400 fill-current' : 'text-gray-500'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-white font-medium">{studio.rating}</span>
+                              <span className="text-purple-300 text-sm">({studio.reviewCount} reviews)</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-purple-300">
+                              <MapPin className="w-4 h-4" />
+                              <span className="text-sm">{studio.location.neighborhood}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {studio.specialties.slice(0, 3).map((specialty) => (
+                              <Badge key={specialty} variant="outline" className="bg-white/5 text-purple-300 border-white/10">
+                                {specialty}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* All Studios Grid */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-6">
+            All Studios {selectedFilter !== 'all' && `- ${selectedFilter.charAt(0).toUpperCase() + selectedFilter.slice(1)}`}
+          </h2>
+          
+          {filteredStudios.length === 0 ? (
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-12 border border-white/10 text-center">
+              <Dumbbell className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">No studios found</h3>
+              <p className="text-purple-200">Try adjusting your search or filters</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredStudios.map((studio) => (
+                <div key={studio.id} className="group transform hover:scale-105 transition-transform duration-300">
+                  <Card className="bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden h-full">
+                    {/* Studio Image */}
+                    <div className="relative h-48 bg-gradient-to-r from-purple-600/20 to-pink-600/20 flex items-center justify-center border-b border-white/10">
+                      <Camera className="w-12 h-12 text-purple-400" />
+                      {studio.featured && (
+                        <Badge className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold">
+                          FEATURED
+                        </Badge>
+                      )}
+                    </div>
+
+                    <CardHeader className="pb-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                              {studio.name}
+                              {studio.verified && (
+                                <Award className="w-4 h-4 text-green-400" />
+                              )}
+                            </h3>
+                            <div className="flex items-center gap-2 text-sm text-purple-300">
+                              <MapPin className="w-3 h-3" />
+                              <span>{studio.location.neighborhood}</span>
+                            </div>
+                          </div>
+                          <span className={`text-lg font-bold ${getPriceRangeColor(studio.priceRange)}`}>
+                            {studio.priceRange}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <div className="flex">
+                            {Array(5).fill(0).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.floor(studio.rating) ? 'text-yellow-400 fill-current' : 'text-gray-500'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-white font-medium">{studio.rating}</span>
+                          <span className="text-purple-300 text-sm">({studio.reviewCount})</span>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-0 space-y-4">
+                      <p className="text-purple-200 text-sm line-clamp-2">{studio.description}</p>
+
+                      {/* Specialties */}
+                      <div className="flex flex-wrap gap-1">
+                        {studio.specialties.slice(0, 3).map((specialty) => (
+                          <Badge key={specialty} variant="outline" className="bg-white/5 text-purple-300 border-white/10 text-xs">
+                            {specialty}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      {/* Amenities */}
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-purple-400">Top Amenities</p>
+                        <div className="flex flex-wrap gap-2">
+                          {studio.amenities.slice(0, 4).map((amenity) => (
+                            <div key={amenity} className="flex items-center gap-1 text-xs text-purple-300">
+                              {getAmenityIcon(amenity)}
+                              <span>{amenity}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Contact & Hours */}
+                      <div className="space-y-3 pt-4 border-t border-white/10">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm text-purple-300">
+                            <Phone className="w-4 h-4" />
+                            <span>{studio.contact.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-purple-300">
+                            <Clock className="w-4 h-4" />
+                            <span>Open today: {studio.openingHours.Monday}</span>
+                          </div>
+                          {studio.contact.website && (
+                            <div className="flex items-center gap-2 text-sm text-purple-400">
+                              <ExternalLink className="w-4 h-4" />
+                              <span>{studio.contact.website}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-xl font-semibold hover:scale-[1.02] transition-transform">
+                          View Classes & Book
+                        </button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

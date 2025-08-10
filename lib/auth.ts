@@ -1,6 +1,6 @@
 import { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -16,6 +16,8 @@ export const authOptions: AuthOptions = {
         }
 
         try {
+          const supabase = createClient()
+          
           // For demo purposes, we'll use a simple email-based auth
           // In production, you'd verify against Supabase auth or your auth system
           const { data, error } = await supabase.auth.signInWithPassword({

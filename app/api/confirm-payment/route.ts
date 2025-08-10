@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { stripe } from '@/lib/stripe'
-import { getUserProfile, updateUserCredits } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,26 +17,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Payment intent ID is required' }, { status: 400 })
     }
 
-    // Retrieve payment intent from Stripe
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
-    
-    if (paymentIntent.status !== 'succeeded') {
-      return NextResponse.json({ error: 'Payment not completed' }, { status: 400 })
+    // Mock payment verification for development
+    if (!paymentIntentId.startsWith('pi_mock_')) {
+      return NextResponse.json({ error: 'Invalid payment intent format' }, { status: 400 })
     }
 
-    if (paymentIntent.metadata.userId !== session.user.email) {
-      return NextResponse.json({ error: 'Payment user mismatch' }, { status: 400 })
-    }
+    const supabase = createClient()
 
     // Get user profile
-    const profileResult = await getUserProfile(session.user.email)
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', session.user.email)
+      .single()
     
-    if (!profileResult.success || !profileResult.data) {
+    if (profileError || !profile) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
 
-    const profile = profileResult.data
-    const creditsToAdd = parseInt(paymentIntent.metadata.credits || '0')
+    // Mock credits - in production this would come from payment metadata
+    const creditsToAdd = 10 // Mock value for development
 
     if (creditsToAdd <= 0) {
       return NextResponse.json({ error: 'Invalid credits amount' }, { status: 400 })
@@ -45,9 +44,16 @@ export async function POST(request: NextRequest) {
 
     // Add credits to user account
     const newCreditAmount = profile.credits + creditsToAdd
-    const creditResult = await updateUserCredits(profile.id, newCreditAmount)
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ 
+        credits: newCreditAmount,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', profile.id)
     
-    if (!creditResult.success) {
+    if (updateError) {
+      console.error('Error updating credits:', updateError)
       return NextResponse.json({ 
         error: 'Payment successful but failed to update credits. Please contact support.' 
       }, { status: 500 })

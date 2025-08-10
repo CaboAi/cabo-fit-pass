@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { stripe, CREDIT_PACKAGES } from '@/lib/stripe'
+
+// Mock credit packages for development
+const CREDIT_PACKAGES = [
+  { id: 'basic', name: 'Basic Pack', credits: 5, bonus: 1, price: '$25', priceUSD: 2500 },
+  { id: 'premium', name: 'Premium Pack', credits: 12, bonus: 3, price: '$50', priceUSD: 5000 },
+  { id: 'ultimate', name: 'Ultimate Pack', credits: 25, bonus: 10, price: '$99', priceUSD: 9900 },
+]
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,20 +30,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid package ID' }, { status: 400 })
     }
 
-    // Create payment intent with Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: creditPackage.priceUSD, // Amount in cents
-      currency: 'usd',
-      metadata: {
-        userId: session.user.email,
-        packageId: packageId,
-        credits: (creditPackage.credits + creditPackage.bonus).toString(),
-      },
-      description: `${creditPackage.name} for Cabo Fit Pass`,
-    })
+    // Mock payment intent for development
+    const mockPaymentIntent = {
+      client_secret: `pi_mock_${Date.now()}_secret`,
+    }
 
     return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
+      clientSecret: mockPaymentIntent.client_secret,
       credits: creditPackage.credits + creditPackage.bonus,
       price: creditPackage.price,
       priceUSD: creditPackage.priceUSD / 100, // Convert back to dollars

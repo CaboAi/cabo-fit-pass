@@ -1,110 +1,137 @@
 ﻿'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/layout/loading-spinner'
 
-export default function SignIn() {
+export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
 
+  const handleDemoLogin = async () => {
+    setLoading(true)
+    setError('')
+    
+    try {
+      const response = await fetch('/api/auth/demo-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'demo@cabofitpass.com', password: 'demo123' })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        // Store demo session in localStorage for demo purposes
+        localStorage.setItem('demo-session', JSON.stringify(data.session))
+        localStorage.setItem('demo-user', JSON.stringify(data.user))
+        router.push('/dashboard')
+      } else {
+        setError(data.error || 'Demo login failed')
+      }
+    } catch (error) {
+      setError('Demo login failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-
+    
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch('/api/auth/demo-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       })
-
-      if (result?.error) {
-        setError('Invalid credentials')
-      } else {
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        localStorage.setItem('demo-session', JSON.stringify(data.session))
+        localStorage.setItem('demo-user', JSON.stringify(data.user))
         router.push('/dashboard')
+      } else {
+        setError(data.error || 'Login failed')
       }
-    } catch {
-      setError('Something went wrong')
+    } catch (error) {
+      setError('Login failed. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-white">
-      <div className="w-full max-w-md bg-white rounded-lg border shadow-sm">
-        <div className="p-6">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
-              Sign In
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Welcome back to Cabo Fit Pass
-            </p>
-          </div>
-          
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-orange-600">
+            Sign In to Cabo Fit Pass
+          </CardTitle>
+          <CardDescription>
+            Access your fitness dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-700 text-sm">{error}</p>
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
-              <input
-                id="email"
+            <div>
+              <Input
                 type="email"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Enter your email"
               />
             </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
-              <input
-                id="password"
+            <div>
+              <Input
                 type="password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Enter your password"
               />
             </div>
-            
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-10 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Signing In...' : 'Sign In'}
-            </button>
+            {error && (
+              <div className="text-red-600 text-sm text-center">{error}</div>
+            )}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
+            </Button>
           </form>
           
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
-              <Link href="/auth/signup" className="text-orange-600 hover:text-orange-700 font-medium">
-                Sign up
-              </Link>
-            </p>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Or</span>
+            </div>
           </div>
-        </div>
-      </div>
+          
+          <Button 
+            onClick={handleDemoLogin} 
+            variant="outline" 
+            className="w-full" 
+            disabled={loading}
+          >
+            {loading ? <LoadingSpinner size="sm" /> : 'Quick Demo Login'}
+          </Button>
+          
+          <div className="text-xs text-gray-500 text-center">
+            Demo credentials: demo@cabofitpass.com / demo123
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

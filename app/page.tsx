@@ -3,7 +3,6 @@
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import SupabaseTest from '@/components/SupabaseTest'
 
 export default function HomePage() {
   const { data: session, status } = useSession()
@@ -23,10 +22,8 @@ export default function HomePage() {
           Cabo Fit Pass
         </h1>
         <p className="text-xl text-gray-600">
-          Your fitness marketplace is LIVE! 
+          Premium Fitness Marketplace in Los Cabos
         </p>
-
-        <SupabaseTest />
 
         <div className="bg-white rounded-lg shadow-lg p-8">
           {session ? (
@@ -49,10 +46,10 @@ export default function HomePage() {
           ) : (
             <div className="space-y-4">
               <h2 className="text-2xl font-semibold text-gray-800">
-                Phase 6 Ready!
+                Ready to Get Fit?
               </h2>
               <p className="text-gray-600">
-                Complete fitness marketplace with real Supabase data!
+                Book premium fitness classes across Los Cabos with our credit system
               </p>
               <Link href="/auth/signin">
                 <Button className="w-full">
