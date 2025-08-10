@@ -39,7 +39,7 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
   }
 
   const getIntensityBars = (difficulty: string) => {
-    const levels = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 }
+    const levels: Record<string, number> = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 }
     const level = levels[difficulty] || 1
     return Array(3).fill(0).map((_, i) => (
       <div 
