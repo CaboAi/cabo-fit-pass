@@ -35,7 +35,7 @@ export default function SignInPage() {
       } else {
         setError(data.error || 'Demo login failed')
       }
-    } catch (error) {
+    } catch {
       setError('Demo login failed. Please try again.')
     } finally {
       setLoading(false)
@@ -63,7 +63,7 @@ export default function SignInPage() {
       } else {
         setError(data.error || 'Login failed')
       }
-    } catch (error) {
+    } catch {
       setError('Login failed. Please try again.')
     } finally {
       setLoading(false)
