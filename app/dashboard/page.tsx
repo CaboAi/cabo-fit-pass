@@ -75,13 +75,19 @@ export default function Dashboard() {
     }, 1000)
   }
 
+
   const handlePurchaseComplete = async (creditsAdded: number) => {
     if (!profile) return
     
-    setProfile(prev => ({ ...prev, credits: prev.credits + creditsAdded }))
+    setProfile(prev => {
+      if (!prev) return null
+      return { ...prev, credits: prev.credits + creditsAdded }
+    })
     showPaymentSuccess(creditsAdded)
     setShowPaymentModal(false)
   }
+
+
 
   const handleSignOut = () => {
     localStorage.removeItem('demo-session')
@@ -170,7 +176,13 @@ export default function Dashboard() {
                 currentCredits={profile.credits}
                 onPurchaseCredits={() => setShowPaymentModal(true)}
                 onCreditsUpdate={() => {}}
-                profile={profile}
+                profile={{
+                  id: 'demo-user',
+                  email: profile.email,
+                  credits: profile.credits,
+                  user_type: 'member',
+                  subscription_tier: 'basic'
+                }}
               />
             </div>
           </div>
