@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CreditDisplay } from '@/components/business/credit-display'
 import { PaymentModal } from '@/components/business/payment-modal'
@@ -136,15 +136,15 @@ export default function Dashboard() {
       <NavigationHeader profile={profile} onSignOut={handleSignOut} />
 
       <div className="max-w-7xl mx-auto p-6">
-        {/* Welcome Section with Stats */}
-        <div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top summary grid: Welcome + Credits (row 1), Peak Times + Leaderboard (row 2) */}
+        <div className="mb-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Welcome Card */}
-          <div className="lg:col-span-2">
+          <div className="col-span-12 lg:col-span-8">
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
               <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
                 <h2 className="text-3xl font-bold text-white mb-2">
-                  Welcome back, Champion! 💪
+                  {`Welcome back${profile?.name ? `, ${profile.name}` : ''}!`} 💪
                 </h2>
                 <p className="text-purple-200 mb-6">
                   Your fitness journey continues. Book your next class and keep pushing your limits.
@@ -170,10 +170,27 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Engagement & Insights */}
-          <div className="lg:col-span-3 grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Peak Times Chart (mock) */}
-            <div className="xl:col-span-2 relative group">
+          {/* Credit Balance (top-right) */}
+          <div className="col-span-12 lg:col-span-4 relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-pink-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+            <div className="relative h-full">
+              <CreditDisplay
+                currentCredits={profile.credits}
+                onPurchaseCredits={() => setShowPaymentModal(true)}
+                onCreditsUpdate={() => {}}
+                profile={{
+                  id: 'demo-user',
+                  email: profile.email,
+                  credits: profile.credits,
+                  user_type: 'member',
+                  subscription_tier: 'basic'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Peak Times Chart (bottom-left) */}
+          <div className="col-span-12 lg:col-span-8 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
               <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
                 <div className="flex items-center justify-between mb-4">
@@ -210,8 +227,8 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Leaderboard (mock) */}
-            <div className="relative group">
+          {/* Leaderboard (bottom-right) */}
+          <div className="col-span-12 lg:col-span-4 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
               <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
                 <div className="flex items-center gap-2 mb-4">
@@ -238,26 +255,6 @@ export default function Dashboard() {
                 <p className="mt-4 text-sm text-purple-200">Keep booking to climb the board!</p>
               </div>
             </div>
-          </div>
-
-          {/* Enhanced Credit Display */}
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-pink-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
-            <div className="relative h-full">
-              <CreditDisplay
-                currentCredits={profile.credits}
-                onPurchaseCredits={() => setShowPaymentModal(true)}
-                onCreditsUpdate={() => {}}
-                profile={{
-                  id: 'demo-user',
-                  email: profile.email,
-                  credits: profile.credits,
-                  user_type: 'member',
-                  subscription_tier: 'basic'
-                }}
-              />
-            </div>
-          </div>
         </div>
 
         {/* Quick Navigation removed to reduce redundancy; use header nav */}
