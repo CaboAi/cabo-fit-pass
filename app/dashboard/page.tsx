@@ -112,15 +112,15 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
         <div className="text-center">
           <div className="relative">
-            <div className="absolute inset-0 animate-ping">
-              <Activity className="w-16 h-16 text-purple-400 opacity-75" />
+            <div className="absolute inset-0 animate-pulse-glow">
+              <Activity className="w-16 h-16 text-primary opacity-75" />
             </div>
-            <Activity className="w-16 h-16 text-purple-500 relative" />
+            <Activity className="w-16 h-16 text-primary relative animate-fitness-bounce" />
           </div>
-          <p className="mt-4 text-purple-200 font-medium">Loading your fitness journey...</p>
+          <p className="mt-4 text-text-secondary font-heading text-heading-lg animate-fade-in">Loading your fitness journey...</p>
         </div>
       </div>
     )
@@ -131,7 +131,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Navigation Header */}
       <NavigationHeader profile={profile} onSignOut={handleSignOut} />
 
@@ -140,43 +140,43 @@ export default function Dashboard() {
         <div className="mb-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Welcome Card */}
           <div className="col-span-12 lg:col-span-8">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
-              <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
-                <h2 className="text-3xl font-bold text-white mb-2">
+            <div className="relative group animate-fade-in">
+              <div className="absolute inset-0 gradient-fitness-primary rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+              <div className="relative card-fitness-stats p-8 animate-slide-up z-10">
+                <h2 className="font-heading text-display-md text-text-primary mb-2">
                   {`Welcome back${profile?.name ? `, ${profile.name}` : ''}!`} 💪
                 </h2>
-                <p className="text-purple-200 mb-6">
+                <p className="text-text-secondary mb-6 text-body-lg">
                   Your fitness journey continues. Book your next class and keep pushing your limits.
                 </p>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                    <TrendingUp className="w-6 h-6 text-green-400 mb-2" />
-                    <p className="text-2xl font-bold text-white">87%</p>
-                    <p className="text-xs text-purple-200">Goal Progress</p>
+                  <div className="card-fitness p-4 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
+                    <TrendingUp className="w-6 h-6 text-success mb-2" />
+                    <p className="text-display-sm font-heading text-text-primary">87%</p>
+                    <p className="text-caption-md text-text-tertiary">Goal Progress</p>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                    <Calendar className="w-6 h-6 text-blue-400 mb-2" />
-                    <p className="text-2xl font-bold text-white">3</p>
-                    <p className="text-xs text-purple-200">This Week</p>
+                  <div className="card-fitness p-4 bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
+                    <Calendar className="w-6 h-6 text-secondary mb-2" />
+                    <p className="text-display-sm font-heading text-text-primary">3</p>
+                    <p className="text-caption-md text-text-tertiary">This Week</p>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                    <Award className="w-6 h-6 text-yellow-400 mb-2" />
-                    <p className="text-2xl font-bold text-white">15</p>
-                    <p className="text-xs text-purple-200">Achievements</p>
+                  <div className="card-fitness p-4 bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
+                    <Award className="w-6 h-6 text-warning mb-2" />
+                    <p className="text-display-sm font-heading text-text-primary">15</p>
+                    <p className="text-caption-md text-text-tertiary">Achievements</p>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+        </div>
+      </div>
 
           {/* Credit Balance (top-right) */}
-          <div className="col-span-12 lg:col-span-4 relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-pink-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
-            <div className="relative h-full">
-              <CreditDisplay
-                currentCredits={profile.credits}
-                onPurchaseCredits={() => setShowPaymentModal(true)}
+          <div className="col-span-12 lg:col-span-4 relative group animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="absolute inset-0 gradient-fitness-secondary rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+            <div className="relative h-full z-10">
+          <CreditDisplay
+            currentCredits={profile.credits}
+            onPurchaseCredits={() => setShowPaymentModal(true)}
                 onCreditsUpdate={() => {}}
                 profile={{
                   id: 'demo-user',
@@ -187,18 +187,18 @@ export default function Dashboard() {
                 }}
               />
             </div>
-          </div>
+        </div>
 
           {/* Peak Times Chart (bottom-left) */}
-          <div className="col-span-12 lg:col-span-8 relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-              <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+          <div className="col-span-12 lg:col-span-8 relative group animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="absolute inset-0 gradient-fitness-accent rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity -z-10"></div>
+              <div className="relative card-fitness-stats p-6 animate-slide-up z-10">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-purple-300" />
-                    <h3 className="text-lg font-semibold text-white">Peak Booking Times</h3>
+                    <BarChart3 className="w-5 h-5 text-primary" />
+                    <h3 className="font-heading text-heading-lg text-text-primary">Peak Booking Times</h3>
                   </div>
-                  <span className="text-xs text-purple-300">Last 7 days</span>
+                  <span className="text-caption-md text-text-tertiary">Last 7 days</span>
                 </div>
                 {/* Simple bar visualization */}
                 <div className="grid grid-cols-7 items-end gap-3 h-40">
@@ -213,27 +213,27 @@ export default function Dashboard() {
                   ].map(({ d, v }) => (
                     <div key={d} className="flex flex-col items-center gap-2">
                       <div
-                        className="w-8 rounded-xl bg-gradient-to-b from-pink-600 to-purple-600 border border-white/10"
+                        className="w-8 rounded-xl gradient-fitness-primary border border-primary/20 shadow-fitness-sm hover:shadow-fitness-glow-primary transition-shadow"
                         style={{ height: `${Math.max(10, v)}%` }}
                         title={`${d}: ${v}`}
                       />
-                      <span className="text-xs text-purple-300">{d}</span>
+                      <span className="text-caption-sm text-text-tertiary">{d}</span>
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-sm text-purple-200">
-                  Highest demand around <span className="text-white font-medium">Sat 6–8pm</span>. Consider booking early.
+                <p className="mt-4 text-body-sm text-text-secondary">
+                  Highest demand around <span className="text-text-primary font-semibold">Sat 6–8pm</span>. Consider booking early.
                 </p>
               </div>
             </div>
 
           {/* Leaderboard (bottom-right) */}
-          <div className="col-span-12 lg:col-span-4 relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-              <div className="relative bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+          <div className="col-span-12 lg:col-span-4 relative group animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="absolute inset-0 bg-gradient-to-r from-warning to-accent-orange rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity -z-10"></div>
+              <div className="relative card-fitness-stats p-6 animate-slide-up z-10">
                 <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-5 h-5 text-yellow-300" />
-                  <h3 className="text-lg font-semibold text-white">Weekly Leaderboard</h3>
+                  <Trophy className="w-5 h-5 text-warning" />
+                  <h3 className="font-heading text-heading-lg text-text-primary">Weekly Leaderboard</h3>
                 </div>
                 <ol className="space-y-3">
                   {[
@@ -241,36 +241,36 @@ export default function Dashboard() {
                     { name: 'Jordan R.', classes: 5 },
                     { name: 'You', classes: 3 }
                   ].map((p, i) => (
-                    <li key={p.name} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+                    <li key={p.name} className="flex items-center justify-between card-fitness px-4 py-3 hover:shadow-fitness-md transition-shadow">
                       <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-sm text-white font-semibold">
+                        <span className="w-7 h-7 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center text-caption-lg text-text-primary font-bold">
                           {i + 1}
                         </span>
-                        <span className="text-white font-medium">{p.name}</span>
+                        <span className="text-text-primary font-medium text-body-md">{p.name}</span>
                       </div>
-                      <span className="text-purple-200 text-sm">{p.classes} classes</span>
+                      <span className="text-text-secondary text-caption-lg">{p.classes} classes</span>
                     </li>
                   ))}
                 </ol>
-                <p className="mt-4 text-sm text-purple-200">Keep booking to climb the board!</p>
+                <p className="mt-4 text-body-sm text-text-secondary">Keep booking to climb the board!</p>
               </div>
             </div>
-        </div>
+          </div>
 
         {/* Quick Navigation removed to reduce redundancy; use header nav */}
 
         {/* Search and Filter Bar */}
-        <div className="mb-8">
-          <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="card-fitness p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-tertiary w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search classes, studios, or instructors..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all"
+                  className="input-fitness-search focus-fitness"
                 />
               </div>
               <div className="flex gap-2">
@@ -280,8 +280,8 @@ export default function Dashboard() {
                     onClick={() => setSelectedFilter(filter)}
                     className={`px-4 py-3 rounded-xl font-medium transition-all ${
                       selectedFilter === filter
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                        : 'bg-white/5 text-purple-300 hover:bg-white/10 border border-white/10'
+                        ? 'btn-fitness-primary'
+                        : 'btn-fitness-ghost border border-border hover:border-primary/40'
                     }`}
                   >
                     {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -295,34 +295,38 @@ export default function Dashboard() {
         {/* Classes Section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="font-heading text-display-sm text-text-primary">
               Available Classes
             </h2>
-            <p className="text-purple-200">
+            <p className="text-text-secondary text-body-md">
               {filteredClasses.length} classes available
             </p>
           </div>
           
           {filteredClasses.length === 0 ? (
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-12 border border-white/10 text-center">
-              <Calendar className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No classes found</h3>
-              <p className="text-purple-200">Try adjusting your search or filters</p>
+            <div className="card-fitness p-12 text-center animate-fade-in">
+              <Calendar className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
+              <h3 className="font-heading text-heading-xl text-text-primary mb-2">No classes found</h3>
+              <p className="text-text-secondary text-body-md">Try adjusting your search or filters</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredClasses.map((classItem) => (
-                <div key={classItem.id} className="transform hover:scale-105 transition-transform duration-300">
-                  <ClassCard
-                    classItem={classItem}
-                    userCredits={profile.credits}
+              {filteredClasses.map((classItem, index) => (
+                <div 
+                  key={classItem.id} 
+                  className="animate-fade-in hover:scale-105 transition-all duration-300" 
+                  style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+                >
+              <ClassCard
+                classItem={classItem}
+                userCredits={profile.credits}
                     onBook={handleBookClass}
-                    isBooking={bookingInProgress === classItem.id}
-                  />
+                isBooking={bookingInProgress === classItem.id}
+              />
                 </div>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
+        )}
         </div>
       </div>
 

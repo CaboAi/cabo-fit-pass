@@ -235,45 +235,45 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Header */}
-      <div className="relative bg-black/20 backdrop-blur-xl border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
+      <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>
         <div className="relative max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => router.back()}
-              className="p-2 text-purple-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+              className="p-3 text-text-secondary hover:text-text-primary transition-colors rounded-2xl hover:bg-surface-tertiary"
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-600 rounded-full blur-xl opacity-50"></div>
-                <div className="relative bg-gradient-to-r from-orange-400 to-pink-600 text-white p-3 rounded-full">
+                <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-xl opacity-75 -z-10"></div>
+                <div className="relative gradient-fitness-primary text-primary-foreground p-4 rounded-2xl z-10">
                   <User className="w-8 h-8" />
                 </div>
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                <h1 className="font-heading text-display-lg gradient-fitness-text">
                   My Profile
                 </h1>
-                <p className="text-purple-300 text-lg">Manage your account and preferences</p>
+                <p className="text-text-secondary text-body-lg">Manage your account and preferences</p>
               </div>
             </div>
           </div>
 
           {/* Profile Header Card */}
           <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            <Card className="relative bg-black/40 backdrop-blur-xl border-white/10 overflow-hidden">
+            <div className="absolute inset-0 gradient-fitness-primary rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+            <Card className="relative card-fitness-elevated bg-surface overflow-hidden z-10">
               <CardContent className="p-8">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-6">
                     {/* Avatar */}
                     <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 rounded-full blur opacity-75"></div>
-                      <div className="relative w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                      <div className="absolute inset-0 gradient-fitness-primary rounded-full blur opacity-75 -z-10"></div>
+                      <div className="relative w-24 h-24 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground text-3xl font-bold z-10">
                         {profile.name?.charAt(0).toUpperCase() || profile.email.charAt(0).toUpperCase()}
                       </div>
                     </div>
@@ -281,30 +281,30 @@ export default function ProfilePage() {
                     {/* Profile Info */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <h2 className="text-3xl font-bold text-white">{profile.name || 'Fitness Enthusiast'}</h2>
-                        <Badge className={`px-3 py-1 rounded-full border font-semibold ${getTierColor(profile.tier)}`}>
+                        <h2 className="font-heading text-display-sm text-text-primary">{profile.name || 'Fitness Enthusiast'}</h2>
+                        <Badge className={`badge-fitness-primary ${getTierColor(profile.tier)}`}>
                           {profile.tier} Member
                         </Badge>
                       </div>
                       
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-purple-300">
+                        <div className="flex items-center gap-2 text-text-secondary">
                           <Mail className="w-4 h-4" />
                           <span>{profile.email}</span>
                         </div>
                         {profile.phone && (
-                          <div className="flex items-center gap-2 text-purple-300">
+                          <div className="flex items-center gap-2 text-text-secondary">
                             <Phone className="w-4 h-4" />
                             <span>{profile.phone}</span>
                           </div>
                         )}
                         {profile.location && (
-                          <div className="flex items-center gap-2 text-purple-300">
+                          <div className="flex items-center gap-2 text-text-secondary">
                             <MapPin className="w-4 h-4" />
                             <span>{profile.location}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-purple-300">
+                        <div className="flex items-center gap-2 text-text-secondary">
                           <Calendar className="w-4 h-4" />
                           <span>Member since {new Date(profile.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                         </div>
@@ -314,13 +314,13 @@ export default function ProfilePage() {
 
                   {/* Quick Stats */}
                   <div className="grid grid-cols-2 gap-4 text-center">
-                    <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                      <p className="text-3xl font-bold text-white">{profile.credits}</p>
-                      <p className="text-xs text-purple-300">Active Credits</p>
+                    <div className="card-fitness-stats p-6">
+                      <p className="text-display-sm font-bold text-text-primary">{profile.credits}</p>
+                      <p className="text-caption-sm text-text-secondary">Active Credits</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                      <p className="text-3xl font-bold text-white">{profile.totalClassesBooked}</p>
-                      <p className="text-xs text-purple-300">Classes Booked</p>
+                    <div className="card-fitness-stats p-6">
+                      <p className="text-display-sm font-bold text-text-primary">{profile.totalClassesBooked}</p>
+                      <p className="text-caption-sm text-text-secondary">Classes Booked</p>
                     </div>
                   </div>
                 </div>

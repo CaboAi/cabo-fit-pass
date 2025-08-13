@@ -269,55 +269,55 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Header */}
-      <div className="relative bg-black/20 backdrop-blur-xl border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
+      <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>
         <div className="relative max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center gap-4 mb-8">
             <button
               onClick={() => router.back()}
-              className="p-2 text-purple-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+              className="p-3 text-text-secondary hover:text-text-primary transition-colors rounded-2xl hover:bg-surface-tertiary"
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-600 rounded-full blur-xl opacity-50"></div>
-                <div className="relative bg-gradient-to-r from-orange-400 to-pink-600 text-white p-3 rounded-full">
+                <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-xl opacity-75 -z-10"></div>
+                <div className="relative gradient-fitness-primary text-primary-foreground p-4 rounded-2xl z-10">
                   <CreditCard className="w-8 h-8" />
                 </div>
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                <h1 className="font-heading text-display-lg gradient-fitness-text">
                   Pricing Plans
                 </h1>
-                <p className="text-purple-300 text-lg">Choose the perfect plan for your fitness journey</p>
+                <p className="text-text-secondary text-body-lg">Choose the perfect plan for your fitness journey</p>
               </div>
             </div>
           </div>
 
           {/* Trust Indicators */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <Shield className="w-8 h-8 text-green-400 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">Secure Payment</p>
-              <p className="text-xs text-purple-300">SSL Protected</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in">
+              <Shield className="w-8 h-8 text-success mx-auto mb-2" />
+              <p className="text-body-sm font-medium text-text-primary">Secure Payment</p>
+              <p className="text-caption-sm text-text-secondary">SSL Protected</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <Award className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">Money Back</p>
-              <p className="text-xs text-purple-300">7-Day Guarantee</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <Award className="w-8 h-8 text-warning mx-auto mb-2" />
+              <p className="text-body-sm font-medium text-text-primary">Money Back</p>
+              <p className="text-caption-sm text-text-secondary">7-Day Guarantee</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">1000+ Members</p>
-              <p className="text-xs text-purple-300">Growing Community</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <Users className="w-8 h-8 text-secondary mx-auto mb-2" />
+              <p className="text-body-sm font-medium text-text-primary">1000+ Members</p>
+              <p className="text-caption-sm text-text-secondary">Growing Community</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <Phone className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">24/7 Support</p>
-              <p className="text-xs text-purple-300">Always Here</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <Phone className="w-8 h-8 text-accent-purple mx-auto mb-2" />
+              <p className="text-body-sm font-medium text-text-primary">24/7 Support</p>
+              <p className="text-caption-sm text-text-secondary">Always Here</p>
             </div>
           </div>
         </div>
@@ -325,14 +325,14 @@ export default function PricingPage() {
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Pricing Toggle */}
-        <div className="mb-12 text-center">
-          <div className="inline-flex bg-black/40 backdrop-blur-xl rounded-2xl p-2 border border-white/10">
+        <div className="mb-12 text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <div className="inline-flex card-fitness p-2">
             <button
               onClick={() => setPricingType('credits')}
               className={`px-8 py-3 rounded-xl font-semibold transition-all ${
                 pricingType === 'credits'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                  : 'text-purple-300 hover:text-white'
+                  ? 'btn-fitness-primary'
+                  : 'btn-fitness-ghost'
               }`}
             >
               Credit Packages
@@ -341,8 +341,8 @@ export default function PricingPage() {
               onClick={() => setPricingType('subscription')}
               className={`px-8 py-3 rounded-xl font-semibold transition-all ${
                 pricingType === 'subscription'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                  : 'text-purple-300 hover:text-white'
+                  ? 'btn-fitness-primary'
+                  : 'btn-fitness-ghost'
               }`}
             >
               Monthly Plans
@@ -354,8 +354,8 @@ export default function PricingPage() {
         {pricingType === 'credits' && (
           <div className="space-y-12">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">One-Time Credit Packages</h2>
-              <p className="text-xl text-purple-200 max-w-2xl mx-auto">
+              <h2 className="font-heading text-display-md text-text-primary mb-4">One-Time Credit Packages</h2>
+              <p className="text-body-xl text-text-secondary max-w-2xl mx-auto">
                 Purchase credits that never expire. Perfect for flexible fitness schedules.
               </p>
             </div>
@@ -688,55 +688,66 @@ export default function PricingPage() {
 
         {/* Final CTA Section */}
         <div className="mt-20 text-center">
-          <Card className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-xl border-purple-500/30 overflow-hidden">
-            <CardContent className="p-12">
-              <div className="space-y-6">
-                <div className="flex justify-center">
-                  <div className="p-4 bg-gradient-to-r from-orange-400 to-pink-600 rounded-full">
-                    <Sparkles className="w-12 h-12 text-white" />
+          <div className="relative group">
+            <div className="absolute inset-0 gradient-fitness-primary rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+            <Card className="relative card-fitness-elevated bg-surface overflow-hidden z-10">
+              <CardContent className="p-12">
+                <div className="space-y-8">
+                  <div className="flex justify-center">
+                    <div className="relative">
+                      <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-lg opacity-75 -z-10"></div>
+                      <div className="relative gradient-fitness-primary p-4 rounded-full z-10">
+                        <Sparkles className="w-12 h-12 text-primary-foreground" />
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                <div>
-                  <h2 className="text-4xl font-bold text-white mb-4">
-                    Ready to Start Your Fitness Journey?
-                  </h2>
-                  <p className="text-xl text-purple-200 max-w-2xl mx-auto">
-                    Join over 1,000 members already transforming their lives with Cabo Fit Pass.
-                    Your perfect fitness plan is just one click away.
-                  </p>
-                </div>
+                  
+                  <div>
+                    <h2 className="font-heading text-display-lg text-text-primary mb-4">
+                      Ready to Start Your Fitness Journey?
+                    </h2>
+                    <p className="text-body-xl text-text-secondary max-w-2xl mx-auto">
+                      Join over 1,000 members already transforming their lives with Cabo Fit Pass.
+                      Your perfect fitness plan is just one click away.
+                    </p>
+                  </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => !isLoggedIn ? router.push('/auth/signin') : handlePurchase('credit', 'popular')}
-                    className="relative group"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl blur-md opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative bg-gradient-to-r from-orange-500 to-pink-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      onClick={() => !isLoggedIn ? router.push('/auth/signin') : handlePurchase('credit', 'popular')}
+                      className="btn-fitness-primary py-4 px-8 text-lg flex items-center gap-3"
+                    >
                       <Star className="w-5 h-5" />
                       Get Popular Pack
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => !isLoggedIn ? router.push('/auth/signin') : handlePurchase('subscription', 'pro')}
-                    className="relative group"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl blur-md opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 px-8 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform flex items-center gap-3 border border-white/20">
+                    </button>
+                    
+                    <button
+                      onClick={() => !isLoggedIn ? router.push('/auth/signin') : handlePurchase('subscription', 'pro')}
+                      className="btn-fitness-secondary py-4 px-8 text-lg flex items-center gap-3"
+                    >
                       <Crown className="w-5 h-5" />
                       Try Pro Monthly
-                    </div>
-                  </button>
-                </div>
+                    </button>
+                  </div>
 
-                <p className="text-sm text-purple-300">
-                  🔒 Secure checkout • ✨ 7-day guarantee • 📞 24/7 support
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center justify-center gap-4 text-text-tertiary">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-success rounded-full"></div>
+                      <span className="text-body-sm">Secure checkout</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-warning rounded-full"></div>
+                      <span className="text-body-sm">7-day guarantee</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-info rounded-full"></div>
+                      <span className="text-body-sm">24/7 support</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

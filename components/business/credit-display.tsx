@@ -23,10 +23,10 @@ export function CreditDisplay({
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'unlimited': return 'from-purple-400 to-pink-600'
-      case 'premium': return 'from-blue-400 to-purple-600'
-      case 'basic': return 'from-green-400 to-blue-600'
-      default: return 'from-gray-400 to-gray-600'
+      case 'unlimited': return 'badge-fitness bg-gradient-to-r from-warning to-accent-purple text-warning-foreground'
+      case 'premium': return 'badge-fitness bg-gradient-to-r from-secondary to-accent-blue text-secondary-foreground'
+      case 'basic': return 'badge-fitness bg-gradient-to-r from-success to-accent-green text-success-foreground'
+      default: return 'badge-fitness'
     }
   }
 
@@ -49,25 +49,25 @@ export function CreditDisplay({
   }
 
   return (
-    <Card className="bg-black/40 backdrop-blur-xl border-white/10 h-full">
-      <CardHeader className="pb-4 border-b border-white/10">
-        <CardTitle className="flex items-center gap-2 text-xl text-white">
-          <div className="p-2 bg-gradient-to-r from-orange-400 to-pink-600 rounded-lg">
-            <Zap className="w-5 h-5 text-white" />
+    <div className="card-fitness-stats h-full animate-scale-in">
+      <div className="pb-4 border-b border-border p-6">
+        <h3 className="flex items-center gap-2 font-heading text-heading-lg text-text-primary">
+          <div className="p-2 gradient-fitness-primary rounded-lg shadow-fitness-glow-primary">
+            <Zap className="w-5 h-5 text-primary-foreground" />
           </div>
           Credit Balance
-        </CardTitle>
-      </CardHeader>
+        </h3>
+      </div>
 
-      <CardContent className="space-y-6 pt-6">
+      <div className="space-y-6 pt-6 p-6">
         {/* Credit Balance Display */}
         <div className="text-center relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-pink-600/20 rounded-2xl blur-2xl"></div>
+          <div className="absolute inset-0 gradient-fitness-secondary rounded-2xl blur-2xl opacity-30"></div>
           <div className="relative">
-            <div className="text-6xl font-bold bg-gradient-to-r from-orange-400 to-pink-600 bg-clip-text text-transparent mb-2">
+            <div className="text-6xl font-heading font-bold gradient-fitness-text mb-2 animate-fitness-glow">
               {currentCredits}
             </div>
-            <div className="text-sm text-purple-200">
+            <div className="text-body-sm text-text-secondary">
               Available Credits
             </div>
           </div>
@@ -76,19 +76,16 @@ export function CreditDisplay({
         {/* Subscription Tier */}
         {profile?.subscription_tier && (
           <div className="flex justify-center">
-            <Badge 
-              variant="outline" 
-              className={`bg-gradient-to-r ${getTierColor(profile.subscription_tier)} text-white border-0 px-4 py-2 text-sm font-medium flex items-center gap-2`}
-            >
+            <div className={`${getTierColor(profile.subscription_tier)} px-4 py-2 flex items-center gap-2`}>
               {getTierIcon(profile.subscription_tier)}
               {profile.subscription_tier.charAt(0).toUpperCase() + profile.subscription_tier.slice(1)} Member
-            </Badge>
+            </div>
           </div>
         )}
 
         {/* Quick Add Credits */}
         <div className="space-y-3">
-          <div className="text-sm font-medium text-purple-200 text-center">
+          <div className="text-body-sm font-medium text-text-secondary text-center">
             Quick Top-Up
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -97,10 +94,11 @@ export function CreditDisplay({
                 key={credits}
                 onClick={() => handleQuickAdd(credits)}
                 disabled={isUpdating}
-                className="group relative px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-medium transition-all hover:scale-105 disabled:opacity-50"
+                className="btn-fitness-ghost group relative hover:shadow-fitness-md disabled:opacity-50 animate-fade-in"
+                style={{ animationDelay: `${credits * 0.1}s` }}
               >
                 <span className="relative z-10">+{credits}</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/50 to-pink-600/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 gradient-fitness-secondary rounded-lg opacity-0 group-hover:opacity-30 transition-opacity"></div>
               </button>
             ))}
           </div>
@@ -111,36 +109,36 @@ export function CreditDisplay({
           onClick={onPurchaseCredits}
           className="relative w-full group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-pink-600 rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative bg-gradient-to-r from-orange-600 to-pink-600 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+          <div className="absolute inset-0 gradient-fitness-primary rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity shadow-fitness-glow-primary"></div>
+          <div className="relative btn-fitness-primary w-full justify-center gap-2 animate-fitness-bounce hover:shadow-fitness-glow-primary">
             <Plus className="w-5 h-5" />
             Get More Credits
           </div>
         </button>
 
         {/* Credit Usage Tips */}
-        <div className="bg-gradient-to-r from-purple-600/10 to-pink-600/10 p-4 rounded-xl border border-purple-500/20">
+        <div className="card-fitness p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <TrendingUp className="w-4 h-4 text-purple-300" />
+            <div className="p-2 bg-primary/20 rounded-lg">
+              <TrendingUp className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1">
-              <div className="text-xs font-semibold text-purple-200 mb-2">Pro Tips</div>
-              <ul className="space-y-1 text-xs text-purple-300">
+              <div className="text-caption-lg font-semibold text-text-primary mb-2">Pro Tips</div>
+              <ul className="space-y-1 text-caption-md text-text-secondary">
                 <li className="flex items-center gap-1">
-                  <span className="text-purple-400">•</span> Buy in bulk for 20% bonus credits
+                  <span className="text-primary">•</span> Buy in bulk for 20% bonus credits
                 </li>
                 <li className="flex items-center gap-1">
-                  <span className="text-purple-400">•</span> Credits never expire
+                  <span className="text-primary">•</span> Credits never expire
                 </li>
                 <li className="flex items-center gap-1">
-                  <span className="text-purple-400">•</span> Share with friends & family
+                  <span className="text-primary">•</span> Share with friends & family
                 </li>
               </ul>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

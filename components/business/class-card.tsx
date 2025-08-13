@@ -22,10 +22,10 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'from-green-400 to-emerald-600'
-      case 'intermediate': return 'from-yellow-400 to-orange-600'
-      case 'advanced': return 'from-red-400 to-pink-600'
-      default: return 'from-gray-400 to-gray-600'
+      case 'beginner': return 'badge-fitness-beginner'
+      case 'intermediate': return 'badge-fitness-intermediate'
+      case 'advanced': return 'badge-fitness-advanced'
+      default: return 'badge-fitness'
     }
   }
 
@@ -45,7 +45,7 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
       <div 
         key={i} 
         className={`h-2 w-2 rounded-full ${
-          i < level ? 'bg-gradient-to-r from-orange-400 to-pink-600' : 'bg-white/20'
+          i < level ? 'gradient-fitness-primary' : 'bg-surface-tertiary'
         }`}
       />
     ))
@@ -55,87 +55,84 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
   const isAlmostFull = spotsRemaining <= 3 && spotsRemaining > 0
 
   return (
-    <Card className="group relative bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+    <div className="card-fitness-workout group animate-scale-in">
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute inset-0 gradient-fitness-surface opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
       
-      <CardHeader className="relative pb-4 border-b border-white/10">
+      <div className="relative p-6 border-b border-border">
         <div className="space-y-3">
           {/* Header with Class Type Badge */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <CardTitle className="text-lg font-bold text-white mb-1 line-clamp-1">
+              <h3 className="font-heading text-heading-lg text-text-primary mb-1 line-clamp-1">
                 {classItem.name}
-              </CardTitle>
+              </h3>
               <div className="flex items-center gap-2">
-                <MapPin className="w-3 h-3 text-purple-400" />
-                <span className="text-xs text-purple-300">{classItem.studio?.name || 'Studio'}</span>
+                <MapPin className="w-3 h-3 text-text-tertiary" />
+                <span className="text-caption-md text-text-secondary">{classItem.studio?.name || 'Studio'}</span>
                 {classItem.studio?.rating && classItem.studio.rating > 0 && (
                   <>
-                    <span className="text-purple-500">•</span>
+                    <span className="text-text-tertiary">•</span>
                     <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      <span className="text-xs text-purple-300">{classItem.studio.rating}</span>
+                      <Star className="w-3 h-3 fill-warning text-warning" />
+                      <span className="text-caption-md text-text-secondary">{classItem.studio.rating}</span>
                     </div>
                   </>
                 )}
               </div>
             </div>
-            <Badge 
-              variant="secondary" 
-              className={`bg-gradient-to-r ${getDifficultyColor(classItem.difficulty_level)} text-white border-0 px-2 py-1 text-xs font-semibold flex items-center gap-1`}
-            >
+            <div className={`${getDifficultyColor(classItem.difficulty_level)} flex items-center gap-1`}>
               {getDifficultyIcon(classItem.difficulty_level)}
               <span className="capitalize">{classItem.difficulty_level}</span>
-            </Badge>
+            </div>
           </div>
 
           {/* Intensity Indicator */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-purple-400">Intensity</span>
+            <span className="text-caption-md text-text-tertiary">Intensity</span>
             <div className="flex gap-1">
               {getIntensityBars(classItem.difficulty_level)}
             </div>
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="relative pt-4 space-y-4">
+      <div className="relative p-6 pt-4 space-y-4">
         {/* Time and Duration */}
-        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+        <div className="flex items-center justify-between card-fitness p-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-purple-400" />
+            <Clock className="w-4 h-4 text-secondary" />
             <div>
-              <p className="text-xs text-purple-300">Class Time</p>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-caption-sm text-text-tertiary">Class Time</p>
+              <p className="text-body-sm font-semibold text-text-primary">
                 {format(new Date(classItem.start_time), 'MMM dd, h:mm a')}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-purple-300">Duration</p>
-            <p className="text-sm font-semibold text-white">{classItem.duration} min</p>
+            <p className="text-caption-sm text-text-tertiary">Duration</p>
+            <p className="text-body-sm font-semibold text-text-primary">{classItem.duration} min</p>
           </div>
         </div>
 
         {/* Capacity with Visual Bar */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body-sm">
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-purple-400" />
-              <span className="text-purple-300">Capacity</span>
+              <Users className="w-4 h-4 text-text-tertiary" />
+              <span className="text-text-secondary">Capacity</span>
             </div>
-            <span className="text-white font-medium">
+            <span className="text-text-primary font-medium">
               {classItem.current_bookings || 0}/{classItem.max_capacity}
               {isAlmostFull && (
-                <span className="ml-2 text-xs text-orange-400">Almost Full!</span>
+                <span className="ml-2 text-caption-sm text-warning">Almost Full!</span>
               )}
             </span>
           </div>
-          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="progress-fitness">
             <div 
-              className={`h-full bg-gradient-to-r transition-all duration-500 ${
-                isAlmostFull ? 'from-orange-400 to-red-500' : 'from-purple-400 to-pink-600'
+              className={`progress-fitness-fill ${
+                isAlmostFull ? 'bg-gradient-to-r from-warning to-error' : ''
               }`}
               style={{ width: `${((classItem.current_bookings || 0) / classItem.max_capacity) * 100}%` }}
             />
@@ -143,33 +140,33 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
         </div>
 
         {/* Credit Cost */}
-        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-600/10 to-pink-600/10 rounded-lg border border-orange-500/20">
+        <div className="flex items-center justify-between card-fitness p-3 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-orange-400" />
-            <span className="text-sm text-orange-300">Credits Required</span>
+            <Zap className="w-4 h-4 text-primary" />
+            <span className="text-body-sm text-text-secondary">Credits Required</span>
           </div>
-          <span className="text-lg font-bold text-orange-400">
+          <span className="text-heading-md font-heading text-primary">
             {classItem.credit_cost}
           </span>
         </div>
 
         {/* Description */}
         {classItem.description && (
-          <div className="text-sm text-purple-200">
+          <div className="text-body-sm text-text-secondary">
             <p className="line-clamp-2">
               {classItem.description}
             </p>
             {classItem.description.length > 100 && (
               <button
                 onClick={() => setShowDetails(!showDetails)}
-                className="text-purple-400 hover:text-purple-300 mt-1 text-xs font-medium flex items-center gap-1"
+                className="text-primary hover:text-primary/80 mt-1 text-caption-md font-medium flex items-center gap-1 focus-fitness"
               >
                 {showDetails ? 'Show less' : 'Read more'}
                 <ChevronRight className={`w-3 h-3 transition-transform ${showDetails ? 'rotate-90' : ''}`} />
               </button>
             )}
             {showDetails && (
-              <p className="mt-2 text-purple-300">
+              <p className="mt-2 text-text-primary">
                 {classItem.description}
               </p>
             )}
@@ -184,11 +181,11 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
               disabled={isBooking}
               className="relative w-full group/btn"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur-md opacity-50 group-hover/btn:opacity-100 transition-opacity"></div>
-              <div className="relative bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+              <div className="absolute inset-0 gradient-fitness-primary rounded-xl blur-md opacity-30 group-hover/btn:opacity-60 transition-opacity shadow-fitness-glow-primary"></div>
+              <div className="relative btn-fitness-primary w-full justify-center gap-2 animate-fitness-bounce hover:shadow-fitness-glow-primary">
                 {isBooking ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                     <span>Booking...</span>
                   </>
                 ) : (
@@ -200,23 +197,23 @@ export function ClassCard({ classItem, userCredits, onBook, isBooking }: ClassCa
               </div>
             </button>
           ) : (
-            <div className="text-center p-3 bg-red-500/10 rounded-xl border border-red-500/20">
+            <div className="text-center card-fitness p-3 bg-gradient-to-r from-error/10 to-error/5 border-error/20">
               {userCredits < classItem.credit_cost ? (
                 <div>
-                  <p className="text-red-400 text-sm font-medium">
+                  <p className="text-error text-body-sm font-medium">
                     Insufficient Credits
                   </p>
-                  <p className="text-red-300 text-xs mt-1">
+                  <p className="text-error/80 text-caption-md mt-1">
                     Need {classItem.credit_cost - userCredits} more credit{classItem.credit_cost - userCredits !== 1 ? 's' : ''}
                   </p>
                 </div>
               ) : (
-                <p className="text-red-400 text-sm font-medium">Class Full</p>
+                <p className="text-error text-body-sm font-medium">Class Full</p>
               )}
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

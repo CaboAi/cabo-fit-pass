@@ -268,11 +268,11 @@ export default function StudioPage() {
 
   const getPriceRangeColor = (priceRange?: string) => {
     switch (priceRange) {
-      case '$': return 'text-green-400'
-      case '$$': return 'text-yellow-400'
-      case '$$$': return 'text-orange-400'
-      case '$$$$': return 'text-red-400'
-      default: return 'text-gray-400'
+      case '$': return 'text-success'
+      case '$$': return 'text-warning'
+      case '$$$': return 'text-primary'
+      case '$$$$': return 'text-error'
+      default: return 'text-text-tertiary'
     }
   }
 
@@ -287,51 +287,51 @@ export default function StudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Header */}
-      <div className="relative bg-black/20 backdrop-blur-xl border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
+      <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>
         <div className="relative max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => router.back()}
-              className="p-2 text-purple-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+              className="p-3 text-text-secondary hover:text-text-primary transition-colors rounded-2xl hover:bg-surface-tertiary"
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-600 rounded-full blur-xl opacity-50"></div>
-                <div className="relative bg-gradient-to-r from-orange-400 to-pink-600 text-white p-3 rounded-full">
+                <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-xl opacity-75 -z-10"></div>
+                <div className="relative gradient-fitness-primary text-primary-foreground p-4 rounded-2xl z-10">
                   <Dumbbell className="w-8 h-8" />
                 </div>
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                <h1 className="font-heading text-display-lg gradient-fitness-text">
                   Fitness Studios
                 </h1>
-                <p className="text-purple-300 text-lg">Discover premium fitness experiences in Los Cabos</p>
+                <p className="text-text-secondary text-body-lg">Discover premium fitness experiences in Los Cabos</p>
               </div>
             </div>
           </div>
 
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <p className="text-2xl font-bold text-white">{studios.length}</p>
-              <p className="text-xs text-purple-300">Total Studios</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in">
+              <p className="text-display-sm font-bold text-text-primary">{studios.length}</p>
+              <p className="text-caption-md text-text-secondary">Total Studios</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <p className="text-2xl font-bold text-white">{studios.filter(s => s.verified).length}</p>
-              <p className="text-xs text-purple-300">Verified Partners</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <p className="text-display-sm font-bold text-text-primary">{studios.filter(s => s.verified).length}</p>
+              <p className="text-caption-md text-text-secondary">Verified Partners</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <p className="text-2xl font-bold text-white">4.8</p>
-              <p className="text-xs text-purple-300">Avg Rating</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <p className="text-display-sm font-bold text-text-primary">4.8</p>
+              <p className="text-caption-md text-text-secondary">Avg Rating</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10 text-center">
-              <p className="text-2xl font-bold text-white">500+</p>
-              <p className="text-xs text-purple-300">Weekly Classes</p>
+            <div className="card-fitness-stats p-6 text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <p className="text-display-sm font-bold text-text-primary">500+</p>
+              <p className="text-caption-md text-text-secondary">Weekly Classes</p>
             </div>
           </div>
         </div>
@@ -339,18 +339,18 @@ export default function StudioPage() {
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Search and Filter Bar */}
-        <div className="mb-8">
-          <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="card-fitness p-6">
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Search */}
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-tertiary w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search studios, neighborhoods, or specialties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all"
+                  className="input-fitness-search focus-fitness"
                 />
               </div>
               
@@ -362,8 +362,8 @@ export default function StudioPage() {
                     onClick={() => setSelectedFilter(filter)}
                     className={`px-4 py-3 rounded-xl font-medium transition-all capitalize ${
                       selectedFilter === filter
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                        : 'bg-white/5 text-purple-300 hover:bg-white/10 border border-white/10'
+                        ? 'btn-fitness-primary'
+                        : 'btn-fitness-ghost'
                     }`}
                   >
                     {filter}
@@ -373,10 +373,10 @@ export default function StudioPage() {
             </div>
             
             <div className="mt-4 flex items-center justify-between text-sm">
-              <p className="text-purple-200">
+              <p className="text-text-secondary">
                 {filteredStudios.length} studio{filteredStudios.length !== 1 ? 's' : ''} found
               </p>
-              <div className="flex items-center gap-2 text-purple-300">
+              <div className="flex items-center gap-2 text-text-tertiary">
                 <Filter className="w-4 h-4" />
                 <span>Sorted by rating</span>
               </div>
@@ -387,18 +387,18 @@ export default function StudioPage() {
         {/* Featured Studios Section */}
         {selectedFilter === 'all' && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Award className="w-6 h-6 text-yellow-400" />
+            <h2 className="font-heading text-heading-xl text-text-primary mb-6 flex items-center gap-3">
+              <Award className="w-6 h-6 text-warning" />
               Featured Studios
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               {studios.filter(s => s.featured).slice(0, 2).map((studio) => (
                 <div key={studio.id} className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                  <Card className="relative bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="absolute inset-0 gradient-fitness-primary rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+                  <Card className="relative card-fitness-elevated bg-surface hover:border-primary/50 transition-all duration-300 overflow-hidden z-10">
                     {/* Featured Badge */}
-                    <div className="absolute top-4 right-4 z-10">
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold">
+                    <div className="absolute top-4 right-4 z-20">
+                      <Badge className="badge-fitness-primary">
                         FEATURED
                       </Badge>
                     </div>
@@ -406,8 +406,8 @@ export default function StudioPage() {
                     <div className="p-6">
                       <div className="flex gap-6">
                         {/* Studio Image */}
-                        <div className="w-48 h-32 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10">
-                          <Dumbbell className="w-8 h-8 text-purple-400" />
+                        <div className="w-48 h-32 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-border">
+                          <Dumbbell className="w-8 h-8 text-primary" />
                           <span className="sr-only">Studio photo</span>
                         </div>
 
@@ -415,15 +415,15 @@ export default function StudioPage() {
                         <div className="flex-1 space-y-4">
                           <div>
                             <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-2xl font-bold text-white">{studio.name}</h3>
+                              <h3 className="font-heading text-heading-xl text-text-primary">{studio.name}</h3>
                               {studio.verified && (
-                                <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs">
+                                <div className="badge-fitness-success text-xs">
                                   <Award className="w-3 h-3" />
                                   Verified
                                 </div>
                               )}
                             </div>
-                            <p className="text-purple-200 line-clamp-2">{studio.description}</p>
+                            <p className="text-text-secondary line-clamp-2">{studio.description}</p>
                           </div>
 
                           <div className="flex items-center gap-4">
@@ -433,15 +433,15 @@ export default function StudioPage() {
                                   <Star
                                     key={i}
                                     className={`w-4 h-4 ${
-                                      i < Math.floor(studio.rating) ? 'text-yellow-400 fill-current' : 'text-gray-500'
+                                      i < Math.floor(studio.rating) ? 'text-warning fill-current' : 'text-text-disabled'
                                     }`}
                                   />
                                 ))}
                               </div>
-                              <span className="text-white font-medium">{studio.rating}</span>
-                              <span className="text-purple-300 text-sm">({studio.reviewCount} reviews)</span>
+                              <span className="text-text-primary font-medium">{studio.rating}</span>
+                              <span className="text-text-secondary text-sm">({studio.reviewCount} reviews)</span>
                             </div>
-                            <div className="flex items-center gap-2 text-purple-300">
+                            <div className="flex items-center gap-2 text-text-secondary">
                               <MapPin className="w-4 h-4" />
                               <span className="text-sm">{studio.location.neighborhood}</span>
                             </div>
@@ -449,7 +449,7 @@ export default function StudioPage() {
 
                           <div className="flex items-center gap-2">
                             {studio.specialties?.slice(0, 3).map((specialty) => (
-                              <Badge key={specialty} variant="outline" className="bg-white/5 text-purple-300 border-white/10">
+                              <Badge key={specialty} variant="outline" className="badge-fitness text-xs">
                                 {specialty}
                               </Badge>
                             ))}
@@ -466,26 +466,26 @@ export default function StudioPage() {
 
         {/* All Studios Grid */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
+          <h2 className="font-heading text-heading-xl text-text-primary mb-6">
             All Studios {selectedFilter !== 'all' && `- ${selectedFilter.charAt(0).toUpperCase() + selectedFilter.slice(1)}`}
           </h2>
           
           {filteredStudios.length === 0 ? (
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-12 border border-white/10 text-center">
-              <Dumbbell className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No studios found</h3>
-              <p className="text-purple-200">Try adjusting your search or filters</p>
+            <div className="card-fitness p-12 text-center">
+              <Dumbbell className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
+              <h3 className="font-heading text-heading-lg text-text-primary mb-2">No studios found</h3>
+              <p className="text-text-secondary">Try adjusting your search or filters</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredStudios.map((studio) => (
                 <div key={studio.id} className="group transform hover:scale-105 transition-transform duration-300">
-                  <Card className="bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden h-full">
+                  <Card className="card-fitness-elevated bg-surface hover:border-primary/50 transition-all duration-300 overflow-hidden h-full">
                     {/* Studio Image */}
-                    <div className="relative h-48 bg-gradient-to-r from-purple-600/20 to-pink-600/20 flex items-center justify-center border-b border-white/10">
-                      <Dumbbell className="w-12 h-12 text-purple-400" />
+                    <div className="relative h-48 bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center border-b border-border">
+                      <Dumbbell className="w-12 h-12 text-primary" />
                       {studio.featured && (
-                        <Badge className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold">
+                        <Badge className="absolute top-4 right-4 badge-fitness-primary">
                           FEATURED
                         </Badge>
                       )}
@@ -495,13 +495,13 @@ export default function StudioPage() {
                       <div className="space-y-3">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                            <h3 className="font-heading text-heading-lg text-text-primary mb-1 flex items-center gap-2">
                               {studio.name}
                               {studio.verified && (
-                                <Award className="w-4 h-4 text-green-400" />
+                                <Award className="w-4 h-4 text-success" />
                               )}
                             </h3>
-                            <div className="flex items-center gap-2 text-sm text-purple-300">
+                            <div className="flex items-center gap-2 text-body-sm text-text-secondary">
                               <MapPin className="w-3 h-3" />
                               <span>{studio.location.neighborhood}</span>
                             </div>
@@ -517,24 +517,24 @@ export default function StudioPage() {
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i < Math.floor(studio.rating) ? 'text-yellow-400 fill-current' : 'text-gray-500'
+                                  i < Math.floor(studio.rating) ? 'text-warning fill-current' : 'text-text-disabled'
                                 }`}
                               />
                             ))}
                           </div>
-                          <span className="text-white font-medium">{studio.rating}</span>
-                          <span className="text-purple-300 text-sm">({studio.reviewCount})</span>
+                          <span className="text-text-primary font-medium">{studio.rating}</span>
+                          <span className="text-text-secondary text-sm">({studio.reviewCount})</span>
                         </div>
                       </div>
                     </CardHeader>
 
                     <CardContent className="pt-0 space-y-4">
-                      <p className="text-purple-200 text-sm line-clamp-2">{studio.description}</p>
+                      <p className="text-text-secondary text-sm line-clamp-2">{studio.description}</p>
 
                       {/* Specialties */}
                       <div className="flex flex-wrap gap-1">
                         {studio.specialties?.slice(0, 3).map((specialty) => (
-                          <Badge key={specialty} variant="outline" className="bg-white/5 text-purple-300 border-white/10 text-xs">
+                          <Badge key={specialty} variant="outline" className="badge-fitness text-xs">
                             {specialty}
                           </Badge>
                         ))}
@@ -542,10 +542,10 @@ export default function StudioPage() {
 
                       {/* Amenities */}
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-purple-400">Top Amenities</p>
+                        <p className="text-caption-md font-medium text-text-tertiary">Top Amenities</p>
                         <div className="flex flex-wrap gap-2">
                           {studio.amenities.slice(0, 4).map((amenity) => (
-                            <div key={amenity} className="flex items-center gap-1 text-xs text-purple-300">
+                            <div key={amenity} className="flex items-center gap-1 text-caption-sm text-text-secondary">
                               {getAmenityIcon(amenity)}
                               <span>{amenity}</span>
                             </div>
@@ -554,25 +554,25 @@ export default function StudioPage() {
                       </div>
 
                       {/* Contact & Hours */}
-                      <div className="space-y-3 pt-4 border-t border-white/10">
+                      <div className="space-y-3 pt-4 border-t border-border">
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-purple-300">
+                          <div className="flex items-center gap-2 text-body-sm text-text-secondary">
                             <Phone className="w-4 h-4" />
                             <span>{studio.contact?.phone}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-purple-300">
+                          <div className="flex items-center gap-2 text-body-sm text-text-secondary">
                             <Clock className="w-4 h-4" />
                             <span>Open today: {studio.openingHours?.Monday}</span>
                           </div>
                           {studio.contact?.website && (
-                            <div className="flex items-center gap-2 text-sm text-purple-400">
+                            <div className="flex items-center gap-2 text-body-sm text-text-tertiary">
                               <Globe className="w-4 h-4" />
                               <span>{studio.contact.website}</span>
                             </div>
                           )}
                         </div>
 
-                        <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-xl font-semibold hover:scale-[1.02] transition-transform">
+                        <button className="btn-fitness-primary w-full">
                           View Classes & Book
                         </button>
                       </div>
