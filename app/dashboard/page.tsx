@@ -113,14 +113,14 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
-        <div className="text-center">
+        <div className="text-center px-4">
           <div className="relative">
             <div className="absolute inset-0 animate-pulse-glow">
-              <Activity className="w-16 h-16 text-primary opacity-75" />
+              <Activity className="w-12 h-12 sm:w-16 sm:h-16 text-primary opacity-75" />
             </div>
-            <Activity className="w-16 h-16 text-primary relative animate-fitness-bounce" />
+            <Activity className="w-12 h-12 sm:w-16 sm:h-16 text-primary relative animate-fitness-bounce" />
           </div>
-          <p className="mt-4 text-text-secondary font-heading text-heading-lg animate-fade-in">Loading your fitness journey...</p>
+          <p className="mt-4 text-text-secondary font-heading text-lg sm:text-heading-lg animate-fade-in">Loading your fitness journey...</p>
         </div>
       </div>
     )
@@ -135,35 +135,36 @@ export default function Dashboard() {
       {/* Navigation Header */}
       <NavigationHeader profile={profile} onSignOut={handleSignOut} />
 
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Top summary grid: Welcome + Credits (row 1), Peak Times + Leaderboard (row 2) */}
-        <div className="mb-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-6">
+        {/* Top summary grid: Welcome + Credits (row 1), Peak Times + Leaderboard (row 2) - Mobile optimized */}
+        <div className="mb-4 sm:mb-6 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-6">
           {/* Welcome Card */}
           <div className="col-span-12 lg:col-span-8">
             <div className="relative group animate-fade-in">
-              <div className="absolute inset-0 gradient-fitness-primary rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
-              <div className="relative card-fitness-stats p-8 animate-slide-up z-10">
-                <h2 className="font-heading text-display-md text-text-primary mb-2">
+              <div className="absolute inset-0 gradient-fitness-primary rounded-xl sm:rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+              <div className="relative card-fitness-stats p-4 sm:p-8 animate-slide-up z-10">
+                <h2 className="font-heading text-xl sm:text-display-md text-text-primary mb-2">
                   {`Welcome back${profile?.name ? `, ${profile.name}` : ''}!`} 💪
                 </h2>
-                <p className="text-text-secondary mb-6 text-body-lg">
+                <p className="text-text-secondary mb-4 sm:mb-6 text-sm sm:text-body-lg">
                   Your fitness journey continues. Book your next class and keep pushing your limits.
                 </p>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="card-fitness p-4 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
-                    <TrendingUp className="w-6 h-6 text-success mb-2" />
-                    <p className="text-display-sm font-heading text-text-primary">87%</p>
-                    <p className="text-caption-md text-text-tertiary">Goal Progress</p>
+                {/* Mobile: 1 column, sm: 2 columns, lg: 3 columns for stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="card-fitness p-3 sm:p-4 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
+                    <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-success mb-2" />
+                    <p className="text-lg sm:text-display-sm font-heading text-text-primary">87%</p>
+                    <p className="text-xs sm:text-caption-md text-text-tertiary">Goal Progress</p>
                   </div>
-                  <div className="card-fitness p-4 bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
-                    <Calendar className="w-6 h-6 text-secondary mb-2" />
-                    <p className="text-display-sm font-heading text-text-primary">3</p>
-                    <p className="text-caption-md text-text-tertiary">This Week</p>
+                  <div className="card-fitness p-3 sm:p-4 bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
+                    <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-secondary mb-2" />
+                    <p className="text-lg sm:text-display-sm font-heading text-text-primary">3</p>
+                    <p className="text-xs sm:text-caption-md text-text-tertiary">This Week</p>
                   </div>
-                  <div className="card-fitness p-4 bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
-                    <Award className="w-6 h-6 text-warning mb-2" />
-                    <p className="text-display-sm font-heading text-text-primary">15</p>
-                    <p className="text-caption-md text-text-tertiary">Achievements</p>
+                  <div className="card-fitness p-3 sm:p-4 bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20 sm:col-span-2 lg:col-span-1">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-warning mb-2" />
+                    <p className="text-lg sm:text-display-sm font-heading text-text-primary">15</p>
+                    <p className="text-xs sm:text-caption-md text-text-tertiary">Achievements</p>
                   </div>
                 </div>
               </div>
@@ -172,7 +173,7 @@ export default function Dashboard() {
 
           {/* Credit Balance (top-right) */}
           <div className="col-span-12 lg:col-span-4 relative group animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="absolute inset-0 gradient-fitness-secondary rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
+            <div className="absolute inset-0 gradient-fitness-secondary rounded-xl sm:rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
             <div className="relative h-full z-10">
           <CreditDisplay
             currentCredits={profile.credits}
@@ -191,17 +192,17 @@ export default function Dashboard() {
 
           {/* Peak Times Chart (bottom-left) */}
           <div className="col-span-12 lg:col-span-8 relative group animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="absolute inset-0 gradient-fitness-accent rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity -z-10"></div>
-              <div className="relative card-fitness-stats p-6 animate-slide-up z-10">
-                <div className="flex items-center justify-between mb-4">
+              <div className="absolute inset-0 gradient-fitness-accent rounded-xl sm:rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity -z-10"></div>
+              <div className="relative card-fitness-stats p-4 sm:p-6 animate-slide-up z-10">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                   <div className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-primary" />
-                    <h3 className="font-heading text-heading-lg text-text-primary">Peak Booking Times</h3>
+                    <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                    <h3 className="font-heading text-lg sm:text-heading-lg text-text-primary">Peak Booking Times</h3>
                   </div>
-                  <span className="text-caption-md text-text-tertiary">Last 7 days</span>
+                  <span className="text-xs sm:text-caption-md text-text-tertiary">Last 7 days</span>
                 </div>
-                {/* Simple bar visualization */}
-                <div className="grid grid-cols-7 items-end gap-3 h-40">
+                {/* Simple bar visualization - responsive height */}
+                <div className="grid grid-cols-7 items-end gap-2 sm:gap-3 h-32 sm:h-40">
                   {[
                     { d: 'Mon', v: 35 },
                     { d: 'Tue', v: 55 },
@@ -211,17 +212,17 @@ export default function Dashboard() {
                     { d: 'Sat', v: 95 },
                     { d: 'Sun', v: 60 }
                   ].map(({ d, v }) => (
-                    <div key={d} className="flex flex-col items-center gap-2">
+                    <div key={d} className="flex flex-col items-center gap-1 sm:gap-2">
                       <div
-                        className="w-8 rounded-xl gradient-fitness-primary border border-primary/20 shadow-fitness-sm hover:shadow-fitness-glow-primary transition-shadow"
+                        className="w-6 sm:w-8 rounded-lg sm:rounded-xl gradient-fitness-primary border border-primary/20 shadow-fitness-sm hover:shadow-fitness-glow-primary transition-shadow"
                         style={{ height: `${Math.max(10, v)}%` }}
                         title={`${d}: ${v}`}
                       />
-                      <span className="text-caption-sm text-text-tertiary">{d}</span>
+                      <span className="text-xs sm:text-caption-sm text-text-tertiary">{d}</span>
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-body-sm text-text-secondary">
+                <p className="mt-3 sm:mt-4 text-xs sm:text-body-sm text-text-secondary">
                   Highest demand around <span className="text-text-primary font-semibold">Sat 6–8pm</span>. Consider booking early.
                 </p>
               </div>
@@ -229,56 +230,55 @@ export default function Dashboard() {
 
           {/* Leaderboard (bottom-right) */}
           <div className="col-span-12 lg:col-span-4 relative group animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="absolute inset-0 bg-gradient-to-r from-warning to-accent-orange rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity -z-10"></div>
-              <div className="relative card-fitness-stats p-6 animate-slide-up z-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-warning to-accent-orange rounded-xl sm:rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity -z-10"></div>
+              <div className="relative card-fitness-stats p-4 sm:p-6 animate-slide-up z-10">
                 <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-5 h-5 text-warning" />
-                  <h3 className="font-heading text-heading-lg text-text-primary">Weekly Leaderboard</h3>
+                  <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-warning" />
+                  <h3 className="font-heading text-lg sm:text-heading-lg text-text-primary">Weekly Leaderboard</h3>
                 </div>
-                <ol className="space-y-3">
+                <ol className="space-y-2 sm:space-y-3">
                   {[
                     { name: 'Alex M.', classes: 6 },
                     { name: 'Jordan R.', classes: 5 },
                     { name: 'You', classes: 3 }
                   ].map((p, i) => (
-                    <li key={p.name} className="flex items-center justify-between card-fitness px-4 py-3 hover:shadow-fitness-md transition-shadow">
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center text-caption-lg text-text-primary font-bold">
+                    <li key={p.name} className="flex items-center justify-between card-fitness px-3 sm:px-4 py-2 sm:py-3 hover:shadow-fitness-md transition-shadow">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center text-sm sm:text-caption-lg text-text-primary font-bold">
                           {i + 1}
                         </span>
-                        <span className="text-text-primary font-medium text-body-md">{p.name}</span>
+                        <span className="text-text-primary font-medium text-sm sm:text-body-md">{p.name}</span>
                       </div>
-                      <span className="text-text-secondary text-caption-lg">{p.classes} classes</span>
+                      <span className="text-text-secondary text-xs sm:text-caption-lg">{p.classes} classes</span>
                     </li>
                   ))}
                 </ol>
-                <p className="mt-4 text-body-sm text-text-secondary">Keep booking to climb the board!</p>
+                <p className="mt-3 sm:mt-4 text-xs sm:text-body-sm text-text-secondary">Keep booking to climb the board!</p>
               </div>
             </div>
           </div>
 
-        {/* Quick Navigation removed to reduce redundancy; use header nav */}
-
-        {/* Search and Filter Bar */}
-        <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="card-fitness p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-tertiary w-5 h-5" />
+        {/* Search and Filter Bar - Mobile optimized */}
+        <div className="mb-6 sm:mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="card-fitness p-4 sm:p-6">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-text-tertiary w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="text"
                   placeholder="Search classes, studios, or instructors..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-fitness-search focus-fitness"
+                  className="input-fitness-search focus-fitness text-sm sm:text-base"
                 />
               </div>
-              <div className="flex gap-2">
+              {/* Mobile: scrollable filter buttons */}
+              <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
                 {['all', 'beginner', 'intermediate', 'advanced'].map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setSelectedFilter(filter)}
-                    className={`px-4 py-3 rounded-xl font-medium transition-all ${
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base ${
                       selectedFilter === filter
                         ? 'btn-fitness-primary'
                         : 'btn-fitness-ghost border border-border hover:border-primary/40'
@@ -294,27 +294,27 @@ export default function Dashboard() {
 
         {/* Classes Section */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-heading text-display-sm text-text-primary">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
+            <h2 className="font-heading text-xl sm:text-display-sm text-text-primary">
               Available Classes
             </h2>
-            <p className="text-text-secondary text-body-md">
+            <p className="text-text-secondary text-sm sm:text-body-md">
               {filteredClasses.length} classes available
             </p>
           </div>
           
           {filteredClasses.length === 0 ? (
-            <div className="card-fitness p-12 text-center animate-fade-in">
-              <Calendar className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
-              <h3 className="font-heading text-heading-xl text-text-primary mb-2">No classes found</h3>
-              <p className="text-text-secondary text-body-md">Try adjusting your search or filters</p>
+            <div className="card-fitness p-8 sm:p-12 text-center animate-fade-in">
+              <Calendar className="w-12 h-12 sm:w-16 sm:h-16 text-text-tertiary mx-auto mb-4" />
+              <h3 className="font-heading text-lg sm:text-heading-xl text-text-primary mb-2">No classes found</h3>
+              <p className="text-text-secondary text-sm sm:text-body-md">Try adjusting your search or filters</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {filteredClasses.map((classItem, index) => (
                 <div 
                   key={classItem.id} 
-                  className="animate-fade-in hover:scale-105 transition-all duration-300" 
+                  className="animate-fade-in hover:scale-105 active:scale-95 transition-all duration-300" 
                   style={{ animationDelay: `${0.5 + index * 0.1}s` }}
                 >
               <ClassCard
