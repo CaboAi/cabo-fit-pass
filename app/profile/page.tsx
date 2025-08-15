@@ -249,7 +249,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
-      <NavigationHeader profile={navigationProfile} onSignOut={handleSignOut} />
+      <NavigationHeader profile={navigationProfile || undefined} onSignOut={handleSignOut} />
       {/* Header */}
       <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>

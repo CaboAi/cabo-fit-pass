@@ -12,7 +12,7 @@ import {
   Clock
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Studio, ClassItem } from '@/types'
+import { ClassItem } from '@/types'
 
 interface AnalyticsDashboardProps {
   classes: (ClassItem & { revenue: number; bookings: number })[]
