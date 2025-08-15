@@ -524,7 +524,7 @@ export default function StudioManagementPage() {
         )}
 
         {activeTab === 'analytics' && (
-          <AnalyticsDashboard studio={studio!} classes={classes} />
+          <AnalyticsDashboard classes={classes} />
         )}
 
         {activeTab === 'settings' && (

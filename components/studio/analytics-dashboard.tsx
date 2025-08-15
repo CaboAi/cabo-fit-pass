@@ -15,11 +15,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Studio, ClassItem } from '@/types'
 
 interface AnalyticsDashboardProps {
-  studio: Studio
   classes: (ClassItem & { revenue: number; bookings: number })[]
 }
 
-export function AnalyticsDashboard({ studio: _studio, classes }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({ classes }: AnalyticsDashboardProps) {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month')
 
   // Calculate analytics data
@@ -157,7 +156,7 @@ export function AnalyticsDashboard({ studio: _studio, classes }: AnalyticsDashbo
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {timeData.map((data, index) => (
+              {timeData.map((data) => (
                 <div key={data.period} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
