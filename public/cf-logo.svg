@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .cf-orange { fill: #e67e22; }
+      .cf-dark { fill: #2c3e50; }
+    </style>
+  </defs>
+  
+  <!-- Orange C shape -->
+  <path class="cf-orange" d="M51.2 102.4 
+    Q51.2 51.2 102.4 51.2 
+    L256 51.2 
+    Q358.4 51.2 358.4 153.6 
+    L358.4 256 
+    Q358.4 358.4 256 358.4 
+    L153.6 358.4 
+    Q51.2 358.4 51.2 256 
+    Z"/>
+  
+  <!-- Dark F shape -->
+  <path class="cf-dark" d="M204.8 102.4 
+    L332.8 102.4 
+    L332.8 153.6 
+    L256 153.6 
+    L256 204.8 
+    L307.2 204.8 
+    L307.2 256 
+    L256 256 
+    L256 358.4 
+    L204.8 358.4 
+    Z"/>
+</svg>

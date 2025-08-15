@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { NavigationHeader } from '@/components/layout/navigation-header'
 import {
   User,
   Mail,
@@ -173,6 +174,7 @@ export default function ProfilePage() {
   const [creditHistory, setCreditHistory] = useState<CreditTransaction[]>([])
   const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'credits' | 'settings'>('overview')
   const [showCreditDetails, setShowCreditDetails] = useState(false)
+  const [navigationProfile, setNavigationProfile] = useState<any>(null)
 
   useEffect(() => {
     // Check for demo session
@@ -188,6 +190,11 @@ export default function ProfilePage() {
     setProfile(MOCK_PROFILE)
     setBookingHistory(MOCK_BOOKING_HISTORY)
     setCreditHistory(MOCK_CREDIT_HISTORY)
+    
+    if (demoUser) {
+      const user = JSON.parse(demoUser)
+      setNavigationProfile(user)
+    }
   }, [router])
 
   const getTierColor = (tier: string) => {
@@ -234,8 +241,15 @@ export default function ProfilePage() {
     )
   }
 
+  const handleSignOut = () => {
+    localStorage.removeItem('demo-session')
+    localStorage.removeItem('demo-user')
+    router.push('/auth/signin')
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
+      <NavigationHeader profile={navigationProfile} onSignOut={handleSignOut} />
       {/* Header */}
       <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>

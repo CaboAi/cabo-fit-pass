@@ -1,0 +1,70 @@
+{
+  "name": "Cabo Fit Pass - Studio Management",
+  "short_name": "Cabo Fit Pass",
+  "description": "Your fitness marketplace in Los Cabos with studio management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1e",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["fitness", "health", "business"],
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Member Dashboard",
+      "short_name": "Dashboard",
+      "description": "View available classes and book sessions",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Studio Management",
+      "short_name": "Manage",
+      "description": "Manage your studio, classes, and analytics",
+      "url": "/studio-management",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Studios",
+      "short_name": "Studios",
+      "description": "Browse fitness studios in Los Cabos",
+      "url": "/studio",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

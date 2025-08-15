@@ -10,7 +10,8 @@ import {
   Menu, 
   X, 
   LogOut,
-  Award
+  Award,
+  Building2
 } from 'lucide-react'
 
 interface NavigationHeaderProps {
@@ -30,6 +31,7 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
   const navigationItems = [
     { path: '/dashboard', label: 'Classes', icon: Calendar },
     { path: '/studio', label: 'Studios', icon: Activity },
+    { path: '/studio-management', label: 'Manage Studio', icon: Building2 },
     { path: '/pricing', label: 'Pricing', icon: CreditCard },
     { path: '/profile', label: 'Profile', icon: User }
   ]
@@ -57,26 +59,23 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
   return (
     <div className="relative bg-surface border-b-2 border-primary/30 shadow-fitness-lg z-50" style={{ backgroundColor: 'rgba(30, 30, 35, 0.95)' }}>
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>
-      <div className="relative max-w-7xl mx-auto px-6 py-6">
+      <div className="relative max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo and Brand */}
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-lg opacity-75 -z-10"></div>
-              <div className="relative gradient-fitness-primary text-primary-foreground p-3 rounded-full z-10">
-                <Activity className="w-6 h-6" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold gradient-fitness-text">
-                Cabo Fit Pass
-              </h1>
-              <p className="text-xs text-text-secondary mt-0.5">Premium Fitness Experience</p>
-            </div>
+          {/* Mobile Navigation Button - Left */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setShowMobileNav(!showMobileNav)}
+              className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-surface-tertiary"
+            >
+              {showMobileNav ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
 
-          {/* Premium Navigation - Desktop */}
-          <div className="hidden lg:flex items-center space-x-2">
+          {/* Desktop spacer for mobile */}
+          <div className="lg:hidden flex-1"></div>
+
+          {/* Centered Navigation - Desktop */}
+          <div className="hidden lg:flex items-center">
             <div className="bg-surface-secondary backdrop-blur-xl rounded-2xl p-1.5 border border-border">
               <nav className="flex items-center space-x-1">
                 {navigationItems.map((item) => {
@@ -89,7 +88,7 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
                       onClick={() => handleNavigation(item.path)}
                       className={getNavItemClass(isActive)}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-5 h-5" />
                       <span className="hidden xl:inline">{item.label}</span>
                     </button>
                   )
@@ -98,65 +97,32 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
             </div>
           </div>
 
-          {/* Mobile Navigation Button */}
-          <div className="lg:hidden">
-            <button
-              onClick={() => setShowMobileNav(!showMobileNav)}
-              className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-surface-tertiary"
-            >
-              {showMobileNav ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-
-          {/* User Profile Section */}
+          {/* User Profile Section - Right */}
           {profile && (
-            <div className="hidden lg:flex items-center space-x-6">
-              {/* Stats */}
-              <div className="hidden md:flex items-center space-x-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-text-primary">{profile.credits}</p>
-                  <p className="text-xs text-text-secondary">Credits</p>
-                </div>
-                <div className="w-px h-10 bg-border"></div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-text-primary">12</p>
-                  <p className="text-xs text-text-secondary">Classes</p>
-                </div>
-                <div className="w-px h-10 bg-border"></div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-text-primary">
-                    <Award className="w-6 h-6 text-warning inline" />
-                  </p>
-                  <p className="text-xs text-text-secondary">Gold Tier</p>
-                </div>
+            <div className="flex items-center space-x-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-text-primary">{profile.name || 'Fitness Enthusiast'}</p>
+                <p className="text-xs text-text-secondary">{profile.email}</p>
               </div>
-
-              {/* User Menu */}
-              <div className="flex items-center space-x-3">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-text-primary">{profile.name || 'Fitness Enthusiast'}</p>
-                  <p className="text-xs text-text-secondary">{profile.email}</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-0 gradient-fitness-primary rounded-full blur opacity-75 -z-10"></div>
-                  <button 
-                    onClick={() => handleNavigation('/profile')}
-                    className="relative w-10 h-10 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground font-bold hover:scale-105 transition-transform z-10"
-                    title="View Profile"
-                  >
-                    {profile.email?.charAt(0).toUpperCase() || 'U'}
-                  </button>
-                </div>
-                {onSignOut && (
-                  <button
-                    onClick={onSignOut}
-                    className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-                    title="Sign Out"
-                  >
-                    <LogOut className="w-5 h-5" />
-                  </button>
-                )}
+              <div className="relative">
+                <div className="absolute inset-0 gradient-fitness-primary rounded-full blur opacity-75 -z-10"></div>
+                <button 
+                  onClick={() => handleNavigation('/profile')}
+                  className="relative w-10 h-10 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground font-bold hover:scale-105 transition-transform z-10"
+                  title="View Profile"
+                >
+                  {profile.email?.charAt(0).toUpperCase() || 'U'}
+                </button>
               </div>
+              {onSignOut && (
+                <button
+                  onClick={onSignOut}
+                  className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              )}
             </div>
           )}
         </div>

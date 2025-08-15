@@ -97,3 +97,39 @@ export interface PaymentFormData {
   currency: string
   description: string
 }
+
+// Studio Management Types
+export interface StudioOwnerProfile extends UserProfile {
+  user_type: 'studio_owner'
+  studios_owned: string[]
+}
+
+export interface ClassWithMetrics extends ClassItem {
+  revenue: number
+  bookings: number
+  attendance_rate: number
+  avg_rating: number
+}
+
+export interface StudioAnalytics {
+  totalRevenue: number
+  totalBookings: number
+  activeClasses: number
+  avgRating: number
+  revenueByType: Record<string, number>
+  monthlyTrend: Array<{ month: string; revenue: number; bookings: number }>
+  peakHours: Record<number, number>
+  topPerformingClasses: ClassWithMetrics[]
+}
+
+export interface ClassFormData {
+  name: string
+  class_type: string
+  description?: string
+  start_time: string
+  duration: number
+  max_capacity: number
+  credit_cost: number
+  difficulty_level: 'beginner' | 'intermediate' | 'advanced'
+  instructor_id?: string
+}

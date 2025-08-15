@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { NavigationHeader } from '@/components/layout/navigation-header'
 import {
   CreditCard,
   Check,
@@ -242,10 +243,15 @@ export default function PricingPage() {
   const [pricingType, setPricingType] = useState<'credits' | 'subscription'>('credits')
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
     const demoSession = localStorage.getItem('demo-session')
+    const demoUser = localStorage.getItem('demo-user')
     setIsLoggedIn(!!demoSession)
+    if (demoUser) {
+      setProfile(JSON.parse(demoUser))
+    }
   }, [])
 
   const handlePurchase = (type: 'credit' | 'subscription', id: string) => {
@@ -268,8 +274,15 @@ export default function PricingPage() {
     setExpandedFAQ(expandedFAQ === index ? null : index)
   }
 
+  const handleSignOut = () => {
+    localStorage.removeItem('demo-session')
+    localStorage.removeItem('demo-user')
+    router.push('/auth/signin')
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
+      <NavigationHeader profile={profile} onSignOut={handleSignOut} />
       {/* Header */}
       <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>

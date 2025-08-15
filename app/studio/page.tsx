@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { NavigationHeader } from '@/components/layout/navigation-header'
 
 // Use the Studio type from types/index.ts
 interface Studio {
@@ -229,8 +230,16 @@ export default function StudioPage() {
   const [filteredStudios, setFilteredStudios] = useState<Studio[]>(STUDIOS)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
+  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
+    // Check for demo session and load profile
+    const demoSession = localStorage.getItem('demo-session')
+    const demoUser = localStorage.getItem('demo-user')
+    
+    if (demoUser) {
+      setProfile(JSON.parse(demoUser))
+    }
     // Filter studios based on search and filter
     let filtered = studios
 
@@ -286,8 +295,15 @@ export default function StudioPage() {
     return <Award className="w-4 h-4" />
   }
 
+  const handleSignOut = () => {
+    localStorage.removeItem('demo-session')
+    localStorage.removeItem('demo-user')
+    router.push('/auth/signin')
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
+      <NavigationHeader profile={profile} onSignOut={handleSignOut} />
       {/* Header */}
       <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>

@@ -1,14 +1,14 @@
-import { AuthOptions } from 'next-auth'
+import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { createClient } from '@/lib/supabase/server'
 
-export const authOptions: AuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: 'credentials',
+      name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -18,22 +18,43 @@ export const authOptions: AuthOptions = {
         try {
           const supabase = createClient()
           
-          // For demo purposes, we'll use a simple email-based auth
-          // In production, you'd verify against Supabase auth or your auth system
-          const { data, error } = await supabase.auth.signInWithPassword({
+          // Try to sign in with Supabase
+          const { data: { user }, error } = await supabase.auth.signInWithPassword({
             email: credentials.email,
             password: credentials.password,
           })
 
-          if (error || !data.user) {
-            console.error('Auth error:', error)
-            return null
+          if (error || !user) {
+            // If sign in fails, try to create a new user
+            const { data: { user: newUser }, error: signUpError } = await supabase.auth.signUp({
+              email: credentials.email,
+              password: credentials.password,
+            })
+
+            if (signUpError || !newUser) {
+              console.error('Sign up error:', signUpError)
+              return null
+            }
+
+            // Create profile for new user
+            await supabase.from('profiles').insert({
+              id: newUser.id,
+              email: newUser.email,
+              credits: 10, // Give new users 10 credits
+              subscription_tier: 'basic'
+            })
+
+            return {
+              id: newUser.id,
+              email: newUser.email,
+              name: newUser.email?.split('@')[0] || 'User'
+            }
           }
 
           return {
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.email?.split('@')[0] || 'User',
+            id: user.id,
+            email: user.email,
+            name: user.email?.split('@')[0] || 'User'
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -42,6 +63,9 @@ export const authOptions: AuthOptions = {
       }
     })
   ],
+  session: {
+    strategy: 'jwt'
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -50,16 +74,13 @@ export const authOptions: AuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (session.user && token.id) {
+      if (token && session.user) {
         session.user.id = token.id as string
       }
       return session
-    },
+    }
   },
   pages: {
-    signIn: '/auth/signin',
-  },
-  session: {
-    strategy: 'jwt',
-  },
+    signIn: '/auth/signin'
+  }
 }

@@ -202,28 +202,29 @@ export default function Dashboard() {
                   <span className="text-xs sm:text-caption-md text-text-tertiary">Last 7 days</span>
                 </div>
                 {/* Simple bar visualization - responsive height */}
-                <div className="grid grid-cols-7 items-end gap-2 sm:gap-3 h-32 sm:h-40">
+                <div className="grid grid-cols-8 items-end gap-1 sm:gap-2 h-32 sm:h-40">
                   {[
-                    { d: 'Mon', v: 35 },
-                    { d: 'Tue', v: 55 },
-                    { d: 'Wed', v: 70 },
-                    { d: 'Thu', v: 45 },
-                    { d: 'Fri', v: 85 },
-                    { d: 'Sat', v: 95 },
-                    { d: 'Sun', v: 60 }
-                  ].map(({ d, v }) => (
+                    { d: '6AM', v: 45, fullTime: '6:00 AM', bookings: 12 },
+                    { d: '8AM', v: 65, fullTime: '8:00 AM', bookings: 18 },
+                    { d: '10AM', v: 40, fullTime: '10:00 AM', bookings: 9 },
+                    { d: '12PM', v: 55, fullTime: '12:00 PM', bookings: 15 },
+                    { d: '2PM', v: 35, fullTime: '2:00 PM', bookings: 8 },
+                    { d: '4PM', v: 70, fullTime: '4:00 PM', bookings: 22 },
+                    { d: '6PM', v: 95, fullTime: '6:00 PM', bookings: 28 },
+                    { d: '8PM', v: 85, fullTime: '8:00 PM', bookings: 25 }
+                  ].map(({ d, v, fullTime, bookings }) => (
                     <div key={d} className="flex flex-col items-center gap-1 sm:gap-2">
                       <div
-                        className="w-6 sm:w-8 rounded-lg sm:rounded-xl gradient-fitness-primary border border-primary/20 shadow-fitness-sm hover:shadow-fitness-glow-primary transition-shadow"
-                        style={{ height: `${Math.max(10, v)}%` }}
-                        title={`${d}: ${v}`}
+                        className="w-5 sm:w-7 rounded-lg sm:rounded-xl gradient-fitness-primary border border-primary/20 shadow-fitness-sm hover:shadow-fitness-glow-primary transition-shadow cursor-pointer"
+                        style={{ height: `${Math.max(15, v)}%` }}
+                        title={`${fullTime}: ${bookings} bookings`}
                       />
                       <span className="text-xs sm:text-caption-sm text-text-tertiary">{d}</span>
                     </div>
                   ))}
                 </div>
                 <p className="mt-3 sm:mt-4 text-xs sm:text-body-sm text-text-secondary">
-                  Highest demand around <span className="text-text-primary font-semibold">Sat 6–8pm</span>. Consider booking early.
+                  Peak hours: <span className="text-text-primary font-semibold">6:00 PM (28 bookings)</span> and <span className="text-text-primary font-semibold">8:00 PM (25 bookings)</span>
                 </p>
               </div>
             </div>

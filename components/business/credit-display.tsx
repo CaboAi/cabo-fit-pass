@@ -92,13 +92,15 @@ export function CreditDisplay({
             {[5, 10, 20].map((credits) => (
               <button
                 key={credits}
-                onClick={() => handleQuickAdd(credits)}
+                onClick={() => {
+                  handleQuickAdd(credits)
+                  onPurchaseCredits()
+                }}
                 disabled={isUpdating}
-                className="btn-fitness-ghost group relative hover:shadow-fitness-md disabled:opacity-50 animate-fade-in"
+                className="px-4 py-3 rounded-lg font-medium transition-all disabled:opacity-50 animate-fade-in bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 hover:border-blue-400 hover:shadow-md"
                 style={{ animationDelay: `${credits * 0.1}s` }}
               >
-                <span className="relative z-10">+{credits}</span>
-                <div className="absolute inset-0 gradient-fitness-secondary rounded-lg opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                <span className="relative z-10 text-white">+{credits}</span>
               </button>
             ))}
           </div>

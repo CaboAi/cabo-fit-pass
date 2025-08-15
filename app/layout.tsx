@@ -10,6 +10,33 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Cabo Fit Pass',
   description: 'Your fitness marketplace in Los Cabos',
+  manifest: '/manifest.json',
+  themeColor: '#6366f1',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Cabo Fit Pass',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'Cabo Fit Pass',
+    title: 'Cabo Fit Pass - Fitness Marketplace in Los Cabos',
+    description: 'Your fitness marketplace in Los Cabos',
+  },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({

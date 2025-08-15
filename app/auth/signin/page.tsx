@@ -126,16 +126,38 @@ export default function SignInPage() {
               </Button>
             </form>
 
-            <div className="text-center">
+            <div className="text-center space-y-4">
               <Button 
                 onClick={handleDemoLogin} 
                 variant="outline" 
-                className="w-full border-white/20 text-white hover:bg白/10"
+                className="w-full border-white/20 text-white hover:bg-white/10"
                 disabled={loading}
               >
-                {loading ? <LoadingSpinner size="sm" /> : 'Quick Demo Login'}
+                {loading ? <LoadingSpinner size="sm" /> : 'Member Demo Login'}
               </Button>
-              <div className="text-xs text-purple-300 mt-2">demo@cabofitpass.com / demo123</div>
+              <div className="text-xs text-purple-300">demo@cabofitpass.com - Member Experience</div>
+              
+              <Button 
+                onClick={() => {
+                  // Studio owner demo login
+                  localStorage.setItem('demo-session', 'true')
+                  localStorage.setItem('demo-user', JSON.stringify({
+                    email: 'owner@cabofitness.com',
+                    credits: 0,
+                    name: 'Maria Rodriguez (Studio Owner)',
+                    user_type: 'studio_owner'
+                  }))
+                  router.push('/studio-management')
+                }} 
+                variant="outline" 
+                className="w-full border-orange-400/30 text-orange-300 hover:bg-orange-400/10"
+                disabled={loading}
+              >
+                Studio Owner Demo
+              </Button>
+              <div className="text-xs text-orange-300">
+                owner@cabofitness.com - Studio Management
+              </div>
             </div>
           </CardContent>
         </Card>
