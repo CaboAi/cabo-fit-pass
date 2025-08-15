@@ -230,11 +230,10 @@ export default function StudioPage() {
   const [filteredStudios, setFilteredStudios] = useState<Studio[]>(STUDIOS)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<{ email: string; credits: number; name?: string } | null>(null)
 
   useEffect(() => {
     // Check for demo session and load profile
-    const demoSession = localStorage.getItem('demo-session')
     const demoUser = localStorage.getItem('demo-user')
     
     if (demoUser) {

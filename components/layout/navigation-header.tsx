@@ -10,7 +10,6 @@ import {
   Menu, 
   X, 
   LogOut,
-  Award,
   Building2
 } from 'lucide-react'
 

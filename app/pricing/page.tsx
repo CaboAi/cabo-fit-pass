@@ -243,7 +243,7 @@ export default function PricingPage() {
   const [pricingType, setPricingType] = useState<'credits' | 'subscription'>('credits')
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<{ email: string; credits: number; name?: string } | null>(null)
 
   useEffect(() => {
     const demoSession = localStorage.getItem('demo-session')

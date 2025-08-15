@@ -174,7 +174,7 @@ export default function ProfilePage() {
   const [creditHistory, setCreditHistory] = useState<CreditTransaction[]>([])
   const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'credits' | 'settings'>('overview')
   const [showCreditDetails, setShowCreditDetails] = useState(false)
-  const [navigationProfile, setNavigationProfile] = useState<any>(null)
+  const [navigationProfile, setNavigationProfile] = useState<{ email: string; credits: number; name?: string } | null>(null)
 
   useEffect(() => {
     // Check for demo session

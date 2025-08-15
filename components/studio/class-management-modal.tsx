@@ -5,11 +5,7 @@ import {
   X, 
   Calendar, 
   Clock, 
-  Users, 
-  Zap, 
   FileText,
-  MapPin,
-  Tag,
   Target,
   Save
 } from 'lucide-react'
@@ -318,7 +314,7 @@ export function ClassManagementModal({
                     </label>
                     <select
                       value={formData.difficulty_level}
-                      onChange={(e) => setFormData({ ...formData, difficulty_level: e.target.value as any })}
+                      onChange={(e) => setFormData({ ...formData, difficulty_level: e.target.value as 'beginner' | 'intermediate' | 'advanced' })}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-400"
                       style={{ colorScheme: 'dark' }}
                     >

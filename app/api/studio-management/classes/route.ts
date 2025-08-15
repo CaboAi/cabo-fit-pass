@@ -108,7 +108,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse<ApiRespons
   }
 }
 
-export async function DELETE(request: NextRequest): Promise<NextResponse<ApiResponse<{}>>> {
+export async function DELETE(request: NextRequest): Promise<NextResponse<ApiResponse<Record<string, never>>>> {
   try {
     const session = await getServerSession(authOptions)
     

@@ -5,10 +5,8 @@ import {
   TrendingUp, 
   DollarSign, 
   Users, 
-  Calendar,
   Target,
   Award,
-  BarChart3,
   PieChart,
   Activity,
   Clock
@@ -21,7 +19,7 @@ interface AnalyticsDashboardProps {
   classes: (ClassItem & { revenue: number; bookings: number })[]
 }
 
-export function AnalyticsDashboard({ studio, classes }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({ studio: _studio, classes }: AnalyticsDashboardProps) {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month')
 
   // Calculate analytics data

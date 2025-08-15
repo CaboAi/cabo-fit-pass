@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { Clock, Users, MapPin, Star, Zap, Activity, ChevronRight, Flame, Target } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+// Card and Badge components not used - imports removed for cleaner code
 import { ClassItem } from '@/types'
 
 interface ClassCardProps {
