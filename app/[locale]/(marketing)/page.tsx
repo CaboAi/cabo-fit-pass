@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Avatar } from '@/components/ui/avatar'
 import { Activity, Search, CalendarClock, Dumbbell, X, DollarSign, FileX, MapPin, Smartphone } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
-import { LanguageToggle } from '@/components/LanguageToggle'
+import { useTranslations } from 'next-intl'
+import { LanguageToggle } from '@/components/i18n/LanguageToggle'
 import { supabase } from '@/lib/supabase/client'
 
 // Simple inline AuthDialog component
@@ -20,7 +20,8 @@ function AuthDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const { t } = useLanguage()
+  const t = useTranslations('auth')
+  const tAria = useTranslations('aria')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,16 +67,16 @@ function AuthDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-text-secondary hover:text-text-primary"
-          aria-label={t.ariaCloseDialog}
+          aria-label={tAria('closeDialog')}
         >
           <X className="w-5 h-5" />
         </button>
         
-        <h2 className="text-xl font-semibold mb-4 text-text-primary">{t.authTitle}</h2>
+        <h2 className="text-xl font-semibold mb-4 text-text-primary">{t('title')}</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">{t.email}</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
@@ -87,7 +88,7 @@ function AuthDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           </div>
           
           <div>
-            <Label htmlFor="password">{t.password}</Label>
+            <Label htmlFor="password">{t('password')}</Label>
             <Input
               id="password"
               type="password"
@@ -110,7 +111,7 @@ function AuthDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             className="w-full"
             data-cta="signup-dialog"
           >
-            {loading ? t.creatingAccount : t.createAccount}
+            {loading ? t('creatingAccount') : t('createAccount')}
           </Button>
         </form>
       </div>
@@ -120,7 +121,15 @@ function AuthDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
 export default function HomePage() {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false)
-  const { t } = useLanguage()
+  const tHero = useTranslations('hero')
+  const tCta = useTranslations('cta')
+  const tSteps = useTranslations('steps')
+  const tBenefits = useTranslations('benefits')
+  const tPricing = useTranslations('pricing')
+  const tTestimonials = useTranslations('testimonials')
+  const tSections = useTranslations('sections')
+  const tFooter = useTranslations('footer')
+  const tAria = useTranslations('aria')
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -150,14 +159,14 @@ export default function HomePage() {
                 onClick={() => setIsAuthDialogOpen(true)}
                 className="btn-fitness-primary"
                 data-cta="header-signup"
-                aria-label={t.ariaSignUp}
+                aria-label={tAria('signUp')}
               >
-                {t.getStarted}
+                {tCta('getStarted')}
               </Button>
             </div>
           </div>
         </div>
-        </header>
+      </header>
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-background via-background-secondary to-background-tertiary min-h-screen flex items-center">
@@ -165,11 +174,11 @@ export default function HomePage() {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold gradient-fitness-text mb-8 leading-relaxed py-4">
-            {t.heroTitle}
+            {tHero('title')}
           </h2>
           
           <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-8">
-            {t.heroSubtitle}
+            {tHero('subtitle')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -178,9 +187,9 @@ export default function HomePage() {
               size="lg"
               className="btn-fitness-primary px-8 py-4 text-lg"
               data-cta="get-started"
-              aria-label={t.ariaSignUp}
+              aria-label={tAria('signUp')}
             >
-              {t.getStarted}
+              {tCta('getStarted')}
             </Button>
             
             <Button
@@ -189,15 +198,15 @@ export default function HomePage() {
               size="lg"
               className="px-8 py-4 text-lg border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground"
               data-cta="learn-more"
-              aria-label={t.ariaLearnMore}
+              aria-label={tAria('learnMore')}
             >
-              {t.learnMore}
-              </Button>
+              {tCta('learnMore')}
+            </Button>
           </div>
           
           {/* Trust Row */}
           <div className="text-center">
-            <p className="text-sm text-text-tertiary mb-4">{t.trustText}</p>
+            <p className="text-sm text-text-tertiary mb-4">{tHero('trustText')}</p>
             <div className="flex justify-center items-center gap-8 opacity-60">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="w-12 h-8 bg-text-tertiary/20 rounded flex items-center justify-center">
@@ -214,10 +223,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              {t.howItWorksTitle}
+              {tSections('howItWorks')}
             </h3>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              {t.howItWorksSubtitle}
+              {tSections('howItWorksSubtitle')}
             </p>
           </div>
           
@@ -225,18 +234,18 @@ export default function HomePage() {
             {[
               {
                 icon: Search,
-                title: t.findTitle,
-                description: t.findDescription
+                title: tSteps('find'),
+                description: tSteps('findDescription')
               },
               {
                 icon: CalendarClock,
-                title: t.bookTitle,
-                description: t.bookDescription
+                title: tSteps('book'),
+                description: tSteps('bookDescription')
               },
               {
                 icon: Dumbbell,
-                title: t.trainTitle,
-                description: t.trainDescription
+                title: tSteps('train'),
+                description: tSteps('trainDescription')
               }
             ].map((step, index) => (
               <Card key={index} className="card-fitness text-center bg-surface border-border">
@@ -260,7 +269,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              {t.benefitsTitle}
+              {tBenefits('title')}
             </h3>
           </div>
           
@@ -268,19 +277,19 @@ export default function HomePage() {
             {[
               {
                 icon: DollarSign,
-                text: t.saveMoneyText
+                text: tBenefits('one')
               },
               {
                 icon: FileX,
-                text: t.noContractsText
+                text: tBenefits('two')
               },
               {
                 icon: MapPin,
-                text: t.discoverSpotsText
+                text: tBenefits('three')
               },
               {
                 icon: Smartphone,
-                text: t.mobilePassText
+                text: tBenefits('four')
               }
             ].map((benefit, index) => (
               <div key={index} className="text-center">
@@ -294,7 +303,7 @@ export default function HomePage() {
           
           <div className="text-center mt-12">
             <p className="text-lg text-text-secondary">
-              {t.pricingText}
+              {tPricing('teaser')}
             </p>
           </div>
         </div>
@@ -305,21 +314,21 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              {t.testimonialsTitle}
+              {tTestimonials('title')}
             </h3>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {[
               {
-                quote: t.testimonial1,
+                quote: tTestimonials('quote1'),
                 name: "Maria Rodriguez",
-                role: t.role1
+                role: tTestimonials('role1')
               },
               {
-                quote: t.testimonial2,
+                quote: tTestimonials('quote2'),
                 name: "Carlos Santos",
-                role: t.role2
+                role: tTestimonials('role2')
               }
             ].map((testimonial, index) => (
               <Card key={index} className="card-fitness bg-surface border-border">
@@ -339,7 +348,7 @@ export default function HomePage() {
           
           {/* Logo Strip */}
           <div className="text-center">
-            <p className="text-sm text-text-tertiary mb-6">{t.featuredGymsText}</p>
+            <p className="text-sm text-text-tertiary mb-6">{tTestimonials('featuredGyms')}</p>
             <div className="flex justify-center items-center gap-12 flex-wrap opacity-40">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="w-16 h-10 bg-text-tertiary/20 rounded flex items-center justify-center">
@@ -355,23 +364,23 @@ export default function HomePage() {
       <section className="py-20 bg-background-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-            {t.demoTitle}
+            {tSections('demoTitle')}
           </h3>
           <p className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto">
-            {t.demoDescription}
+            {tSections('demoDescription')}
           </p>
           
-            <Link href="/dashboard">
+          <Link href="/dashboard">
             <Button
               variant="outline"
               size="lg"
               className="px-8 py-4 text-lg border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground"
               data-cta="try-demo"
-              aria-label={t.ariaTryDemo}
+              aria-label={tAria('tryDemo')}
             >
-              {t.tryDemo}
-              </Button>
-            </Link>
+              {tCta('tryDemo')}
+            </Button>
+          </Link>
         </div>
       </section>
 
@@ -379,10 +388,10 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-primary to-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            {t.finalCtaTitle}
+            {tSections('finalCtaTitle')}
           </h3>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            {t.finalCtaDescription}
+            {tSections('finalCtaDescription')}
           </p>
           
           <Button
@@ -390,9 +399,9 @@ export default function HomePage() {
             size="lg"
             className="bg-white text-primary hover:bg-white/90 px-8 py-4 text-lg font-semibold"
             data-cta="final-cta"
-            aria-label={t.ariaFinalCta}
+            aria-label={tAria('finalCta')}
           >
-            {t.getStartedToday}
+            {tCta('getStartedToday')}
           </Button>
         </div>
       </section>
@@ -409,10 +418,10 @@ export default function HomePage() {
             </div>
             
             <div className="flex gap-6 text-sm text-text-secondary">
-              <a href="#" className="hover:text-text-primary transition-colors">{t.terms}</a>
-              <a href="#" className="hover:text-text-primary transition-colors">{t.privacy}</a>
+              <a href="#" className="hover:text-text-primary transition-colors">{tFooter('terms')}</a>
+              <a href="#" className="hover:text-text-primary transition-colors">{tFooter('privacy')}</a>
               <a href="mailto:hello@cabofitpass.com" className="hover:text-text-primary transition-colors">
-                {t.contact}
+                {tFooter('contact')}
               </a>
             </div>
           </div>

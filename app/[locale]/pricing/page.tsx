@@ -301,8 +301,8 @@ export default function PricingPage() {
                   <CreditCard className="w-8 h-8" />
                 </div>
               </div>
-              <div>
-                <h1 className="font-heading text-display-lg gradient-fitness-text">
+              <div className="min-w-0"> {/* Ensure container doesn't constrain text */}
+                <h1 className="font-heading text-display-lg gradient-fitness-text leading-tight">
                   Pricing Plans
                 </h1>
                 <p className="text-text-secondary text-body-lg">Choose the perfect plan for your fitness journey</p>
@@ -395,8 +395,8 @@ export default function PricingPage() {
                   {/* Glow Effect */}
                   <div className={`absolute inset-0 bg-gradient-to-r ${package_.color} rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity`}></div>
 
-                  <Card className={`relative bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden ${
-                    selectedPackage === package_.id ? 'border-purple-400 bg-gradient-to-br from-purple-600/20 to-pink-600/20' : ''
+                  <Card className={`relative bg-surface border-border hover:border-primary/50 transition-all duration-300 overflow-hidden ${
+                    selectedPackage === package_.id ? 'border-primary bg-gradient-to-br from-primary/10 to-secondary/10' : ''
                   }`}>
                     <CardHeader className="text-center pb-6">
                       {/* Package Icon */}
@@ -406,34 +406,34 @@ export default function PricingPage() {
                         </div>
                       </div>
 
-                      <CardTitle className="text-2xl font-bold text-white mb-2">
+                      <CardTitle className="text-2xl font-bold text-text-primary mb-2">
                         {package_.name}
                       </CardTitle>
                       
                       <div className="space-y-2">
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-4xl font-bold text-white">{package_.credits}</span>
+                          <span className="text-4xl font-bold text-text-primary">{package_.credits}</span>
                           {package_.bonus && (
-                            <span className="text-xl text-green-400 font-semibold">
+                            <span className="text-xl text-success font-semibold">
                               +{package_.bonus}
                             </span>
                           )}
-                          <span className="text-purple-300">credits</span>
+                          <span className="text-text-secondary">credits</span>
                         </div>
                         
                         <div className="text-center">
-                          <div className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-pink-600 bg-clip-text text-transparent">
+                          <div className="text-5xl font-bold gradient-fitness-text">
                             ${package_.price}
                           </div>
                           {package_.savings && (
-                            <Badge className="mt-2 bg-green-500/20 text-green-400 border-green-500/30">
+                            <Badge className="mt-2 bg-success/20 text-success border-success/30">
                               {package_.savings}
                             </Badge>
                           )}
                         </div>
                       </div>
 
-                      <p className="text-purple-200 mt-4">{package_.description}</p>
+                      <p className="text-text-secondary mt-4">{package_.description}</p>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
@@ -441,22 +441,22 @@ export default function PricingPage() {
                       <div className="space-y-3">
                         {package_.features.map((feature, index) => (
                           <div key={index} className="flex items-center gap-3">
-                            <div className="p-1 bg-green-500/20 rounded-full">
-                              <Check className="w-3 h-3 text-green-400" />
+                            <div className="p-1 bg-success/20 rounded-full">
+                              <Check className="w-3 h-3 text-success" />
                             </div>
-                            <span className="text-purple-200 text-sm">{feature}</span>
+                            <span className="text-text-secondary text-sm">{feature}</span>
                           </div>
                         ))}
                       </div>
 
                       {/* Bonus Credits Highlight */}
                       {package_.bonus && (
-                        <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-4 rounded-xl border border-green-500/20">
+                        <div className="bg-gradient-to-r from-success/10 to-emerald-500/10 p-4 rounded-xl border border-success/20">
                           <div className="flex items-center gap-3">
-                            <Gift className="w-5 h-5 text-green-400" />
+                            <Gift className="w-5 h-5 text-success" />
                             <div>
-                              <p className="text-green-400 font-semibold">Bonus Credits!</p>
-                              <p className="text-green-300 text-sm">
+                              <p className="text-success font-semibold">Bonus Credits!</p>
+                              <p className="text-text-secondary text-sm">
                                 Get {package_.bonus} extra credits free - Total: {package_.credits + package_.bonus} credits
                               </p>
                             </div>
@@ -490,9 +490,9 @@ export default function PricingPage() {
         {pricingType === 'subscription' && (
           <div className="space-y-12">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Monthly Subscription Plans</h2>
-              <p className="text-xl text-purple-200 max-w-2xl mx-auto">
-                Consistent fitness with monthly credits and exclusive benefits.
+              <h2 className="font-heading text-display-md text-text-primary mb-4">Monthly Subscription Plans</h2>
+              <p className="text-body-xl text-text-secondary max-w-2xl mx-auto">
+                Get regular credits every month with exclusive perks and priority access.
               </p>
             </div>
 
@@ -509,6 +509,16 @@ export default function PricingPage() {
                   {tier.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                       <div className="bg-gradient-to-r from-orange-400 to-pink-600 text-white text-sm font-bold px-4 py-2 rounded-full flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        {tier.badge}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Premium Badge */}
+                  {tier.badge === 'Premium' && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="bg-gradient-to-r from-purple-400 to-pink-600 text-white text-sm font-bold px-4 py-2 rounded-full flex items-center gap-2">
                         <Crown className="w-4 h-4" />
                         {tier.badge}
                       </div>
@@ -518,8 +528,8 @@ export default function PricingPage() {
                   {/* Glow Effect */}
                   <div className={`absolute inset-0 bg-gradient-to-r ${tier.color} rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity`}></div>
 
-                  <Card className={`relative bg-black/40 backdrop-blur-xl border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden h-full ${
-                    selectedSubscription === tier.id ? 'border-purple-400 bg-gradient-to-br from-purple-600/20 to-pink-600/20' : ''
+                  <Card className={`relative bg-surface border-border hover:border-primary/50 transition-all duration-300 overflow-hidden ${
+                    selectedSubscription === tier.id ? 'border-primary bg-gradient-to-br from-primary/10 to-secondary/10' : ''
                   }`}>
                     <CardHeader className="text-center pb-6">
                       {/* Tier Icon */}
@@ -529,37 +539,37 @@ export default function PricingPage() {
                         </div>
                       </div>
 
-                      <CardTitle className="text-2xl font-bold text-white mb-2">
+                      <CardTitle className="text-2xl font-bold text-text-primary mb-2">
                         {tier.name}
                       </CardTitle>
                       
                       <div className="space-y-2">
                         <div className="text-center">
-                          <div className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-pink-600 bg-clip-text text-transparent">
+                          <div className="text-5xl font-bold gradient-fitness-text">
                             ${tier.price}
                           </div>
-                          <div className="text-purple-300">/month</div>
+                          <div className="text-text-secondary text-sm">per month</div>
                         </div>
                         
-                        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                          <p className="text-white font-semibold text-lg">{tier.monthlyCredits} Credits</p>
-                          <p className="text-purple-300 text-sm">Every month</p>
+                        <div className="flex items-center justify-center gap-2 mt-4">
+                          <span className="text-3xl font-bold text-text-primary">{tier.monthlyCredits}</span>
+                          <span className="text-text-secondary">credits/month</span>
                         </div>
                       </div>
 
-                      <p className="text-purple-200 mt-4">{tier.description}</p>
+                      <p className="text-text-secondary mt-4">{tier.description}</p>
                     </CardHeader>
 
-                    <CardContent className="space-y-6 flex-1">
+                    <CardContent className="space-y-6">
                       {/* Features */}
                       <div className="space-y-3">
-                        <p className="text-white font-semibold text-sm">INCLUDED:</p>
+                        <h4 className="font-semibold text-text-primary mb-3">What's included:</h4>
                         {tier.features.map((feature, index) => (
-                          <div key={index} className="flex items-start gap-3">
-                            <div className="p-1 bg-green-500/20 rounded-full mt-0.5">
-                              <Check className="w-3 h-3 text-green-400" />
+                          <div key={index} className="flex items-center gap-3">
+                            <div className="p-1 bg-success/20 rounded-full">
+                              <Check className="w-3 h-3 text-success" />
                             </div>
-                            <span className="text-purple-200 text-sm">{feature}</span>
+                            <span className="text-text-secondary text-sm">{feature}</span>
                           </div>
                         ))}
                       </div>
@@ -567,32 +577,30 @@ export default function PricingPage() {
                       {/* Restrictions */}
                       {tier.restrictions && tier.restrictions.length > 0 && (
                         <div className="space-y-3">
-                          <p className="text-purple-400 font-semibold text-sm">LIMITATIONS:</p>
+                          <h4 className="font-semibold text-text-primary mb-3">Credit Policy:</h4>
                           {tier.restrictions.map((restriction, index) => (
-                            <div key={index} className="flex items-start gap-3">
-                              <div className="p-1 bg-orange-500/20 rounded-full mt-0.5">
-                                <Clock className="w-3 h-3 text-orange-400" />
+                            <div key={index} className="flex items-center gap-3">
+                              <div className="p-1 bg-warning/20 rounded-full">
+                                <Clock className="w-3 h-3 text-warning" />
                               </div>
-                              <span className="text-purple-300 text-sm">{restriction}</span>
+                              <span className="text-text-secondary text-sm">{restriction}</span>
                             </div>
                           ))}
                         </div>
                       )}
 
-                      {/* Value Highlight */}
-                      {tier.id === 'elite' && (
-                        <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4 rounded-xl border border-purple-500/20">
-                          <div className="flex items-center gap-3">
-                            <Infinity className="w-5 h-5 text-purple-400" />
-                            <div>
-                              <p className="text-purple-400 font-semibold">Premium Value</p>
-                              <p className="text-purple-300 text-sm">
-                                Just $2.97 per credit - our best value!
-                              </p>
-                            </div>
+                      {/* Monthly Value Highlight */}
+                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 rounded-xl border border-primary/20">
+                        <div className="flex items-center gap-3">
+                          <TrendingUp className="w-5 h-5 text-primary" />
+                          <div>
+                            <p className="text-primary font-semibold">Monthly Value</p>
+                            <p className="text-text-secondary text-sm">
+                              ${(tier.price / tier.monthlyCredits).toFixed(2)} per credit
+                            </p>
                           </div>
                         </div>
-                      )}
+                      </div>
 
                       {/* CTA Button */}
                       <button
@@ -600,12 +608,12 @@ export default function PricingPage() {
                           e.stopPropagation()
                           handlePurchase('subscription', tier.id)
                         }}
-                        className="relative w-full group mt-auto"
+                        className="relative w-full group"
                       >
                         <div className={`absolute inset-0 bg-gradient-to-r ${tier.color} rounded-xl blur-md opacity-50 group-hover:opacity-100 transition-opacity`}></div>
                         <div className={`relative bg-gradient-to-r ${tier.color} text-white py-4 px-6 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2`}>
                           <Calendar className="w-5 h-5" />
-                          Start Subscription
+                          Subscribe Now
                         </div>
                       </button>
                     </CardContent>
@@ -615,151 +623,125 @@ export default function PricingPage() {
             </div>
 
             {/* Subscription Benefits */}
-            <div className="mt-16">
-              <Card className="bg-black/40 backdrop-blur-xl border-white/10">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-3">
-                    <Heart className="w-6 h-6 text-pink-400" />
-                    Why Choose a Subscription?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="text-center space-y-3">
-                      <div className="p-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/20 inline-block">
-                        <TrendingUp className="w-8 h-8 text-green-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white">Better Value</h3>
-                      <p className="text-purple-300 text-sm">
-                        Save up to 40% compared to individual credit purchases with consistent monthly benefits.
-                      </p>
-                    </div>
-                    
-                    <div className="text-center space-y-3">
-                      <div className="p-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl border border-blue-500/20 inline-block">
-                        <Calendar className="w-8 h-8 text-blue-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white">Consistent Fitness</h3>
-                      <p className="text-purple-300 text-sm">
-                        Fresh credits every month encourage regular fitness habits and help you stay on track.
-                      </p>
-                    </div>
-                    
-                    <div className="text-center space-y-3">
-                      <div className="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-500/20 inline-block">
-                        <Crown className="w-8 h-8 text-purple-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white">Exclusive Perks</h3>
-                      <p className="text-purple-300 text-sm">
-                        Priority booking, guest passes, personal consultations, and member-only events.
-                      </p>
-                    </div>
+            <div className="bg-gradient-to-r from-surface/50 to-surface-secondary/50 backdrop-blur-xl p-8 rounded-3xl border border-border">
+              <div className="text-center mb-8">
+                <Heart className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="font-heading text-heading-xl text-text-primary mb-2">Why Choose a Subscription?</h3>
+                <p className="text-text-secondary">Unlock exclusive benefits with our monthly plans</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="p-3 bg-success/20 rounded-full w-fit mx-auto mb-3">
+                    <Infinity className="w-6 h-6 text-success" />
                   </div>
-                </CardContent>
-              </Card>
+                  <h4 className="font-semibold text-text-primary mb-2">Never Run Out</h4>
+                  <p className="text-text-secondary text-sm">Regular monthly credits ensure you never miss a workout</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="p-3 bg-warning/20 rounded-full w-fit mx-auto mb-3">
+                    <Star className="w-6 h-6 text-warning" />
+                  </div>
+                  <h4 className="font-semibold text-text-primary mb-2">Priority Access</h4>
+                  <p className="text-text-secondary text-sm">Book popular classes before they fill up</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="p-3 bg-secondary/20 rounded-full w-fit mx-auto mb-3">
+                    <Users className="w-6 h-6 text-secondary" />
+                  </div>
+                  <h4 className="font-semibold text-text-primary mb-2">Guest Passes</h4>
+                  <p className="text-text-secondary text-sm">Bring friends and family to join your fitness journey</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="p-3 bg-accent-purple/20 rounded-full w-fit mx-auto mb-3">
+                    <Shield className="w-6 h-6 text-accent-purple" />
+                  </div>
+                  <h4 className="font-semibold text-text-primary mb-2">Flexible</h4>
+                  <p className="text-text-secondary text-sm">Cancel anytime, no long-term commitments</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
         {/* FAQ Section */}
-        <div className="mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-purple-200">
-              Everything you need to know about our pricing and plans
+        <div className="mt-20 space-y-12">
+          <div className="text-center">
+            <h2 className="font-heading text-display-md text-text-primary mb-4">Frequently Asked Questions</h2>
+            <p className="text-body-xl text-text-secondary max-w-2xl mx-auto">
+              Everything you need to know about our pricing and credit system.
             </p>
           </div>
 
-          <Card className="bg-black/40 backdrop-blur-xl border-white/10">
-            <CardContent className="p-8">
-              <div className="space-y-4">
-                {FAQ_DATA.map((faq, index) => (
-                  <div key={index} className="border border-white/10 rounded-xl overflow-hidden">
-                    <button
-                      onClick={() => toggleFAQ(index)}
-                      className="w-full p-6 text-left hover:bg-white/5 transition-colors flex items-center justify-between"
-                    >
-                      <span className="text-white font-semibold">{faq.question}</span>
-                      {expandedFAQ === index ? (
-                        <ChevronUp className="w-5 h-5 text-purple-400" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-purple-400" />
-                      )}
-                    </button>
-                    
-                    {expandedFAQ === index && (
-                      <div className="px-6 pb-6">
-                        <p className="text-purple-200 leading-relaxed">{faq.answer}</p>
-                      </div>
-                    )}
+          <div className="max-w-3xl mx-auto space-y-4">
+            {FAQ_DATA.map((faq, index) => (
+              <div
+                key={index}
+                className="card-fitness border border-border hover:border-primary/30 transition-colors"
+              >
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full p-6 text-left flex items-center justify-between group"
+                >
+                  <h3 className="font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    {faq.question}
+                  </h3>
+                  {expandedFAQ === index ? (
+                    <ChevronUp className="w-5 h-5 text-text-secondary group-hover:text-primary transition-colors" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-text-secondary group-hover:text-primary transition-colors" />
+                  )}
+                </button>
+                
+                {expandedFAQ === index && (
+                  <div className="px-6 pb-6 animate-fade-in">
+                    <p className="text-text-secondary leading-relaxed">{faq.answer}</p>
                   </div>
-                ))}
+                )}
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         </div>
 
         {/* Final CTA Section */}
         <div className="mt-20 text-center">
-          <div className="relative group">
-            <div className="absolute inset-0 gradient-fitness-primary rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
-            <Card className="relative card-fitness-elevated bg-surface overflow-hidden z-10">
-              <CardContent className="p-12">
-                <div className="space-y-8">
-                  <div className="flex justify-center">
-                    <div className="relative">
-                      <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-lg opacity-75 -z-10"></div>
-                      <div className="relative gradient-fitness-primary p-4 rounded-full z-10">
-                        <Sparkles className="w-12 h-12 text-primary-foreground" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h2 className="font-heading text-display-lg text-text-primary mb-4">
-                      Ready to Start Your Fitness Journey?
-                    </h2>
-                    <p className="text-body-xl text-text-secondary max-w-2xl mx-auto">
-                      Join over 1,000 members already transforming their lives with Cabo Fit Pass.
-                      Your perfect fitness plan is just one click away.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button
-                      onClick={() => !isLoggedIn ? router.push('/auth/signin') : handlePurchase('credit', 'popular')}
-                      className="btn-fitness-primary py-4 px-8 text-lg flex items-center gap-3"
-                    >
-                      <Star className="w-5 h-5" />
-                      Get Popular Pack
-                    </button>
-                    
-                    <button
-                      onClick={() => !isLoggedIn ? router.push('/auth/signin') : handlePurchase('subscription', 'pro')}
-                      className="btn-fitness-secondary py-4 px-8 text-lg flex items-center gap-3"
-                    >
-                      <Crown className="w-5 h-5" />
-                      Try Pro Monthly
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-4 text-text-tertiary">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-success rounded-full"></div>
-                      <span className="text-body-sm">Secure checkout</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-warning rounded-full"></div>
-                      <span className="text-body-sm">7-day guarantee</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-info rounded-full"></div>
-                      <span className="text-body-sm">24/7 support</span>
-                    </div>
-                  </div>
+          <div className="card-fitness-stats p-12 max-w-4xl mx-auto">
+            <div className="relative">
+              <div className="absolute inset-0 gradient-fitness-primary rounded-full blur-3xl opacity-20 -z-10"></div>
+              <div className="relative">
+                <Sparkles className="w-16 h-16 gradient-fitness-primary text-primary-foreground p-4 rounded-2xl mx-auto mb-6" />
+                <h2 className="font-heading text-display-sm gradient-fitness-text mb-4">
+                  Ready to Start Your Fitness Journey?
+                </h2>
+                <p className="text-body-lg text-text-secondary mb-8 max-w-2xl mx-auto">
+                  Join thousands of members already transforming their lives with our premium fitness network in Los Cabos.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <button
+                    onClick={() => setPricingType('credits')}
+                    className="btn-fitness-primary text-lg px-8 py-4"
+                  >
+                    <CreditCard className="w-5 h-5" />
+                    Buy Credits Now
+                  </button>
+                  <button
+                    onClick={() => setPricingType('subscription')}
+                    className="btn-fitness-secondary text-lg px-8 py-4"
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Start Subscription
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
+                
+                <p className="text-text-tertiary text-sm mt-6">
+                  ✨ 7-day money-back guarantee • No setup fees • Cancel anytime
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

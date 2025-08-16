@@ -22,6 +22,9 @@ export default function Dashboard() {
   const { showBookingSuccess, showBookingError, showPaymentSuccess } = useToast()
 
   useEffect(() => {
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') return
+    
     const demoSession = localStorage.getItem('demo-session')
     const demoUser = localStorage.getItem('demo-user')
     
@@ -92,8 +95,10 @@ export default function Dashboard() {
 
 
   const handleSignOut = () => {
-    localStorage.removeItem('demo-session')
-    localStorage.removeItem('demo-user')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('demo-session')
+      localStorage.removeItem('demo-user')
+    }
     router.push('/')
   }
 

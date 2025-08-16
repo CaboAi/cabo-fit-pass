@@ -26,13 +26,16 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
   const router = useRouter()
   const pathname = usePathname()
   const [showMobileNav, setShowMobileNav] = useState(false)
+  
+  // Safe locale detection from pathname - defaults to 'en'
+  const locale = pathname.startsWith('/es') ? 'es' : 'en'
 
   const navigationItems = [
-    { path: '/dashboard', label: 'Classes', icon: Calendar },
-    { path: '/studio', label: 'Studios', icon: Activity },
-    { path: '/studio-management', label: 'Manage Studio', icon: Building2 },
-    { path: '/pricing', label: 'Pricing', icon: CreditCard },
-    { path: '/profile', label: 'Profile', icon: User }
+    { path: '/dashboard', label: 'Classes', icon: Calendar, localized: false },
+    { path: '/studio', label: 'Studios', icon: Activity, localized: false },
+    { path: '/studio-management', label: 'Manage Studio', icon: Building2, localized: false },
+    { path: '/pricing', label: 'Pricing', icon: CreditCard, localized: true },
+    { path: '/profile', label: 'Profile', icon: User, localized: false }
   ]
 
   const getNavItemClass = (isActive: boolean, isMobile: boolean = false) => {
@@ -50,8 +53,13 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
       : `${baseClass} text-text-secondary hover:text-text-primary hover:bg-surface-tertiary`
   }
 
-  const handleNavigation = (path: string) => {
-    router.push(path)
+  const getNavigationPath = (path: string, localized: boolean) => {
+    return localized ? `/${locale}${path}` : path
+  }
+
+  const handleNavigation = (path: string, localized: boolean) => {
+    const navigationPath = getNavigationPath(path, localized)
+    router.push(navigationPath)
     setShowMobileNav(false)
   }
 
@@ -79,12 +87,13 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
               <nav className="flex items-center space-x-1">
                 {navigationItems.map((item) => {
                   const Icon = item.icon
-                  const isActive = pathname === item.path
+                  const expectedPath = getNavigationPath(item.path, item.localized)
+                  const isActive = pathname === expectedPath || pathname === item.path
                   
                   return (
                     <button
                       key={item.path}
-                      onClick={() => handleNavigation(item.path)}
+                      onClick={() => handleNavigation(item.path, item.localized)}
                       className={getNavItemClass(isActive)}
                     >
                       <Icon className="w-5 h-5" />
@@ -106,7 +115,7 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
               <div className="relative">
                 <div className="absolute inset-0 gradient-fitness-primary rounded-full blur opacity-75 -z-10"></div>
                 <button 
-                  onClick={() => handleNavigation('/profile')}
+                  onClick={() => handleNavigation('/profile', false)}
                   className="relative w-10 h-10 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground font-bold hover:scale-105 transition-transform z-10"
                   title="View Profile"
                 >
@@ -133,12 +142,13 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
               <nav className="space-y-2">
                 {navigationItems.map((item) => {
                   const Icon = item.icon
-                  const isActive = pathname === item.path
+                  const expectedPath = getNavigationPath(item.path, item.localized)
+                  const isActive = pathname === expectedPath || pathname === item.path
                   
                   return (
                     <button
                       key={item.path}
-                      onClick={() => handleNavigation(item.path)}
+                      onClick={() => handleNavigation(item.path, item.localized)}
                       className={getNavItemClass(isActive, true)}
                     >
                       <Icon className="w-5 h-5" />

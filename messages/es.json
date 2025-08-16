@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "explore": "Explorar",
+    "pricing": "Precios"
+  },
+  "hero": {
+    "title": "Un pase. Todos los gimnasios en Cabo.",
+    "subtitle": "Prueba gimnasios, estudios y clases con un solo pase simple.",
+    "trustText": "Confiado por 300+ entusiastas del fitness en Los Cabos"
+  },
+  "cta": {
+    "getStarted": "Comenzar",
+    "learnMore": "Saber más",
+    "getStartedToday": "Comenzar Hoy",
+    "tryDemo": "Probar la Demo"
+  },
+  "steps": {
+    "find": "Encuentra",
+    "findDescription": "Explora gimnasios y estudios en todo Cabo",
+    "book": "Reserva",
+    "bookDescription": "Asegura tu lugar en cualquier clase",
+    "train": "Entrena", 
+    "trainDescription": "Aparece y haz tu entrenamiento"
+  },
+  "benefits": {
+    "title": "¿Por Qué Elegir Cabo Fit Pass?",
+    "one": "Ahorra dinero",
+    "two": "Sin contratos",
+    "three": "Descubre nuevos lugares", 
+    "four": "Pase móvil"
+  },
+  "pricing": {
+    "teaser": "Desde $550 MXN por mes. Cancela en cualquier momento."
+  },
+  "testimonials": {
+    "title": "Lo Que Dicen Nuestros Miembros",
+    "quote1": "La mejor inversión que he hecho para mi rutina de fitness. Acceso a todos los mejores gimnasios sin compromiso.",
+    "quote2": "Me encanta probar diferentes estudios cada semana. La variedad mantiene mis entrenamientos emocionantes y desafiantes.",
+    "role1": "Agente de Bienes Raíces",
+    "role2": "Propietario de Negocio Local",
+    "featuredGyms": "Gimnasios Socios Destacados"
+  },
+  "sections": {
+    "howItWorks": "Cómo Funciona",
+    "howItWorksSubtitle": "Comienza en tres pasos simples",
+    "demoTitle": "Prueba Antes de Comprometerte",
+    "demoDescription": "Explora nuestra plataforma con una demo gratis. Ve qué fácil es descubrir y reservar una clase en Los Cabos.",
+    "finalCtaTitle": "¿Listo para Transformar tu Fitness?",
+    "finalCtaDescription": "Únete a cientos de miembros que ya están descubriendo los mejores gimnasios en Cabo."
+  },
+  "footer": {
+    "terms": "Términos",
+    "privacy": "Privacidad",
+    "contact": "Contacto"
+  },
+  "auth": {
+    "title": "Comenzar",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "createAccount": "Crear Cuenta",
+    "creatingAccount": "Creando Cuenta..."
+  },
+  "aria": {
+    "signUp": "Registrarse en Cabo Fit Pass",
+    "learnMore": "Saber más sobre cómo funciona",
+    "closeDialog": "Cerrar diálogo",
+    "tryDemo": "Probar el tablero de demostración",
+    "finalCta": "Comenzar con Cabo Fit Pass hoy"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "home": "Home",
+    "explore": "Explore", 
+    "pricing": "Pricing"
+  },
+  "hero": {
+    "title": "One pass. Every gym in Cabo.",
+    "subtitle": "Try gyms, studios, and classes with one simple pass.",
+    "trustText": "Trusted by 300+ fitness enthusiasts in Los Cabos"
+  },
+  "cta": {
+    "getStarted": "Get Started",
+    "learnMore": "Learn more",
+    "getStartedToday": "Get Started Today",
+    "tryDemo": "Try the Demo"
+  },
+  "steps": {
+    "find": "Find",
+    "findDescription": "Browse gyms and studios across Cabo",
+    "book": "Book", 
+    "bookDescription": "Reserve your spot in any class",
+    "train": "Train",
+    "trainDescription": "Show up and get your workout on"
+  },
+  "benefits": {
+    "title": "Why Choose Cabo Fit Pass?",
+    "one": "Save money",
+    "two": "No contracts", 
+    "three": "Discover new spots",
+    "four": "Mobile pass"
+  },
+  "pricing": {
+    "teaser": "From $550 MXN per month. Cancel anytime."
+  },
+  "testimonials": {
+    "title": "What Our Members Say",
+    "quote1": "Best investment I've made for my fitness routine. Access to all the top gyms without the commitment.",
+    "quote2": "Love trying different studios every week. The variety keeps my workouts exciting and challenging.",
+    "role1": "Real Estate Agent",
+    "role2": "Local Business Owner",
+    "featuredGyms": "Featured Partner Gyms"
+  },
+  "sections": {
+    "howItWorks": "How It Works",
+    "howItWorksSubtitle": "Get started in three simple steps",
+    "demoTitle": "Try Before You Commit",
+    "demoDescription": "Explore our platform with a free demo. See how easy it is to discover and book a class in Los Cabos.",
+    "finalCtaTitle": "Ready to Transform Your Fitness?",
+    "finalCtaDescription": "Join hundreds of members who are already discovering the best gyms in Cabo."
+  },
+  "footer": {
+    "terms": "Terms",
+    "privacy": "Privacy", 
+    "contact": "Contact"
+  },
+  "auth": {
+    "title": "Get Started",
+    "email": "Email",
+    "password": "Password",
+    "createAccount": "Create Account",
+    "creatingAccount": "Creating Account..."
+  },
+  "aria": {
+    "signUp": "Sign up for Cabo Fit Pass",
+    "learnMore": "Learn more about how it works",
+    "closeDialog": "Close dialog",
+    "tryDemo": "Try the demo dashboard",
+    "finalCta": "Get started with Cabo Fit Pass today"
+  }
+}
