@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { NavigationHeader } from '@/components/layout/navigation-header'
@@ -236,6 +237,18 @@ const FAQ_DATA: FAQ[] = [
   }
 ]
 
+function PricingBanner() {
+  return (
+    <div className="relative w-full h-[280px] md:h-[360px] mb-8 overflow-hidden rounded-2xl">
+      <Image src="/images/fitness/strength.jpg" alt="Strength training" fill className="object-cover" priority />
+      <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <h2 className="text-white text-2xl md:text-4xl font-bold">Membership Pricing</h2>
+      </div>
+    </div>
+  )
+}
+
 export default function PricingPage() {
   const router = useRouter()
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
@@ -254,7 +267,7 @@ export default function PricingPage() {
     setIsLoggedIn(!!demoSession)
     if (demoUser) {
       try {
-        setProfile(JSON.parse(demoUser))
+      setProfile(JSON.parse(demoUser))
       } catch (error) {
         console.error('Error parsing user data:', error)
         localStorage.removeItem('demo-user')
@@ -291,6 +304,12 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       <NavigationHeader profile={profile || undefined} onSignOut={handleSignOut} />
+      
+      {/* Pricing Banner */}
+      <div className="max-w-7xl mx-auto px-6 pt-8">
+        <PricingBanner />
+      </div>
+      
       {/* Header */}
       <div className="relative bg-surface/95 backdrop-blur-xl border-b border-border shadow-fitness-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>

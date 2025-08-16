@@ -12,6 +12,8 @@ import { Activity, Search, CalendarClock, Dumbbell, X, DollarSign, FileX, MapPin
 import { useTranslations } from 'next-intl'
 import { LanguageToggle } from '@/components/i18n/LanguageToggle'
 import { supabase } from '@/lib/supabase/client'
+import Hero from '@/components/Hero'
+import ServicesGrid from '@/components/ServicesGrid'
 
 // Simple inline AuthDialog component
 function AuthDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -169,18 +171,15 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background via-background-secondary to-background-tertiary min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.1),transparent_70%)]" />
+      <section className="relative bg-gradient-to-br from-background via-background-secondary to-background-tertiary py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+          <Hero
+            heading={tHero('title')}
+            subheading={tHero('subtitle')}
+          />
+        </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold gradient-fitness-text mb-8 leading-relaxed py-4">
-            {tHero('title')}
-          </h2>
-          
-          <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-8">
-            {tHero('subtitle')}
-          </p>
-          
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button
               onClick={() => setIsAuthDialogOpen(true)}
@@ -218,8 +217,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Services Grid */}
+      <section className="py-20 bg-surface-secondary">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+              Popular Categories
+            </h3>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Discover the variety of fitness experiences available across Los Cabos
+            </p>
+          </div>
+          <ServicesGrid />
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-surface-secondary">
+      <section id="how-it-works" className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
