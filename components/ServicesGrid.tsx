@@ -13,7 +13,7 @@ const services: Service[] = [
   { key: 'pilates', title: 'Pilates', desc: 'Core strength, flexibility, and control with guided movements.', img: '/images/fitness/pilates1.jpg', alt: 'Pilates reformer workout' },
   { key: 'yoga', title: 'Yoga', desc: 'Balance body and mind with breathwork and mobility training.', img: '/images/fitness/yoga1.jpg', alt: 'Yoga class in studio' },
   { key: 'strength', title: 'Strength', desc: 'Weight training programs to build power and muscle safely.', img: '/images/fitness/strength1.jpg', alt: 'Strength training in gym' },
-  { key: 'gym', title: 'Gym Access', desc: 'Full access to modern gym equipment and facilities.', img: '/images/fitness/gym1.jpg', alt: 'Modern gym interior' },
+  { key: 'gym', title: 'Gym Access', desc: 'Full access to modern gym equipment and facilities.', img: '/images/fitness/gym_access.jpg', alt: 'Modern gym interior' },
   { key: 'group', title: 'Group Classes', desc: 'Train with others in a fun, motivating group environment.', img: '/images/fitness/group1.jpg', alt: 'Group fitness class' },
   { key: 'pickle', title: 'Pickleball', desc: 'Fast paced and social, great for all levels.', img: '/images/fitness/pickle1.jpg', alt: 'Pickleball players mid game' },
   { key: 'padel', title: 'Padel', desc: 'Dynamic racquet sport blending tennis and squash.', img: '/images/fitness/padel1.jpg', alt: 'Padel match in progress' }

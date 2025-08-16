@@ -33,9 +33,9 @@ function getStudioImage(studio: { image?: string; tags?: string[]; specialties?:
     padel: "/images/fitness/padel1.jpg",
     pickle: "/images/fitness/pickle1.jpg",
     group: "/images/fitness/group1.jpg",
-    gym: "/images/fitness/gym1.jpg",
-    "weight training": "/images/fitness/gym1.jpg",
-    "crossfit": "/images/fitness/gym1.jpg",
+    gym: "/images/fitness/gym_access.jpg",
+    "weight training": "/images/fitness/gym_access.jpg",
+    "crossfit": "/images/fitness/gym_access.jpg",
     "functional training": "/images/fitness/hiit1.jpg",
     "bootcamp": "/images/fitness/hiit1.jpg"
   }
