@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image, { StaticImageData } from 'next/image'
+import Image from 'next/image'
 import { 
   MapPin, 
   Star, 
@@ -23,39 +23,20 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { NavigationHeader } from '@/components/layout/navigation-header'
 
-// Map tags to image sources
-const tagToSrc = {
-  yoga: "/yoga2.jpg",
-  pilates: "/pilates.jpg",
-  hiit: "/hiit.jpg",
-  padel: "/padel1.jpg",
-  pickle: "/pickle.jpg",
-  group: "/group.jpg",
-  gym: "/gym1.jpg"
-}
-
-// Helper function to get studio image source based on specialties
-function getStudioSrc(studio: Studio): string {
+// Helper function to get studio image
+function getStudioImage(studio: { image?: string; tags?: string[] }) {
   if (studio.image) return studio.image
-  
-  // Check specialties for a match
-  if (studio.specialties) {
-    const matchedSpecialty = studio.specialties.find(specialty => 
-      tagToSrc[specialty.toLowerCase() as keyof typeof tagToSrc]
-    )
-    if (matchedSpecialty) {
-      return tagToSrc[matchedSpecialty.toLowerCase() as keyof typeof tagToSrc]
-    }
+  const tagToSrc: Record<string, string> = {
+    yoga: "/yoga2.jpg",
+    pilates: "/pilates.jpg",
+    hiit: "/hiit.jpg",
+    padel: "/padel1.jpg",
+    pickle: "/pickle.jpg",
+    group: "/group.jpg",
+    gym: "/gym1.jpg"
   }
-  
-  // Fallback based on name
-  const name = studio.name.toLowerCase()
-  if (name.includes('yoga')) return "/yoga2.jpg"
-  if (name.includes('gym') || name.includes('iron')) return "/gym1.jpg"
-  if (name.includes('pilates')) return "/pilates.jpg"
-  
-  // Default fallback
-  return "/group.jpg"
+  const tag = studio.tags?.find(t => tagToSrc[t.toLowerCase()])
+  return tag ? tagToSrc[tag.toLowerCase()] : "/group.jpg"
 }
 
 // Use the Studio type from types/index.ts

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
-import { ClassBooking, BookingResult, ApiResponse } from '@/types'
+import { ClassBooking, ApiResponse } from '@/types'
 
 export async function POST(request: Request) {
   try {
