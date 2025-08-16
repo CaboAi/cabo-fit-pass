@@ -453,7 +453,6 @@ export default function StudioPage() {
                             alt={`${studio.name} cover`} 
                             fill 
                             className="object-cover" 
-                            placeholder="blur" 
                           />
                         </div>
 
@@ -534,7 +533,6 @@ export default function StudioPage() {
                         alt={`${studio.name} cover`} 
                         fill 
                         className="object-cover" 
-                        placeholder="blur" 
                       />
                       {studio.featured && (
                         <Badge className="absolute top-4 right-4 badge-fitness-primary z-10">
