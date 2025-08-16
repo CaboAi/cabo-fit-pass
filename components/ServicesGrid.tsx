@@ -9,14 +9,14 @@ type Service = {
 }
 
 const services: Service[] = [
-  { key: 'hiit', title: 'HIIT', desc: 'Short, intense intervals to boost endurance and burn calories.', img: '/images/fitness/hiit.jpg', alt: 'HIIT workout session' },
-  { key: 'pilates', title: 'Pilates', desc: 'Core strength, flexibility, and control with guided movements.', img: '/images/fitness/pilates.jpg', alt: 'Pilates reformer workout' },
-  { key: 'yoga', title: 'Yoga', desc: 'Balance body and mind with breathwork and mobility training.', img: '/images/fitness/yoga.jpg', alt: 'Yoga class in studio' },
-  { key: 'strength', title: 'Strength', desc: 'Weight training programs to build power and muscle safely.', img: '/images/fitness/strength.jpg', alt: 'Strength training in gym' },
-  { key: 'gym', title: 'Gym Access', desc: 'Full access to modern gym equipment and facilities.', img: '/images/fitness/gym.jpg', alt: 'Modern gym interior' },
-  { key: 'group', title: 'Group Classes', desc: 'Train with others in a fun, motivating group environment.', img: '/images/fitness/group.jpg', alt: 'Group fitness class' },
-  { key: 'pickle', title: 'Pickleball', desc: 'Fast paced and social, great for all levels.', img: '/images/fitness/pickle.jpg', alt: 'Pickleball players mid game' },
-  { key: 'padel', title: 'Padel', desc: 'Dynamic racquet sport blending tennis and squash.', img: '/images/fitness/padel.jpg', alt: 'Padel match in progress' }
+  { key: 'hiit', title: 'HIIT', desc: 'Short, intense intervals to boost endurance and burn calories.', img: '/hiit.jpg', alt: 'HIIT workout session' },
+  { key: 'pilates', title: 'Pilates', desc: 'Core strength, flexibility, and control with guided movements.', img: '/pilates.jpg', alt: 'Pilates reformer workout' },
+  { key: 'yoga', title: 'Yoga', desc: 'Balance body and mind with breathwork and mobility training.', img: '/yoga2.jpg', alt: 'Yoga class in studio' },
+  { key: 'strength', title: 'Strength', desc: 'Weight training programs to build power and muscle safely.', img: '/strength2.jpg', alt: 'Strength training in gym' },
+  { key: 'gym', title: 'Gym Access', desc: 'Full access to modern gym equipment and facilities.', img: '/gym1.jpg', alt: 'Modern gym interior' },
+  { key: 'group', title: 'Group Classes', desc: 'Train with others in a fun, motivating group environment.', img: '/group.jpg', alt: 'Group fitness class' },
+  { key: 'pickle', title: 'Pickleball', desc: 'Fast paced and social, great for all levels.', img: '/pickle.jpg', alt: 'Pickleball players mid game' },
+  { key: 'padel', title: 'Padel', desc: 'Dynamic racquet sport blending tennis and squash.', img: '/padel1.jpg', alt: 'Padel match in progress' }
 ]
 
 export default function ServicesGrid() {

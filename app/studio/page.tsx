@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image, { StaticImageData } from 'next/image'
 import { 
   MapPin, 
   Star, 
@@ -21,6 +22,41 @@ import {
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { NavigationHeader } from '@/components/layout/navigation-header'
+
+// Map tags to image sources
+const tagToSrc = {
+  yoga: "/yoga2.jpg",
+  pilates: "/pilates.jpg",
+  hiit: "/hiit.jpg",
+  padel: "/padel1.jpg",
+  pickle: "/pickle.jpg",
+  group: "/group.jpg",
+  gym: "/gym1.jpg"
+}
+
+// Helper function to get studio image source based on specialties
+function getStudioSrc(studio: Studio): string {
+  if (studio.image) return studio.image
+  
+  // Check specialties for a match
+  if (studio.specialties) {
+    const matchedSpecialty = studio.specialties.find(specialty => 
+      tagToSrc[specialty.toLowerCase() as keyof typeof tagToSrc]
+    )
+    if (matchedSpecialty) {
+      return tagToSrc[matchedSpecialty.toLowerCase() as keyof typeof tagToSrc]
+    }
+  }
+  
+  // Fallback based on name
+  const name = studio.name.toLowerCase()
+  if (name.includes('yoga')) return "/yoga2.jpg"
+  if (name.includes('gym') || name.includes('iron')) return "/gym1.jpg"
+  if (name.includes('pilates')) return "/pilates.jpg"
+  
+  // Default fallback
+  return "/group.jpg"
+}
 
 // Use the Studio type from types/index.ts
 interface Studio {
@@ -50,6 +86,7 @@ interface Studio {
   }
   images?: string[]
   reviewCount?: number
+  image?: string
 }
 
 // Mock studio data for Los Cabos
@@ -429,9 +466,14 @@ export default function StudioPage() {
                     <div className="p-6">
                       <div className="flex gap-6">
                         {/* Studio Image */}
-                        <div className="w-48 h-32 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-border">
-                          <Dumbbell className="w-8 h-8 text-primary" />
-                          <span className="sr-only">Studio photo</span>
+                        <div className="relative w-48 h-32 rounded-xl overflow-hidden flex-shrink-0 border border-border">
+                          <Image 
+                            src={getStudioImage(studio)} 
+                            alt={`${studio.name} cover`} 
+                            fill 
+                            className="object-cover" 
+                            placeholder="blur" 
+                          />
                         </div>
 
                         {/* Studio Info */}
@@ -505,10 +547,16 @@ export default function StudioPage() {
                 <div key={studio.id} className="group transform hover:scale-105 transition-transform duration-300">
                   <Card className="card-fitness-elevated bg-surface hover:border-primary/50 transition-all duration-300 overflow-hidden h-full">
                     {/* Studio Image */}
-                    <div className="relative h-48 bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center border-b border-border">
-                      <Dumbbell className="w-12 h-12 text-primary" />
+                    <div className="relative h-48 border-b border-border">
+                      <Image 
+                        src={getStudioImage(studio)} 
+                        alt={`${studio.name} cover`} 
+                        fill 
+                        className="object-cover" 
+                        placeholder="blur" 
+                      />
                       {studio.featured && (
-                        <Badge className="absolute top-4 right-4 badge-fitness-primary">
+                        <Badge className="absolute top-4 right-4 badge-fitness-primary z-10">
                           FEATURED
                         </Badge>
                       )}

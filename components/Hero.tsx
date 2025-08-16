@@ -9,8 +9,8 @@ export default function Hero({ heading, subheading }: HeroProps) {
   return (
     <div className="relative w-full h-[420px] md:h-[520px] overflow-hidden rounded-2xl">
       <Image
-        src="/images/fitness/cabo.jpg"
-        alt="Cabo beach and fitness lifestyle"
+        src="/cabo2.jpg"
+        alt="Cabo arch ocean view"
         fill
         className="object-cover"
         priority
