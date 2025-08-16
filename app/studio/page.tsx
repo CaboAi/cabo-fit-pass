@@ -24,19 +24,36 @@ import { Badge } from '@/components/ui/badge'
 import { NavigationHeader } from '@/components/layout/navigation-header'
 
 // Helper function to get studio image
-function getStudioImage(studio: { image?: string; tags?: string[] }) {
+function getStudioImage(studio: { image?: string; tags?: string[]; specialties?: string[] }) {
   if (studio.image) return studio.image
   const tagToSrc: Record<string, string> = {
-    yoga: "/yoga2.jpg",
-    pilates: "/pilates.jpg",
-    hiit: "/hiit.jpg",
-    padel: "/padel1.jpg",
-    pickle: "/pickle.jpg",
-    group: "/group.jpg",
-    gym: "/gym1.jpg"
+    yoga: "/images/fitness/yoga1.jpg",
+    pilates: "/images/fitness/pilates1.jpg",
+    hiit: "/images/fitness/hiit1.jpg",
+    padel: "/images/fitness/padel1.jpg",
+    pickle: "/images/fitness/pickle1.jpg",
+    group: "/images/fitness/group1.jpg",
+    gym: "/images/fitness/gym1.jpg",
+    "weight training": "/images/fitness/gym1.jpg",
+    "crossfit": "/images/fitness/gym1.jpg",
+    "functional training": "/images/fitness/hiit1.jpg",
+    "bootcamp": "/images/fitness/hiit1.jpg"
   }
+  
+  // Check specialties first (this is what the mock data uses)
+  const specialty = studio.specialties?.find(s => tagToSrc[s.toLowerCase()])
+  if (specialty) {
+    return tagToSrc[specialty.toLowerCase()]
+  }
+  
+  // Check tags as fallback
   const tag = studio.tags?.find(t => tagToSrc[t.toLowerCase()])
-  return tag ? tagToSrc[tag.toLowerCase()] : "/group.jpg"
+  if (tag) {
+    return tagToSrc[tag.toLowerCase()]
+  }
+  
+  // Default fallback - FIXED PATH
+  return "/images/fitness/group1.jpg"
 }
 
 // Use the Studio type from types/index.ts
@@ -452,7 +469,8 @@ export default function StudioPage() {
                             src={getStudioImage(studio)} 
                             alt={`${studio.name} cover`} 
                             fill 
-                            className="object-cover" 
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           />
                         </div>
 
@@ -532,7 +550,8 @@ export default function StudioPage() {
                         src={getStudioImage(studio)} 
                         alt={`${studio.name} cover`} 
                         fill 
-                        className="object-cover" 
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       {studio.featured && (
                         <Badge className="absolute top-4 right-4 badge-fitness-primary z-10">

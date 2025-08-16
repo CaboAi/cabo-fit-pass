@@ -7,7 +7,7 @@ const mockStudios = [
   {
     id: '1',
     name: 'Cabo Wellness Studio',
-    image: '/yoga2.jpg',
+    image: '/images/fitness/yoga1.jpg',
     rating: 4.8,
     reviewCount: 142,
     specialties: ['yoga', 'meditation'],
@@ -16,7 +16,7 @@ const mockStudios = [
   {
     id: '2', 
     name: 'Iron Gym Los Cabos',
-    image: '/gym1.jpg',
+    image: '/images/fitness/gym1.jpg',
     rating: 4.6,
     reviewCount: 89,
     specialties: ['strength', 'crossfit'],
@@ -25,7 +25,7 @@ const mockStudios = [
   {
     id: '3',
     name: 'Padel Paradise',
-    image: '/padel1.jpg', 
+    image: '/images/fitness/padel1.jpg', 
     rating: 4.9,
     reviewCount: 76,
     specialties: ['padel'],
@@ -63,6 +63,7 @@ export default function PerfTestPage() {
                   alt={`${studio.name} cover`}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
               

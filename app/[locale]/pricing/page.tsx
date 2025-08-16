@@ -240,7 +240,7 @@ const FAQ_DATA: FAQ[] = [
 function PricingBanner() {
   return (
     <div className="relative w-full h-[280px] md:h-[360px] mb-8 overflow-hidden rounded-2xl">
-      <Image src="/strength2.jpg" alt="Strength training" fill className="object-cover" priority />
+      <Image src="/images/fitness/strength1.jpg" alt="Strength training" fill className="object-cover" priority sizes="100vw" />
       <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
       <div className="absolute inset-0 flex items-center justify-center">
         <h2 className="text-white text-2xl md:text-4xl font-bold">Membership Pricing</h2>
