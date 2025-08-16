@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CreditDisplay } from '@/components/business/credit-display'
@@ -40,14 +39,28 @@ export default function Dashboard() {
 
   const loadClasses = async () => {
     try {
-      const response = await fetch('/api/classes')
+      const response = await fetch('/api/classes', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'max-age=300', // 5 minutes cache
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch classes: ${response.status}`)
+      }
+      
       const data = await response.json()
       
       if (data.success) {
         setClasses(data.data.classes)
+      } else {
+        throw new Error(data.error || 'Failed to load classes')
       }
     } catch (error) {
       console.error('Failed to load classes:', error)
+      // Could add a toast notification here for better UX
     } finally {
       setLoading(false)
     }

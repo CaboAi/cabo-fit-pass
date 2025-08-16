@@ -177,6 +177,9 @@ export default function ProfilePage() {
   const [navigationProfile, setNavigationProfile] = useState<{ email: string; credits: number; name?: string } | null>(null)
 
   useEffect(() => {
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') return
+    
     // Check for demo session
     const demoSession = localStorage.getItem('demo-session')
     const demoUser = localStorage.getItem('demo-user')
@@ -192,8 +195,14 @@ export default function ProfilePage() {
     setCreditHistory(MOCK_CREDIT_HISTORY)
     
     if (demoUser) {
-      const user = JSON.parse(demoUser)
-      setNavigationProfile(user)
+      try {
+        const user = JSON.parse(demoUser)
+        setNavigationProfile(user)
+      } catch (error) {
+        console.error('Error parsing user data:', error)
+        localStorage.removeItem('demo-user')
+        router.push('/auth/signin')
+      }
     }
   }, [router])
 

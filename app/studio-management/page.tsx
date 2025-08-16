@@ -128,6 +128,9 @@ export default function StudioManagementPage() {
   const { showSuccess } = useToast()
 
   useEffect(() => {
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') return
+    
     // For demo, we'll simulate checking if user is a studio owner
     const demoSession = localStorage.getItem('demo-session')
     

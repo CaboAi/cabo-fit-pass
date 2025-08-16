@@ -4,8 +4,24 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { ClassBooking, BookingResult, ApiResponse } from '@/types'
 
-export async function POST(request: NextRequest): Promise<NextResponse<BookingResult>> {
+export async function POST(request: Request) {
   try {
+    const body = await request.json()
+    const { class_id, user_email } = body
+
+    // Input validation
+    if (!class_id || typeof class_id !== 'string' || class_id.trim().length === 0) {
+      return NextResponse.json({ error: 'Invalid class_id provided' }, { status: 400 })
+    }
+
+    if (!user_email || typeof user_email !== 'string' || !user_email.includes('@')) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
+
+    // Sanitize inputs
+    const sanitizedClassId = class_id.trim()
+    const sanitizedEmail = user_email.trim().toLowerCase()
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.email) {
@@ -15,22 +31,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<BookingRe
       }, { status: 401 })
     }
 
-    const { class_id, user_email }: { class_id: string; user_email: string } = await request.json()
-
-    if (!class_id) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Class ID is required' 
-      }, { status: 400 })
-    }
-
     const supabase = createClient()
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('email', user_email)
+      .eq('email', sanitizedEmail)
       .single()
 
     if (profileError || !profile) {
@@ -44,7 +51,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BookingRe
     const { data: classInfo, error: classError } = await supabase
       .from('classes')
       .select('*')
-      .eq('id', class_id)
+      .eq('id', sanitizedClassId)
       .single()
 
     if (classError || !classInfo) {
@@ -66,7 +73,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BookingRe
     const { count: currentBookings, error: countError } = await supabase
       .from('bookings')
       .select('*', { count: 'exact', head: true })
-      .eq('class_id', class_id)
+      .eq('class_id', sanitizedClassId)
       .eq('booking_status', 'confirmed')
 
     if (countError) {
@@ -89,7 +96,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BookingRe
       .from('bookings')
       .select('id')
       .eq('user_id', profile.id)
-      .eq('class_id', class_id)
+      .eq('class_id', sanitizedClassId)
       .eq('booking_status', 'confirmed')
       .single()
 
@@ -105,7 +112,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BookingRe
       .from('bookings')
       .insert([{
         user_id: profile.id,
-        class_id: class_id,
+        class_id: sanitizedClassId,
         credits_used: classInfo.credit_cost,
         booking_status: 'confirmed' as const
       }])

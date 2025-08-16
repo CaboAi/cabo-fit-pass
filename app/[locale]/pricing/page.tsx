@@ -246,11 +246,19 @@ export default function PricingPage() {
   const [profile, setProfile] = useState<{ email: string; credits: number; name?: string } | null>(null)
 
   useEffect(() => {
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') return
+    
     const demoSession = localStorage.getItem('demo-session')
     const demoUser = localStorage.getItem('demo-user')
     setIsLoggedIn(!!demoSession)
     if (demoUser) {
-      setProfile(JSON.parse(demoUser))
+      try {
+        setProfile(JSON.parse(demoUser))
+      } catch (error) {
+        console.error('Error parsing user data:', error)
+        localStorage.removeItem('demo-user')
+      }
     }
   }, [])
 
@@ -563,7 +571,7 @@ export default function PricingPage() {
                     <CardContent className="space-y-6">
                       {/* Features */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-text-primary mb-3">What's included:</h4>
+                        <h4 className="font-semibold text-text-primary mb-3">What&apos;s included:</h4>
                         {tier.features.map((feature, index) => (
                           <div key={index} className="flex items-center gap-3">
                             <div className="p-1 bg-success/20 rounded-full">

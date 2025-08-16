@@ -62,7 +62,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 
     // In production, verify payment with Stripe/payment processor here
     if (payment_intent_id) {
-      console.log(`Payment verified for ${credits_to_add} credits with intent ${payment_intent_id}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Payment verified for ${credits_to_add} credits with intent ${payment_intent_id}`)
+      }
       // TODO: Verify payment_intent_id with Stripe
     }
 

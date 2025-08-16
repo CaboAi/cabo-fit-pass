@@ -233,11 +233,19 @@ export default function StudioPage() {
   const [profile, setProfile] = useState<{ email: string; credits: number; name?: string } | null>(null)
 
   useEffect(() => {
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') return
+    
     // Check for demo session and load profile
     const demoUser = localStorage.getItem('demo-user')
     
     if (demoUser) {
-      setProfile(JSON.parse(demoUser))
+      try {
+        setProfile(JSON.parse(demoUser))
+      } catch (error) {
+        console.error('Error parsing user data:', error)
+        localStorage.removeItem('demo-user')
+      }
     }
     // Filter studios based on search and filter
     let filtered = studios

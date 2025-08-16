@@ -1,29 +1,23 @@
 import createNextIntlPlugin from 'next-intl/plugin';
  
-const withNextIntl = createNextIntlPlugin();
-
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts'); // Update path
+ 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static exports for Vercel deployment
-  output: 'standalone',
-  
-  // Environment variables
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:3000', 'cabo-fit-pass.vercel.app'],
+    },
   },
-  
-  // Experimental features removed - appDir is now stable
-  
-  // Images configuration
   images: {
-    domains: ['localhost'],
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+    ],
   },
-  
-  // Disable static optimization for dynamic content
-  trailingSlash: false,
-  
-  // Handle environment variables during build
+  // Add webpack config to handle Supabase realtime warning
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -34,5 +28,5 @@ const nextConfig = {
     return config;
   },
 };
-
+ 
 export default withNextIntl(nextConfig);
