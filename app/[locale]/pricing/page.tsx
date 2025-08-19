@@ -83,8 +83,8 @@ const CREDIT_PACKAGES: CreditPackage[] = [
     color: 'from-blue-500 to-cyan-500'
   },
   {
-    id: 'popular',
-    name: 'Popular Pack',
+    id: 'standard',
+    name: 'Standard Pack',
     credits: 25,
     price: 50,
     bonus: 8,
@@ -411,9 +411,9 @@ export default function PricingPage() {
                 >
                   {/* Popular Badge */}
                   {package_.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                      <div className="bg-gradient-to-r from-orange-400 to-pink-600 text-white text-sm font-bold px-4 py-2 rounded-full flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="inline-flex items-center text-[10px] px-2 py-0.5 rounded-full mb-2 bg-gradient-to-r from-orange-400 to-pink-600 text-white font-bold uppercase tracking-wide">
+                        <Star className="size-4 mr-1 align-middle" />
                         MOST POPULAR
                       </div>
                     </div>

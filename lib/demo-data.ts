@@ -87,8 +87,7 @@ export const DEMO_CLASSES: Omit<ClassItem, 'id' | 'studio'>[] = [
     difficulty_level: 'advanced',
     created_at: new Date().toISOString(),
     current_bookings: 0
-  }
-  ,
+  },
   {
     studio_id: 'studio-1',
     name: 'Spin Power Ride',
@@ -114,6 +113,20 @@ export const DEMO_CLASSES: Omit<ClassItem, 'id' | 'studio'>[] = [
     max_capacity: 18,
     credit_cost: 2,
     difficulty_level: 'beginner',
+    created_at: new Date().toISOString(),
+    current_bookings: 0
+  },
+  {
+    studio_id: 'studio-1',
+    name: 'CrossFit WOD',
+    instructor_id: 'instructor-7',
+    class_type: 'CrossFit',
+    description: 'High-intensity functional movements for strength and conditioning.',
+    start_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    duration: 60,
+    max_capacity: 15,
+    credit_cost: 4,
+    difficulty_level: 'advanced',
     created_at: new Date().toISOString(),
     current_bookings: 0
   }
@@ -197,10 +210,11 @@ export const DEMO_CLASSES_WITH_METRICS: ClassWithMetrics[] = [
 export const DEMO_INSTRUCTORS = [
   { id: 'instructor-1', name: 'Sofia Mendez', speciality: 'Yoga', rating: 4.8 },
   { id: 'instructor-2', name: 'Carlos Rivera', speciality: 'HIIT', rating: 4.9 },
-  { id: 'instructor-3', name: 'Ana Gutierrez', speciality: 'Pilates', rating: 4.7 },
-  { id: 'instructor-4', name: 'Miguel Torres', speciality: 'Strength', rating: 4.8 },
-  { id: 'instructor-5', name: 'Isabella Cruz', speciality: 'Dance', rating: 4.9 },
-  { id: 'instructor-6', name: 'Diego Martinez', speciality: 'CrossFit', rating: 4.8 }
+  { id: 'instructor-3', name: 'Ana Lopez', speciality: 'Pilates', rating: 4.7 },
+  { id: 'instructor-4', name: 'Miguel Torres', speciality: 'Strength', rating: 4.9 },
+  { id: 'instructor-5', name: 'Elena Rodriguez', speciality: 'Cycling', rating: 4.8 },
+  { id: 'instructor-6', name: 'David Martinez', speciality: 'Yoga', rating: 4.8 },
+  { id: 'instructor-7', name: 'Isabella Cruz', speciality: 'CrossFit', rating: 4.9 }
 ]
 
 export async function seedDemoData() {

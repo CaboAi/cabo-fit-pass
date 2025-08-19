@@ -72,56 +72,73 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.15),transparent_60%)]" />
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-3 mb-6">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-600 rounded-full blur-lg opacity-75"></div>
-            <div className="relative bg-gradient-to-r from-orange-400 to-pink-600 text-white p-3 rounded-full">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-lg opacity-75"></div>
+            <div className="relative bg-gradient-to-r from-primary to-secondary text-white p-3 rounded-full">
               <Activity className="w-6 h-6" />
             </div>
           </div>
-          <h1 className="text-xl font-extrabold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+          <h1 className="text-xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Cabo Fit Pass
           </h1>
         </div>
 
-        <Card className="bg-black/40 backdrop-blur-xl border-white/10">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-white">
+        <Card className="rounded-2xl border bg-card p-6 space-y-4">
+          <CardHeader className="text-center p-0">
+            <CardTitle className="text-2xl font-bold text-foreground">
               Welcome back
             </CardTitle>
-            <p className="text-purple-200 mt-1">
+            <p className="text-muted-foreground mt-1">
               Sign in to continue your Cabo Fit Pass journey
             </p>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-5 p-0">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
+                <label htmlFor="email" className="text-sm font-medium block mb-2">
+                  Email
+                </label>
                 <Input
+                  id="email"
                   type="email"
-                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder-purple-300"
+                  className="h-11 rounded-lg"
+                  placeholder="Enter your email"
                 />
               </div>
+              
               <div>
+                <label htmlFor="password" className="text-sm font-medium block mb-2">
+                  Password
+                </label>
                 <Input
+                  id="password"
                   type="password"
-                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder-purple-300"
+                  className="h-11 rounded-lg"
+                  placeholder="Enter your password"
                 />
               </div>
+              
               {error && (
-                <div className="text-red-400 text-sm text-center">{error}</div>
+                <p className="text-sm text-destructive" role="alert">
+                  {error}
+                </p>
               )}
-              <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90" disabled={loading}>
+              
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-11 text-base rounded-xl"
+                data-cta="signin"
+              >
                 {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
               </Button>
             </form>
@@ -130,12 +147,12 @@ export default function SignInPage() {
               <Button 
                 onClick={handleDemoLogin} 
                 variant="outline" 
-                className="w-full border-white/20 text-white hover:bg-white/10"
+                className="w-full h-11 text-base rounded-xl border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
                 disabled={loading}
               >
                 {loading ? <LoadingSpinner size="sm" /> : 'Member Demo Login'}
               </Button>
-              <div className="text-xs text-purple-300">demo@cabofitpass.com - Member Experience</div>
+              <div className="text-xs text-muted-foreground">demo@cabofitpass.com - Member Experience</div>
               
               <Button 
                 onClick={() => {
@@ -149,22 +166,24 @@ export default function SignInPage() {
                   }))
                   router.push('/studio-management')
                 }} 
-                variant="outline" 
-                className="w-full border-orange-400/30 text-orange-300 hover:bg-orange-400/10"
-                disabled={loading}
+                variant="outline"
+                className="w-full h-11 text-base rounded-xl border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
               >
                 Studio Owner Demo
               </Button>
-              <div className="text-xs text-orange-300">
-                owner@cabofitness.com - Studio Management
-              </div>
+              <div className="text-xs text-muted-foreground">Studio Management Experience</div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <a href="#" className="text-primary underline-offset-4 hover:underline font-medium">
+                  Sign up
+                </a>
+              </p>
             </div>
           </CardContent>
         </Card>
-
-        <div className="text-center text-purple-200 text-sm mt-6">
-          One pass. Access top studios. Book in seconds.
-        </div>
       </div>
     </div>
   )

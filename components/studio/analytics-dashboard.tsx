@@ -87,15 +87,15 @@ export function AnalyticsDashboard({ classes }: AnalyticsDashboardProps) {
       <Card className="card-fitness bg-surface p-4">
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-heading-xl text-text-primary">Analytics Dashboard</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1 -mx-4 px-4">
             {(['week', 'month', 'year'] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all capitalize ${
+                className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-all capitalize ${
                   timeRange === range
-                    ? 'btn-fitness-primary'
-                    : 'btn-fitness-ghost'
+                    ? 'bg-primary text-primary-foreground border-transparent'
+                    : 'border-border text-text-secondary hover:bg-surface-secondary hover:text-text-primary'
                 }`}
               >
                 {range}

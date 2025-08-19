@@ -24,8 +24,20 @@ import { Badge } from '@/components/ui/badge'
 import { NavigationHeader } from '@/components/layout/navigation-header'
 
 // Helper function to get studio image
-function getStudioImage(studio: { image?: string; tags?: string[]; specialties?: string[] }) {
+function getStudioImage(studio: { image?: string; tags?: string[]; specialties?: string[]; name?: string }) {
   if (studio.image) return studio.image
+  
+  // Special cases for specific studios
+  if (studio.name === 'Serenity Spa & Fitness') {
+    return "/images/fitness/pilates3.jpg"
+  }
+  if (studio.name === 'Beachside Yoga Retreat') {
+    return "/images/fitness/yoga2.jpg"
+  }
+  if (studio.name === 'CrossFit Cabo') {
+    return "/images/fitness/strength2.jpg"
+  }
+  
   const tagToSrc: Record<string, string> = {
     yoga: "/images/fitness/yoga1.jpg",
     pilates: "/images/fitness/pilates1.jpg",
@@ -35,7 +47,7 @@ function getStudioImage(studio: { image?: string; tags?: string[]; specialties?:
     group: "/images/fitness/group1.jpg",
     gym: "/images/fitness/gym_access.jpg",
     "weight training": "/images/fitness/gym_access.jpg",
-    "crossfit": "/images/fitness/gym_access.jpg",
+    "crossfit": "/images/fitness/strength2.jpg",
     "functional training": "/images/fitness/hiit1.jpg",
     "bootcamp": "/images/fitness/hiit1.jpg"
   }
@@ -49,7 +61,7 @@ function getStudioImage(studio: { image?: string; tags?: string[]; specialties?:
   // Check tags as fallback
   const tag = studio.tags?.find(t => tagToSrc[t.toLowerCase()])
   if (tag) {
-    return tagToSrc[tag.toLowerCase()]
+    return tagToSrc[t.toLowerCase()]
   }
   
   // Default fallback - FIXED PATH
@@ -255,6 +267,40 @@ const STUDIOS: Studio[] = [
       'Sunday': '6:00 AM - 8:00 PM'
     },
     featured: true,
+    verified: true
+  },
+  {
+    id: '6',
+    owner_id: 'owner-6',
+    name: 'CrossFit Cabo',
+    description: 'High-intensity functional fitness facility specializing in CrossFit workouts, Olympic lifting, and strength conditioning. Push your limits in a supportive community.',
+    location: {
+      address: 'Calle Morelos 245, Centro',
+      neighborhood: 'Centro',
+      lat: 22.8912,
+      lng: -109.9140
+    },
+    rating: 4.8,
+    reviewCount: 112,
+    amenities: ['CrossFit Equipment', 'Olympic Lifting Area', 'Recovery Room', 'Shower Facilities', 'Parking', 'AC'],
+    contact: {
+      phone: '+52 624 189 4567',
+      email: 'wod@crossfitcabo.com',
+      website: 'crossfitcabo.com'
+    },
+    images: ['/api/placeholder/400/300', '/api/placeholder/400/300'],
+    specialties: ['CrossFit', 'Olympic Lifting', 'Functional Fitness', 'Strength Training'],
+    priceRange: '$$',
+    openingHours: {
+      'Monday': '5:00 AM - 9:00 PM',
+      'Tuesday': '5:00 AM - 9:00 PM',
+      'Wednesday': '5:00 AM - 9:00 PM',
+      'Thursday': '5:00 AM - 9:00 PM',
+      'Friday': '5:00 AM - 9:00 PM',
+      'Saturday': '6:00 AM - 8:00 PM',
+      'Sunday': '6:00 AM - 7:00 PM'
+    },
+    featured: false,
     verified: true
   }
 ]

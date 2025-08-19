@@ -355,8 +355,8 @@ export default function ProfilePage() {
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-2 border border-white/10 inline-flex">
+        <div className="sticky top-0 z-30 bg-background border-b">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2 -mx-4">
             {[
               { id: 'overview', label: 'Overview', icon: User },
               { id: 'bookings', label: 'Bookings', icon: Calendar },
@@ -366,13 +366,14 @@ export default function ProfilePage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as 'overview' | 'bookings' | 'credits' | 'settings')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                className={`inline-flex items-center rounded-full border px-3 py-1.5 text-sm whitespace-nowrap transition-all ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                    : 'text-purple-300 hover:text-white hover:bg-white/10'
+                    ? 'bg-primary text-primary-foreground border-transparent'
+                    : 'border-border hover:bg-surface-secondary'
                 }`}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className="w-4 h-4 mr-2" />
                 {tab.label}
               </button>
             ))}
