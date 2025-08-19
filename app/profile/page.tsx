@@ -290,60 +290,64 @@ export default function ProfilePage() {
           <div className="relative group">
             <div className="absolute inset-0 gradient-fitness-primary rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity -z-10"></div>
             <Card className="relative card-fitness-elevated bg-surface overflow-hidden z-10">
-              <CardContent className="p-8">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-6">
+              <CardContent className="p-4 sm:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                     {/* Avatar */}
-                    <div className="relative">
+                    <div className="relative shrink-0">
                       <div className="absolute inset-0 gradient-fitness-primary rounded-full blur opacity-75 -z-10"></div>
-                      <div className="relative w-24 h-24 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground text-3xl font-bold z-10">
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl sm:text-3xl font-bold z-10">
                         {profile.name?.charAt(0).toUpperCase() || profile.email.charAt(0).toUpperCase()}
                       </div>
                     </div>
                     
                     {/* Profile Info */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <h2 className="font-heading text-display-sm text-text-primary">{profile.name || 'Fitness Enthusiast'}</h2>
-                        <Badge className={`badge-fitness-primary ${getTierColor(profile.tier)}`}>
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                        <h2 className="font-heading text-xl sm:text-display-sm text-text-primary truncate">
+                          {profile.name || 'Fitness Enthusiast'}
+                        </h2>
+                        <Badge className={`badge-fitness-primary ${getTierColor(profile.tier)} shrink-0`}>
                           {profile.tier} Member
                         </Badge>
                       </div>
                       
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-text-secondary">
-                          <Mail className="w-4 h-4" />
-                          <span>{profile.email}</span>
+                        <div className="flex items-center gap-2 text-text-secondary min-w-0">
+                          <Mail className="w-4 h-4 shrink-0" />
+                          <span className="truncate">{profile.email}</span>
                         </div>
                         {profile.phone && (
-                          <div className="flex items-center gap-2 text-text-secondary">
-                            <Phone className="w-4 h-4" />
-                            <span>{profile.phone}</span>
+                          <div className="flex items-center gap-2 text-text-secondary min-w-0">
+                            <Phone className="w-4 h-4 shrink-0" />
+                            <span className="truncate">{profile.phone}</span>
                           </div>
                         )}
                         {profile.location && (
-                          <div className="flex items-center gap-2 text-text-secondary">
-                            <MapPin className="w-4 h-4" />
-                            <span>{profile.location}</span>
+                          <div className="flex items-center gap-2 text-text-secondary min-w-0">
+                            <MapPin className="w-4 h-4 shrink-0" />
+                            <span className="truncate">{profile.location}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-text-secondary">
-                          <Calendar className="w-4 h-4" />
-                          <span>Member since {new Date(profile.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                        <div className="flex items-center gap-2 text-text-secondary min-w-0">
+                          <Calendar className="w-4 h-4 shrink-0" />
+                          <span className="truncate">
+                            Member since {new Date(profile.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div className="card-fitness-stats p-6">
-                      <p className="text-display-sm font-bold text-text-primary">{profile.credits}</p>
-                      <p className="text-caption-sm text-text-secondary">Active Credits</p>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-center shrink-0">
+                    <div className="card-fitness-stats p-4 sm:p-6">
+                      <p className="text-lg sm:text-display-sm font-bold text-text-primary">{profile.credits}</p>
+                      <p className="text-xs sm:text-caption-sm text-text-secondary">Active Credits</p>
                     </div>
-                    <div className="card-fitness-stats p-6">
-                      <p className="text-display-sm font-bold text-text-primary">{profile.totalClassesBooked}</p>
-                      <p className="text-caption-sm text-text-secondary">Classes Booked</p>
+                    <div className="card-fitness-stats p-4 sm:p-6">
+                      <p className="text-lg sm:text-display-sm font-bold text-text-primary">{profile.totalClassesBooked}</p>
+                      <p className="text-xs sm:text-caption-sm text-text-secondary">Classes Booked</p>
                     </div>
                   </div>
                 </div>
@@ -366,14 +370,14 @@ export default function ProfilePage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as 'overview' | 'bookings' | 'credits' | 'settings')}
-                className={`inline-flex items-center rounded-full border px-3 py-1.5 text-sm whitespace-nowrap transition-all ${
+                className={`inline-flex items-center rounded-full border px-3 py-1.5 text-sm whitespace-nowrap transition-all shrink-0 ${
                   activeTab === tab.id
                     ? 'bg-primary text-primary-foreground border-transparent'
                     : 'border-border hover:bg-surface-secondary'
                 }`}
                 aria-current={activeTab === tab.id ? 'page' : undefined}
               >
-                <tab.icon className="w-4 h-4 mr-2" />
+                <tab.icon className="w-4 h-4 mr-2 shrink-0" />
                 {tab.label}
               </button>
             ))}

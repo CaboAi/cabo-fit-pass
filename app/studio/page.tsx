@@ -17,7 +17,12 @@ import {
   Wifi,
   Car,
   Heart,
-  Users
+  Users,
+  Mail,
+  Calendar,
+  CreditCard,
+  Settings,
+  User
 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -441,36 +446,36 @@ export default function StudioPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Search and Filter Bar */}
-        <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="card-fitness p-6">
+        <div className="mb-6 sm:mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="card-fitness p-4 sm:p-6">
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Search */}
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-tertiary w-5 h-5" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-text-tertiary w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="text"
                   placeholder="Search studios, neighborhoods, or specialties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-fitness-search focus-fitness"
+                  className="input-fitness-search focus-fitness text-sm sm:text-base pl-10 sm:pl-12"
                 />
               </div>
               
-              {/* Filters */}
-              <div className="flex gap-2 flex-wrap">
+              {/* Mobile: scrollable filter buttons */}
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
                 {['all', 'featured', 'verified', 'yoga', 'gym', 'wellness'].map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setSelectedFilter(filter)}
-                    className={`px-4 py-3 rounded-xl font-medium transition-all capitalize ${
+                    className={`shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedFilter === filter
                         ? 'btn-fitness-primary'
                         : 'btn-fitness-ghost'
                     }`}
                   >
-                    {filter}
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
                   </button>
                 ))}
               </div>
@@ -586,112 +591,117 @@ export default function StudioPage() {
               <p className="text-text-secondary">Try adjusting your search or filters</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
               {filteredStudios.map((studio) => (
-                <div key={studio.id} className="group transform hover:scale-105 transition-transform duration-300">
-                  <Card className="card-fitness-elevated bg-surface hover:border-primary/50 transition-all duration-300 overflow-hidden h-full">
-                    {/* Studio Image */}
-                    <div className="relative h-48 border-b border-border">
-                      <Image 
-                        src={getStudioImage(studio)} 
-                        alt={`${studio.name} cover`} 
-                        fill 
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      {studio.featured && (
-                        <Badge className="absolute top-4 right-4 badge-fitness-primary z-10">
-                          FEATURED
-                        </Badge>
-                      )}
-                    </div>
-
-                    <CardHeader className="pb-4">
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-heading text-heading-lg text-text-primary mb-1 flex items-center gap-2">
-                              {studio.name}
-                              {studio.verified && (
-                                <Award className="w-4 h-4 text-success" />
-                              )}
-                            </h3>
-                            <div className="flex items-center gap-2 text-body-sm text-text-secondary">
-                              <MapPin className="w-3 h-3" />
-                              <span>{studio.location.neighborhood}</span>
-                            </div>
+                <div key={studio.id} className="animate-fade-in">
+                  <Card className="card-fitness overflow-hidden">
+                    <div className="flex flex-col sm:flex-row">
+                      {/* Studio Image */}
+                      <div className="relative w-full sm:w-48 h-48 sm:h-auto aspect-[16/9] sm:aspect-square shrink-0">
+                        <Image 
+                          src={getStudioImage(studio)} 
+                          alt={`${studio.name} cover`} 
+                          fill 
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 192px"
+                        />
+                        {studio.featured && (
+                          <div className="absolute top-2 right-2">
+                            <Badge className="badge-fitness-primary text-xs px-2 py-1">
+                              FEATURED
+                            </Badge>
                           </div>
-                          <span className={`text-lg font-bold ${getPriceRangeColor(studio.priceRange || '')}`}>
-                            {studio.priceRange}
-                          </span>
+                        )}
+                      </div>
+
+                      {/* Studio Info */}
+                      <div className="flex-1 min-w-0 p-4 sm:p-6 space-y-4">
+                        <div>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2">
+                            <div className="min-w-0">
+                              <h3 className="font-heading text-lg sm:text-heading-xl text-text-primary mb-1 flex items-center gap-2 truncate">
+                                {studio.name}
+                                {studio.verified && (
+                                  <Award className="w-4 h-4 text-success shrink-0" />
+                                )}
+                              </h3>
+                              <div className="flex items-center gap-2 text-sm sm:text-body-sm text-text-secondary min-w-0">
+                                <MapPin className="w-3 h-3 shrink-0" />
+                                <span className="truncate">{studio.location.neighborhood}</span>
+                              </div>
+                            </div>
+                            <span className={`text-base sm:text-lg font-bold ${getPriceRangeColor(studio.priceRange || '')} shrink-0`}>
+                              {studio.priceRange}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="flex">
+                              {Array(5).fill(0).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                                    i < Math.floor(studio.rating) ? 'text-warning fill-current' : 'text-text-disabled'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-text-primary font-medium text-sm sm:text-base">{studio.rating}</span>
+                            <span className="text-text-secondary text-xs sm:text-sm">({studio.reviewCount})</span>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <div className="flex">
-                            {Array(5).fill(0).map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < Math.floor(studio.rating) ? 'text-warning fill-current' : 'text-text-disabled'
-                                }`}
-                              />
+                        <CardContent className="p-0 space-y-3">
+                          <p className="text-text-secondary text-sm line-clamp-2 leading-relaxed">{studio.description}</p>
+
+                          {/* Specialties */}
+                          <div className="flex flex-wrap gap-1">
+                            {studio.specialties?.slice(0, 3).map((specialty) => (
+                              <Badge key={specialty} variant="outline" className="badge-fitness text-xs shrink-0">
+                                {specialty}
+                              </Badge>
                             ))}
                           </div>
-                          <span className="text-text-primary font-medium">{studio.rating}</span>
-                          <span className="text-text-secondary text-sm">({studio.reviewCount})</span>
-                        </div>
-                      </div>
-                    </CardHeader>
 
-                    <CardContent className="pt-0 space-y-4">
-                      <p className="text-text-secondary text-sm line-clamp-2">{studio.description}</p>
-
-                      {/* Specialties */}
-                      <div className="flex flex-wrap gap-1">
-                        {studio.specialties?.slice(0, 3).map((specialty) => (
-                          <Badge key={specialty} variant="outline" className="badge-fitness text-xs">
-                            {specialty}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Amenities */}
-                      <div className="space-y-2">
-                        <p className="text-caption-md font-medium text-text-tertiary">Top Amenities</p>
-                        <div className="flex flex-wrap gap-2">
-                          {studio.amenities.slice(0, 4).map((amenity) => (
-                            <div key={amenity} className="flex items-center gap-1 text-caption-sm text-text-secondary">
-                              {getAmenityIcon(amenity)}
-                              <span>{amenity}</span>
+                          {/* Amenities */}
+                          <div className="space-y-2">
+                            <p className="text-xs sm:text-caption-md font-medium text-text-tertiary">Top Amenities</p>
+                            <div className="flex flex-wrap gap-2">
+                              {studio.amenities.slice(0, 4).map((amenity) => (
+                                <div key={amenity} className="flex items-center gap-1 text-xs sm:text-caption-sm text-text-secondary shrink-0">
+                                  {getAmenityIcon(amenity)}
+                                  <span className="truncate">{amenity}</span>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                          </div>
 
-                      {/* Contact & Hours */}
-                      <div className="space-y-3 pt-4 border-t border-border">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-body-sm text-text-secondary">
-                            <Phone className="w-4 h-4" />
-                            <span>{studio.contact?.phone}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-body-sm text-text-secondary">
-                            <Clock className="w-4 h-4" />
-                            <span>Open today: {studio.openingHours?.Monday}</span>
-                          </div>
-                          {studio.contact?.website && (
-                            <div className="flex items-center gap-2 text-body-sm text-text-tertiary">
-                              <Globe className="w-4 h-4" />
-                              <span>{studio.contact.website}</span>
+                          {/* Contact & Hours */}
+                          <div className="space-y-2 pt-3 border-t border-border">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 text-xs sm:text-body-sm text-text-secondary min-w-0">
+                                <Phone className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                                <span className="truncate">{studio.contact?.phone}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs sm:text-body-sm text-text-secondary min-w-0">
+                                <Clock className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                                <span className="truncate">Open today: {studio.openingHours?.Monday}</span>
+                              </div>
+                              {studio.contact?.website && (
+                                <div className="flex items-center gap-2 text-xs sm:text-body-sm text-text-tertiary min-w-0">
+                                  <Globe className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                                  <span className="truncate">{studio.contact.website}</span>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
 
-                        <button className="btn-fitness-primary w-full">
-                          View Classes & Book
-                        </button>
+                            <button className="btn-fitness-primary w-full text-sm sm:text-base py-2 sm:py-3">
+                              View Classes & Book
+                            </button>
+                          </div>
+                        </CardContent>
                       </div>
-                    </CardContent>
+                    </div>
                   </Card>
                 </div>
               ))}
