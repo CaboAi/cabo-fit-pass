@@ -61,7 +61,7 @@ function getStudioImage(studio: { image?: string; tags?: string[]; specialties?:
   // Check tags as fallback
   const tag = studio.tags?.find(t => tagToSrc[t.toLowerCase()])
   if (tag) {
-    return tagToSrc[t.toLowerCase()]
+    return tagToSrc[tag.toLowerCase()]
   }
   
   // Default fallback - FIXED PATH
