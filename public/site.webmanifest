@@ -1,0 +1,29 @@
+{
+    "name": "Cabo Fit Pass",
+    "short_name": "CFP",
+    "description": "Your fitness marketplace in Los Cabos",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f0f23",
+    "theme_color": "#6366f1",
+    "orientation": "portrait-primary",
+    "icons": [
+      {
+        "src": "/android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/android-chrome-512x512-padded.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ],
+    "categories": ["fitness", "health", "lifestyle"],
+    "lang": "en",
+    "scope": "/"
+  }
+
+
