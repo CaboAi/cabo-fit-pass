@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -14,6 +17,7 @@
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
     "@stripe/stripe-js": "^7.8.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "0.6.1",
@@ -38,12 +42,15 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "20.14.0",
     "@types/react": "18.2.8",
     "@types/react-dom": "18.2.6",
     "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "14.2.20",
+    "jest": "^30.0.5",
+    "jest-environment-node": "^30.0.5",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CreditDisplay } from '@/components/business/credit-display'
+import { CreditBreakdown } from '@/components/dashboard/CreditBreakdown'
 import { PaymentModal } from '@/components/business/payment-modal'
 import { ClassCard } from '@/components/business/class-card'
 import { NavigationHeader } from '@/components/layout/navigation-header'
@@ -309,6 +310,14 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Enhanced Credit Breakdown */}
+        <div className="mb-6 sm:mb-8 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <CreditBreakdown 
+            onPurchaseCredits={() => setShowPaymentModal(true)}
+            onPurchaseTouristPass={() => setShowPaymentModal(true)}
+          />
         </div>
 
         {/* Classes Section */}
