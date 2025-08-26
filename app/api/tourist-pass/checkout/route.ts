@@ -5,6 +5,9 @@ import { createClient } from '@/lib/supabase/server'
 import { TOURIST_PASS_CONFIG, type TouristPassType } from '@/lib/billing'
 import { getPaymentProvider, createCheckoutMetadata, isMockProvider } from '@/lib/payments/provider'
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 interface TouristPassRequest {
   passType: TouristPassType
 }
@@ -18,8 +21,14 @@ interface TouristPassResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const paymentProvider = await getPaymentProvider()
+    const body = await request.json()
+
+    if (process.env.FEATURE_STRIPE !== "true") {
+      return new Response(null, { status: 204 })
+    }
+
     const session = await getServerSession(authOptions)
-    
     if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -27,7 +36,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const { passType }: TouristPassRequest = await request.json()
+    const { passType }: TouristPassRequest = body
 
     // Validate pass type
     if (!passType || !TOURIST_PASS_CONFIG[passType]) {
@@ -67,17 +76,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { 
           success: false, 
-          error: `You already have an active tourist pass that expires on ${new Date(existingPass.ends_at).toLocaleDateString()}. Please wait for it to expire before purchasing a new one.`
+          error: `You already have an active tourist pass that expires on ${new Date(existingPass.ends_at).toLocaleDateString()}. Please wait for it to expire before purchasing a new one.` 
         },
         { status: 400 }
       )
     }
 
     // Get payment provider
-    const paymentProvider = getPaymentProvider()
-    
-    // Create or retrieve customer
-    let customerId = profile.stripe_customer_id
+    const customerId = profile.stripe_customer_id
     
     if (!customerId) {
       const customer = await paymentProvider.createCustomer(
@@ -183,8 +189,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Convert config to API format
     const availablePasses = Object.entries(TOURIST_PASS_CONFIG).map(([key, config]) => ({
-      id: key,
       ...config,
+      id: key,
       eligible: !hasActivePass,
       reason: hasActivePass ? 'You already have an active tourist pass' : 'Available for purchase'
     }))

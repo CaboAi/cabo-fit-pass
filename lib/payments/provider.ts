@@ -65,26 +65,20 @@ export interface PaymentProvider {
   getSubscription(subscriptionId: string): Promise<PaymentSubscription | null>
   
   // Webhook signature verification
-  verifyWebhookSignature(payload: string, signature: string): boolean
+  verifyWebhookSignature(payload: string, signature: string): Promise<boolean>
   
   // Provider name for logging
   getProviderName(): string
 }
 
 // Factory function to get the appropriate payment provider
-export function getPaymentProvider(): PaymentProvider {
-  const provider = process.env.PAYMENT_PROVIDER || 'mock'
-  const stripeEnabled = process.env.FEATURE_STRIPE === 'true'
-  
-  if (stripeEnabled && provider === 'stripe') {
-    // Lazy load to avoid importing Stripe when not needed
-    const { StripeProvider } = require('./stripe-provider')
-    return new StripeProvider()
+export async function getPaymentProvider(): Promise<PaymentProvider> {
+  if (process.env.FEATURE_STRIPE !== 'true') {
+    const { MockProvider } = await import("./mock-provider")
+    return new MockProvider()
   }
-  
-  // Default to mock provider
-  const { MockProvider } = require('./mock-provider')
-  return new MockProvider()
+  const { StripeProvider } = await import("./stripe-provider")
+  return new StripeProvider()
 }
 
 // Type guard to check if using mock provider
@@ -95,12 +89,19 @@ export function isMockProvider(): boolean {
 // Helper to generate consistent checkout metadata
 export function createCheckoutMetadata(params: {
   userId: string
-  kind: 'topup' | 'tourist_pass' | 'subscription'
+  kind: 'topup' | 'tourist_pass' | 'subscription' | 'corporate_purchase' | 'freeze'
   credits?: number
   packType?: string
   passType?: string
   tier?: string
   creditsBefore?: number
+  discountRate?: string
+  businessName?: string
+  freezeMonths?: string
+  frozenUntil?: string
+  freezeFee?: string
+  validityDays?: number
+  expiresAfter?: string
 }): Record<string, string> {
   const metadata: Record<string, string> = {
     user_id: params.userId,

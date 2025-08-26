@@ -11,15 +11,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-07-30.basil',
 })
 
+async function getStripe() {
+  const Stripe = (await import("stripe")).default
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error("STRIPE_SECRET_KEY missing")
+  return new Stripe(key, { apiVersion: "2023-10-16" })
+}
+
 export class StripeProvider implements PaymentProvider {
-  private stripe: Stripe
-  
-  constructor() {
-    this.stripe = stripe
-  }
+  // Remove constructor and private stripe property
   
   async createCustomer(email: string, metadata?: Record<string, string>): Promise<PaymentCustomer> {
-    const customer = await this.stripe.customers.create({
+    const stripe = await getStripe()
+
+    const customer = await stripe.customers.create({
       email,
       metadata
     })
@@ -33,7 +38,9 @@ export class StripeProvider implements PaymentProvider {
   
   async getCustomer(customerId: string): Promise<PaymentCustomer | null> {
     try {
-      const customer = await this.stripe.customers.retrieve(customerId)
+      const stripe = await getStripe()
+
+      const customer = await stripe.customers.retrieve(customerId)
       
       if (customer.deleted) {
         return null
@@ -64,7 +71,9 @@ export class StripeProvider implements PaymentProvider {
     cancelUrl: string
     metadata: Record<string, string>
   }): Promise<CheckoutSession> {
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    const stripe = await getStripe()
+
+    const sessionParams: any = {
       payment_method_types: ['card'],
       line_items: params.lineItems.map(item => ({
         price_data: {
@@ -89,7 +98,7 @@ export class StripeProvider implements PaymentProvider {
       sessionParams.customer_email = params.customerEmail
     }
     
-    const session = await this.stripe.checkout.sessions.create(sessionParams)
+    const session = await stripe.checkout.sessions.create(sessionParams)
     
     return {
       id: session.id,
@@ -103,7 +112,9 @@ export class StripeProvider implements PaymentProvider {
   
   async getCheckoutSession(sessionId: string): Promise<CheckoutSession | null> {
     try {
-      const session = await this.stripe.checkout.sessions.retrieve(sessionId)
+      const stripe = await getStripe()
+
+      const session = await stripe.checkout.sessions.retrieve(sessionId)
       
       return {
         id: session.id,
@@ -124,7 +135,9 @@ export class StripeProvider implements PaymentProvider {
     priceId: string
     metadata?: Record<string, string>
   }): Promise<PaymentSubscription> {
-    const subscription = await this.stripe.subscriptions.create({
+    const stripe = await getStripe()
+
+    const subscription = await stripe.subscriptions.create({
       customer: params.customerId,
       items: [{ price: params.priceId }],
       metadata: params.metadata
@@ -147,12 +160,14 @@ export class StripeProvider implements PaymentProvider {
     metadata?: Record<string, string>
     cancel?: boolean
   }): Promise<PaymentSubscription> {
-    let subscription: Stripe.Subscription
+    const stripe = await getStripe()
+
+    let subscription: any
     
     if (params.cancel) {
-      subscription = await this.stripe.subscriptions.cancel(subscriptionId)
+      subscription = await stripe.subscriptions.cancel(subscriptionId)
     } else {
-      const updateParams: Stripe.SubscriptionUpdateParams = {}
+      const updateParams: any = {}
       
       if (params.metadata) {
         updateParams.metadata = params.metadata
@@ -160,7 +175,7 @@ export class StripeProvider implements PaymentProvider {
       
       if (params.priceId) {
         // Get current subscription to find item ID
-        const current = await this.stripe.subscriptions.retrieve(subscriptionId)
+        const current = await stripe.subscriptions.retrieve(subscriptionId)
         const itemId = current.items.data[0]?.id
         
         if (itemId) {
@@ -172,7 +187,7 @@ export class StripeProvider implements PaymentProvider {
         }
       }
       
-      subscription = await this.stripe.subscriptions.update(subscriptionId, updateParams)
+      subscription = await stripe.subscriptions.update(subscriptionId, updateParams)
     }
     
     return {
@@ -189,7 +204,9 @@ export class StripeProvider implements PaymentProvider {
   
   async getSubscription(subscriptionId: string): Promise<PaymentSubscription | null> {
     try {
-      const subscription = await this.stripe.subscriptions.retrieve(subscriptionId)
+      const stripe = await getStripe()
+
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
       
       return {
         id: subscription.id,
@@ -207,7 +224,7 @@ export class StripeProvider implements PaymentProvider {
     }
   }
   
-  verifyWebhookSignature(payload: string, signature: string): boolean {
+  async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
     try {
       const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
       
@@ -216,8 +233,10 @@ export class StripeProvider implements PaymentProvider {
         return false
       }
       
+      const stripe = await getStripe()
+
       // Stripe will throw if signature is invalid
-      this.stripe.webhooks.constructEvent(payload, signature, webhookSecret)
+      stripe.webhooks.constructEvent(payload, signature, webhookSecret)
       return true
     } catch (error) {
       console.error('Webhook signature verification failed:', error)
@@ -230,7 +249,7 @@ export class StripeProvider implements PaymentProvider {
   }
   
   // Helper methods to map Stripe statuses
-  private mapStripeStatus(status: Stripe.Checkout.Session.Status | null): CheckoutSession['status'] {
+  private mapStripeStatus(status: any): CheckoutSession['status'] {
     switch (status) {
       case 'complete':
         return 'completed'
@@ -241,7 +260,7 @@ export class StripeProvider implements PaymentProvider {
     }
   }
   
-  private mapSubscriptionStatus(status: Stripe.Subscription.Status): PaymentSubscription['status'] {
+  private mapSubscriptionStatus(status: any): PaymentSubscription['status'] {
     switch (status) {
       case 'active':
       case 'trialing':

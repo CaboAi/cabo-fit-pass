@@ -20,7 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const provider = getPaymentProvider()
+    const provider = await getPaymentProvider()
 
     // Check if it's the mock provider
     if (provider.constructor.name !== 'MockProvider') {

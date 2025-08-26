@@ -1,92 +1,122 @@
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+// Initialize Stripe client
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-07-30.basil',
 })
 
-export { stripe }
+export default stripe
 
-// New pricing structure using environment variables
-export const STRIPE_PRICES = {
-  TIER1: process.env.STRIPE_PRICE_TIER1 || '25',
-  TIER2: process.env.STRIPE_PRICE_TIER2 || '45', 
-  TIER3: process.env.STRIPE_PRICE_TIER3 || '65',
-  FREEZE: process.env.STRIPE_PRICE_FREEZE || '5',
-  TOURIST_3DAY: process.env.STRIPE_PRICE_TOURIST_3DAY || '50',
-  TOURIST_ADDON: process.env.STRIPE_PRICE_TOURIST_ADDON || '10'
+// Stripe Connect configuration
+export const STRIPE_CONNECT_CONFIG = {
+  refreshUrl: process.env.CONNECT_REFRESH_URL || 'http://localhost:3000/admin/gym-pricing',
+  returnUrl: process.env.CONNECT_RETURN_URL || 'http://localhost:3000/admin/gym-pricing',
 }
 
-// Updated credit packages with new pricing structure
+// Stripe Price IDs for different products
+export const STRIPE_PRICE_IDS = {
+  // Subscription tiers
+  subscriptions: {
+    tier1: process.env.STRIPE_PRICE_TIER1,
+    tier2: process.env.STRIPE_PRICE_TIER2,
+    tier3: process.env.STRIPE_PRICE_TIER3,
+  },
+  // Top-up packages
+  topup: {
+    starter: process.env.STRIPE_PRICE_TOPUP_STARTER,
+    standard: process.env.STRIPE_PRICE_TOPUP_STANDARD,
+    premium: process.env.STRIPE_PRICE_TOPUP_PREMIUM,
+  },
+  // Tourist pass
+  tourist_pass: {
+    '7day': process.env.STRIPE_PRICE_TOURIST_7DAY,
+  },
+  // Freeze fees
+  freeze: {
+    monthly: process.env.STRIPE_PRICE_FREEZE_MONTHLY,
+  }
+}
+
+// Credit packages configuration
 export const CREDIT_PACKAGES = [
   {
-    id: 'credits-5',
-    credits: 5,
-    price: 250, // Price in pesos (MXN)
-    priceUSD: 1500, // Price in cents for Stripe
-    bonus: 0,
-    popular: false,
-    name: '5 Credits Package',
-    stripePriceId: STRIPE_PRICES.TIER1
-  },
-  {
-    id: 'credits-10',
+    id: 'tier1',
+    name: 'Tier 1',
     credits: 10,
-    price: 450, // Price in pesos (MXN)
-    priceUSD: 2700, // Price in cents for Stripe 
-    bonus: 2,
-    popular: true,
-    name: '10 Credits Package + 2 Bonus',
-    stripePriceId: STRIPE_PRICES.TIER2
+    price: 15,
+    priceId: process.env.STRIPE_PRICE_TIER1,
+    description: 'Basic fitness access',
+    features: ['10 credits per month', 'No rollover']
   },
   {
-    id: 'credits-20',
-    credits: 20,
-    price: 800, // Price in pesos (MXN)
-    priceUSD: 4800, // Price in cents for Stripe
-    bonus: 5,
-    popular: false,
-    name: '20 Credits Package + 5 Bonus',
-    stripePriceId: STRIPE_PRICES.TIER3
+    id: 'tier2', 
+    name: 'Tier 2',
+    credits: 25,
+    price: 35,
+    priceId: process.env.STRIPE_PRICE_TIER2,
+    description: 'Popular choice',
+    features: ['25 credits per month', 'Rollover up to 25 credits']
+  },
+  {
+    id: 'tier3',
+    name: 'Tier 3', 
+    credits: 50,
+    price: 65,
+    priceId: process.env.STRIPE_PRICE_TIER3,
+    description: 'Premium fitness access',
+    features: ['50 credits per month', 'Rollover up to 50 credits']
   }
 ]
 
-// New tourist packages
-export const TOURIST_PACKAGES = [
+// Top-up packages
+export const TOPUP_PACKAGES = [
   {
-    id: 'tourist-3day',
-    name: '3-Day Tourist Pass',
-    duration: '3 days',
-    price: 50, // USD
-    stripePriceId: STRIPE_PRICES.TOURIST_3DAY,
-    description: 'Perfect for short-term visitors'
+    id: 'starter',
+    name: 'Starter Pack',
+    credits: 12,
+    price: 25,
+    priceId: process.env.STRIPE_PRICE_TOPUP_STARTER,
+    description: '10 credits + 2 bonus',
+    bonus: 2
   },
   {
-    id: 'tourist-addon',
-    name: 'Tourist Add-on',
-    price: 10, // USD
-    stripePriceId: STRIPE_PRICES.TOURIST_ADDON,
-    description: 'Additional day pass for tourists'
+    id: 'standard',
+    name: 'Standard Pack', 
+    credits: 33,
+    price: 50,
+    priceId: process.env.STRIPE_PRICE_TOPUP_STANDARD,
+    description: '25 credits + 8 bonus',
+    bonus: 8
+  },
+  {
+    id: 'premium',
+    name: 'Premium Pack',
+    credits: 70, 
+    price: 90,
+    priceId: process.env.STRIPE_PRICE_TOPUP_PREMIUM,
+    description: '50 credits + 20 bonus',
+    bonus: 20
   }
 ]
 
-// Freeze package
-export const FREEZE_PACKAGE = {
-  id: 'freeze',
-  name: 'Freeze Membership',
-  price: 5, // USD
-  stripePriceId: STRIPE_PRICES.FREEZE,
-  description: 'Pause your membership temporarily'
+// Tourist pass
+export const TOURIST_PASS = {
+  id: '7day',
+  name: '7-Day Tourist Pass',
+  credits: 3,
+  price: 50,
+  priceId: process.env.STRIPE_PRICE_TOURIST_7DAY,
+  description: '3 credits valid for 7 days',
+  validityDays: 7
 }
 
-// Helper function to get package by Stripe price ID
-export const getPackageByStripePriceId = (stripePriceId: string) => {
-  const creditPackage = CREDIT_PACKAGES.find(pkg => pkg.stripePriceId === stripePriceId)
-  if (creditPackage) return creditPackage
-  
-  const touristPackage = TOURIST_PACKAGES.find(pkg => pkg.stripePriceId === stripePriceId)
-  if (touristPackage) return touristPackage
-  
-  if (stripePriceId === STRIPE_PRICES.FREEZE) return FREEZE_PACKAGE
-  
-  return null
+// Helper function to get Connect account status
+export async function getConnectAccountStatus(accountId: string) {
+  try {
+    const account = await stripe.accounts.retrieve(accountId)
+    return account
+  } catch (error) {
+    console.error('Error retrieving Connect account:', error)
+    return null
+  }
 }

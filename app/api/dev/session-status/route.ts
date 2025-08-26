@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+ import { NextRequest, NextResponse } from 'next/server'
 import { getPaymentProvider } from '@/lib/payments/provider'
 
 // Development endpoint to check mock session status
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const paymentProvider = getPaymentProvider()
+    const paymentProvider = await getPaymentProvider()
     const session = await paymentProvider.getCheckoutSession(sessionId)
 
     if (!session) {

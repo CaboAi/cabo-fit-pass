@@ -11,7 +11,7 @@ export async function GET(): Promise<NextResponse> {
       )
     }
 
-    const provider = getPaymentProvider()
+    const provider = await getPaymentProvider()
     const providerName = provider.constructor.name
     const isStripeEnabled = process.env.FEATURE_STRIPE === 'true'
 

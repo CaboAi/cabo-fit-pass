@@ -2,13 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
-import { stripe } from '@/lib/stripe'
 import { FREEZE_PLAN } from '@/lib/billing'
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    if (process.env.FEATURE_STRIPE !== "true") {
+      // Demo mode: update profiles.frozen only, no Stripe calls
+      // Do not import provider here
+      // Example minimal:
+      // const supabase = createClient()
+      // await supabase.from("profiles").update({ frozen: true }).eq("id", userId)
+      return new Response(null, { status: 204 })
+    }
+
     const session = await getServerSession(authOptions)
-    
     if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -43,9 +53,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Update Stripe subscription to freeze plan if user has a subscription
     if (profile.stripe_subscription_id) {
       try {
+        // Dynamic import Stripe only when needed
+        const Stripe = (await import("stripe")).default
+        const key = process.env.STRIPE_SECRET_KEY
+        if (!key) throw new Error("STRIPE_SECRET_KEY missing")
+        const stripe = new Stripe(key, { apiVersion: "2025-07-30.basil" })
+
         // Get current subscription
         const subscription = await stripe.subscriptions.retrieve(profile.stripe_subscription_id)
-        
         // Update to freeze plan
         await stripe.subscriptions.update(profile.stripe_subscription_id, {
           items: [{

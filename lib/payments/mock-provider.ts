@@ -126,9 +126,8 @@ export class MockProvider implements PaymentProvider {
     return mockSubscriptions.get(subscriptionId) || null
   }
   
-  verifyWebhookSignature(payload: string, signature: string): boolean {
-    // In mock mode, always return true
-    return true
+  async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
+    return true // Mock always returns true
   }
   
   getProviderName(): string {
