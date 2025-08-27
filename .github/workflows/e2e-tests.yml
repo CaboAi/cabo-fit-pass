@@ -1,0 +1,209 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run tests in parallel across different browsers
+        project: [
+          'chromium',
+          'firefox', 
+          'webkit',
+          'Mobile Chrome',
+          'admin-chromium'
+        ]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    
+    - name: Setup test environment
+      run: |
+        cp env.example .env.local
+        # Set test-specific environment variables
+        echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> .env.local
+        echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" >> .env.local
+        echo "NEXTAUTH_SECRET=test-secret-key" >> .env.local
+        echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_TEST_SECRET_KEY }}" >> .env.local
+        echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_TEST_WEBHOOK_SECRET }}" >> .env.local
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Run Playwright tests
+      run: npx playwright test --project=${{ matrix.project }}
+      env:
+        CI: true
+        PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.project }}
+    
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.project }}
+        path: playwright-report-${{ matrix.project }}/
+        retention-days: 30
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.project }}
+        path: test-results/
+        retention-days: 30
+
+  # Combine reports from all browser tests
+  merge-reports:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Download all reports
+      uses: actions/download-artifact@v4
+      with:
+        pattern: playwright-report-*
+        path: all-reports/
+    
+    - name: Merge HTML reports
+      run: |
+        npx playwright merge-reports --reporter=html all-reports/
+    
+    - name: Upload merged report
+      uses: actions/upload-artifact@v4
+      with:
+        name: merged-playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  # Critical path smoke tests (fastest tests for quick feedback)
+  smoke-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium
+    
+    - name: Setup test environment
+      run: |
+        cp env.example .env.local
+        echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> .env.local
+    
+    - name: Run critical path tests only
+      run: npx playwright test --project=chromium tests/e2e/booking-flow.spec.ts tests/e2e/auth.spec.ts
+      env:
+        CI: true
+    
+    - name: Upload smoke test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: smoke-test-results
+        path: test-results/
+        retention-days: 7
+
+  # Performance and accessibility tests
+  quality-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium
+    
+    - name: Setup test environment
+      run: |
+        cp env.example .env.local
+        echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> .env.local
+    
+    - name: Run accessibility tests
+      run: npx playwright test --project=chromium tests/e2e/accessibility.spec.ts
+      env:
+        CI: true
+    
+    - name: Run mobile responsive tests
+      run: npx playwright test --project="Mobile Chrome" tests/e2e/mobile-responsive.spec.ts
+      env:
+        CI: true
+    
+    - name: Upload quality test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: quality-test-results
+        path: test-results/
+        retention-days: 14
+
+  # Notify on test failures
+  notify-failure:
+    needs: [test, smoke-tests, quality-tests]
+    runs-on: ubuntu-latest
+    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+    - name: Notify Slack on failure
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        text: 'E2E Tests failed on ${{ github.ref_name }} branch'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

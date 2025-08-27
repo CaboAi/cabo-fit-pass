@@ -2,12 +2,38 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { ClassItem, ApiResponse } from '@/types'
 import { seedDemoData } from '@/lib/demo-data'
+import { createComponentLogger } from '@/lib/logger'
+import { cache, CACHE_TTL } from '@/lib/cache'
 
 export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassItem[] }>>> {
+  const logger = createComponentLogger('classes')
+  const startTime = Date.now()
+  
   try {
+    logger.info('Fetching classes started', {
+      action: 'fetch-classes'
+    })
+
+    // Try to get data from cache first
+    const cachedClasses = await cache.classes.list().get()
+    if (cachedClasses) {
+      const duration = Date.now() - startTime
+      logger.info('Classes served from cache', {
+        action: 'fetch-classes',
+        duration,
+        statusCode: 200,
+        metadata: { classCount: cachedClasses.length, source: 'cache' }
+      })
+      
+      return NextResponse.json({
+        success: true,
+        data: { classes: cachedClasses }
+      })
+    }
+    
     const supabase = createClient()
     
-    // Try to get real data first
+    // Try to get real data from database
     const { data: classes, error } = await supabase
       .from('classes')
       .select(`
@@ -27,6 +53,11 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassIt
 
     // If we have real data, use it
     if (classes && classes.length > 0 && !error) {
+      logger.info('Real classes data found', {
+        action: 'fetch-classes',
+        resource: 'classes',
+        metadata: { classCount: classes.length }
+      })
       const transformedClasses: ClassItem[] = classes.map((classData: {
         id: string
         studio_id: string
@@ -69,6 +100,17 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassIt
         current_bookings: classData.bookings?.length || 0
       }))
 
+      // Cache the transformed classes data
+      await cache.classes.list().set(transformedClasses, CACHE_TTL.MEDIUM)
+
+      const duration = Date.now() - startTime
+      logger.info('Classes fetched successfully from database and cached', {
+        action: 'fetch-classes',
+        duration,
+        statusCode: 200,
+        metadata: { classCount: transformedClasses.length, source: 'database' }
+      })
+
       return NextResponse.json({
         success: true,
         data: { classes: transformedClasses }
@@ -76,7 +118,24 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassIt
     }
 
     // Fallback to demo data if no real data exists
+    logger.info('No real classes data found, using demo data', {
+      action: 'fetch-classes',
+      resource: 'demo-data',
+      metadata: { reason: 'no_real_data' }
+    })
+    
     const demoData = await seedDemoData()
+    
+    // Cache demo data for a shorter period
+    await cache.classes.list().set(demoData.classes, CACHE_TTL.SHORT)
+    
+    const duration = Date.now() - startTime
+    logger.info('Demo classes data returned and cached', {
+      action: 'fetch-classes',
+      duration,
+      statusCode: 200,
+      metadata: { classCount: demoData.classes.length, source: 'demo' }
+    })
     
     return NextResponse.json({
       success: true,
@@ -85,17 +144,33 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ classes: ClassIt
     })
 
   } catch (error) {
-    console.error('Classes API error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Classes API error', {
+      action: 'fetch-classes',
+      duration,
+      errorCode: 'CLASSES_FETCH_FAILED'
+    }, error instanceof Error ? error : new Error('Unknown error'))
     
     // Even if everything fails, return demo data
     try {
+      logger.info('Attempting to return demo data after error', {
+        action: 'fetch-classes',
+        metadata: { fallback: 'demo_data' }
+      })
+      
       const demoData = await seedDemoData()
       return NextResponse.json({
         success: true,
         data: { classes: demoData.classes },
         message: 'Using demo data due to server error'
       })
-    } catch {
+    } catch (fallbackError) {
+      logger.error('Failed to return demo data as fallback', {
+        action: 'fetch-classes',
+        errorCode: 'DEMO_DATA_FALLBACK_FAILED',
+        statusCode: 500
+      }, fallbackError instanceof Error ? fallbackError : new Error('Unknown fallback error'))
+      
       return NextResponse.json({
         success: false,
         error: 'Failed to load classes'

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { reportError, addBreadcrumb, recordMetric } from '@/lib/monitoring/sentry-integration'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -10,6 +11,14 @@ interface ErrorBoundaryState {
 
 interface ErrorBoundaryProps {
   children: React.ReactNode
+  fallback?: React.ComponentType<{ error: Error; resetError: () => void }>
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  context?: {
+    component?: string
+    userId?: string
+    page?: string
+    feature?: string
+  }
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -24,10 +33,65 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo)
+
+    // Add breadcrumb for error context
+    addBreadcrumb(
+      `Error caught by ErrorBoundary in ${this.props.context?.component || 'unknown component'}`,
+      'error',
+      'error',
+      {
+        componentStack: errorInfo.componentStack.substring(0, 200),
+        page: this.props.context?.page,
+        feature: this.props.context?.feature,
+      }
+    )
+
+    // Report error to monitoring with enhanced context
+    reportError(error, {
+      component: this.props.context?.component || 'react-component',
+      userId: this.props.context?.userId,
+      metadata: {
+        errorBoundary: true,
+        componentStack: errorInfo.componentStack,
+        page: this.props.context?.page,
+        feature: this.props.context?.feature,
+        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
+        url: typeof window !== 'undefined' ? window.location.href : undefined,
+        timestamp: new Date().toISOString(),
+      }
+    }, 'error')
+
+    // Record error metrics
+    recordMetric('react.errors', 1, 'count', {
+      component: this.props.context?.component || 'unknown',
+      page: this.props.context?.page || 'unknown',
+      error_type: error.name,
+    })
+
+    // Call custom error handler if provided
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo)
+    }
+  }
+
+  private resetError = () => {
+    this.setState({ hasError: false, error: undefined })
+    
+    // Record recovery attempt
+    recordMetric('react.error_recovery', 1, 'count', {
+      component: this.props.context?.component || 'unknown',
+      page: this.props.context?.page || 'unknown',
+    })
   }
 
   render() {
-    if (this.state.hasError) {
+    if (this.state.hasError && this.state.error) {
+      // Use custom fallback if provided
+      if (this.props.fallback) {
+        const Fallback = this.props.fallback
+        return <Fallback error={this.state.error} resetError={this.resetError} />
+      }
+
       return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
           <div className="bg-white rounded-lg border border-red-200 shadow-sm max-w-md w-full p-6 text-center">
@@ -55,7 +119,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               </button>
               
               <button
-                onClick={() => this.setState({ hasError: false })}
+                onClick={this.resetError}
                 className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
               >
                 Try Again

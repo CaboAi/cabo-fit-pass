@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
           },
           metadata: {
             userId: profile.id,
-            itemType,
-            plan
+              itemType,
+              plan
           },
-          success_url: successUrl || `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
-          cancel_url: cancelUrl || `${process.env.NEXTAUTH_URL}/dashboard?canceled=true`,
+          success_url: successUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?success=true`,
+          cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?canceled=true`,
         })
       } catch (stripeError) {
         console.error('Stripe subscription creation error:', stripeError)
@@ -118,8 +118,8 @@ export async function POST(request: NextRequest) {
             plan,
             credits: getCreditsForItem(itemType, plan)
           },
-          success_url: successUrl || `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
-          cancel_url: cancelUrl || `${process.env.NEXTAUTH_URL}/dashboard?canceled=true`,
+          success_url: successUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?success=true`,
+          cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?canceled=true`,
         })
       } catch (stripeError) {
         console.error('Stripe payment creation error:', stripeError)

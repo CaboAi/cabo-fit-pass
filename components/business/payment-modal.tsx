@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CREDIT_PACKAGES, TOPUP_PACKAGES, TOURIST_PASS } from '@/lib/stripe'
+import { CREDIT_PACKAGES, TOPUP_PACKAGES, TOURIST_PASS } from '@/lib/stripe-constants'
 import { useToast } from '@/hooks/use-toast'
 
 interface PaymentModalProps {

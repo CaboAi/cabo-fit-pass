@@ -96,7 +96,7 @@ export default function SignInPage() {
             </p>
           </CardHeader>
           <CardContent className="space-y-5 p-0">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" data-testid="signin-form">
               <div>
                 <label htmlFor="email" className="text-sm font-medium block mb-2">
                   Email
@@ -109,6 +109,7 @@ export default function SignInPage() {
                   required
                   className="h-11 rounded-lg"
                   placeholder="Enter your email"
+                  data-testid="email-input"
                 />
               </div>
               
@@ -124,11 +125,12 @@ export default function SignInPage() {
                   required
                   className="h-11 rounded-lg"
                   placeholder="Enter your password"
+                  data-testid="password-input"
                 />
               </div>
               
               {error && (
-                <p className="text-sm text-destructive" role="alert">
+                <p className="text-sm text-destructive" role="alert" data-testid="auth-error">
                   {error}
                 </p>
               )}
@@ -138,6 +140,7 @@ export default function SignInPage() {
                 disabled={loading}
                 className="w-full h-11 text-base rounded-xl"
                 data-cta="signin"
+                data-testid="signin-button"
               >
                 {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
               </Button>
@@ -149,6 +152,7 @@ export default function SignInPage() {
                 variant="outline" 
                 className="w-full h-11 text-base rounded-xl border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
                 disabled={loading}
+                data-testid="demo-user-button"
               >
                 {loading ? <LoadingSpinner size="sm" /> : 'Member Demo Login'}
               </Button>

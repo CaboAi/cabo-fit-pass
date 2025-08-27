@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Calendar, DollarSign, CreditCard, TrendingUp } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 interface PayoutRecord {
   id: string
@@ -26,6 +27,7 @@ interface PayoutStats {
 }
 
 export default function GymPayoutsDashboard({ gymId }: { gymId: string }) {
+  const { showSuccess, showError } = useToast()
   const [payouts, setPayouts] = useState<PayoutRecord[]>([])
   const [stats, setStats] = useState<PayoutStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -196,13 +198,13 @@ export default function GymPayoutsDashboard({ gymId }: { gymId: string }) {
                   },
                 })
                 if (response.ok) {
-                  alert('Payout processing triggered successfully')
+                  showSuccess('Payout processing triggered successfully')
                   fetchPayouts()
                 } else {
-                  alert('Failed to trigger payout processing')
+                  showError('Failed to trigger payout processing')
                 }
               } catch (error) {
-                alert('Error triggering payout processing')
+                showError('Error triggering payout processing')
               }
             }}
             variant="outline"

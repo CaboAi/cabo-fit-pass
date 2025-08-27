@@ -1,0 +1,1819 @@
+openapi: 3.0.3
+info:
+  title: Cabo Fit Pass API
+  version: 1.0.0
+  description: |
+    **Cabo Fit Pass** is a production-ready fitness booking platform built for the Los Cabos market. 
+    
+    This API provides a comprehensive suite of endpoints for:
+    - **User Authentication & Profiles** - Secure user management with NextAuth.js
+    - **Class Booking System** - Credit-based booking with atomic transactions
+    - **Payment Processing** - Stripe integration with webhook support
+    - **Admin Management** - Gym and studio administration
+    - **Health Monitoring** - System health and performance tracking
+    
+    ## Authentication
+    The API uses JWT-based authentication via NextAuth.js. Include the session token in requests to protected endpoints.
+    
+    ## Rate Limiting
+    API endpoints are rate-limited to prevent abuse:
+    - **Standard endpoints**: 100 requests per minute per IP
+    - **Payment endpoints**: 20 requests per minute per user
+    - **Admin endpoints**: 50 requests per minute per admin user
+    
+    ## Error Handling
+    All endpoints return consistent error responses with:
+    - HTTP status codes following REST conventions
+    - Structured error objects with `success: false`
+    - Detailed error messages for debugging (development only)
+    - Request IDs for tracing (via headers)
+
+  contact:
+    name: Cabo Fit Pass API Support
+    url: https://github.com/your-repo/cabo-fit-pass
+    email: support@cabofitpass.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://cabo-fit-pass.vercel.app/api
+    description: Production server
+  - url: http://localhost:3000/api
+    description: Development server
+
+security:
+  - BearerAuth: []
+  - SessionAuth: []
+
+paths:
+  # Health Check Endpoints
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Comprehensive system health check
+      description: |
+        Returns detailed health status of all system components including:
+        - Database connectivity (Supabase)
+        - Redis cache status
+        - Stripe API connectivity
+        - Environment configuration
+        - Memory usage
+      operationId: getSystemHealth
+      security: []
+      responses:
+        '200':
+          description: System is healthy or degraded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  summary: All systems operational
+                  value:
+                    status: healthy
+                    timestamp: "2025-01-27T10:00:00.000Z"
+                    version: "1.0.0"
+                    environment: "production"
+                    uptime: 86400
+                    responseTime: 150
+                    components:
+                      database:
+                        name: "Supabase Database"
+                        status: healthy
+                        responseTime: 45
+                      redis:
+                        name: "Redis Cache"
+                        status: healthy
+                        responseTime: 12
+                      stripe:
+                        name: "Stripe API"
+                        status: healthy
+                        responseTime: 89
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /health/ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness probe for Kubernetes/Docker
+      description: Lightweight endpoint for container orchestration readiness checks
+      operationId: getReadinessProbe
+      security: []
+      responses:
+        '200':
+          description: Service is ready to accept traffic
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ready]
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /health/live:
+    get:
+      tags:
+        - Health
+      summary: Liveness probe for Kubernetes/Docker
+      description: Lightweight endpoint for container orchestration liveness checks
+      operationId: getLivenessProbe
+      security: []
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [alive]
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  # Authentication Endpoints
+  /auth/demo-login:
+    post:
+      tags:
+        - Authentication
+      summary: Demo login for testing
+      description: Provides quick demo access without requiring real credentials
+      operationId: demoLogin
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [user, admin]
+                  default: user
+                  description: Role to demo login as
+      responses:
+        '200':
+          description: Demo login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                success: true
+                message: "Demo login successful"
+                data:
+                  sessionToken: "demo-jwt-token"
+                  user:
+                    id: "demo-user-id"
+                    email: "demo@example.com"
+                    role: "user"
+
+  # Profile Management
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get current user profile
+      description: |
+        Retrieves the authenticated user's profile including:
+        - Basic user information
+        - Credit balance
+        - Subscription tier
+        - Account preferences
+        
+        **Caching**: Results are cached for 1 hour for performance
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          profile:
+                            $ref: '#/components/schemas/UserProfile'
+              example:
+                success: true
+                data:
+                  profile:
+                    id: "user-123"
+                    email: "john@example.com"
+                    full_name: "John Doe"
+                    user_type: "member"
+                    credits: 25
+                    subscription_tier: "premium"
+                    created_at: "2024-01-15T08:00:00.000Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Profile
+      summary: Update user profile
+      description: |
+        Updates user profile information. Only modifiable fields are accepted.
+        
+        **Rate Limiting**: 10 updates per minute per user
+      operationId: updateUserProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                  maxLength: 100
+                  description: User's full display name
+                subscription_tier:
+                  type: string
+                  enum: [free, basic, premium, unlimited]
+                  description: User's subscription level
+            example:
+              full_name: "John Smith"
+              subscription_tier: "premium"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          profile:
+                            $ref: '#/components/schemas/UserProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Classes
+  /classes:
+    get:
+      tags:
+        - Classes
+      summary: List all available fitness classes
+      description: |
+        Retrieves all upcoming fitness classes with studio and booking information.
+        
+        **Features**:
+        - Includes current booking counts
+        - Shows studio information
+        - Filtered to future classes only
+        - Cached for optimal performance
+        
+        **Caching**: Results cached for 15 minutes
+      operationId: listClasses
+      security: []
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of classes to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Classes retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          classes:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ClassItem'
+                      message:
+                        type: string
+                        description: Additional info (e.g., demo data notice)
+              example:
+                success: true
+                data:
+                  classes:
+                    - id: "class-123"
+                      name: "Morning Yoga Flow"
+                      class_type: "yoga"
+                      start_time: "2024-01-28T07:00:00.000Z"
+                      duration: 60
+                      credit_cost: 1
+                      max_capacity: 20
+                      current_bookings: 12
+                      difficulty_level: "beginner"
+                      studio:
+                        name: "Cabo Wellness Studio"
+                        location:
+                          address: "Marina District, Cabo San Lucas"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Bookings
+  /bookings:
+    get:
+      tags:
+        - Bookings
+      summary: Get user's bookings
+      description: |
+        Retrieves all confirmed bookings for the authenticated user, 
+        including class and studio details.
+      operationId: getUserBookings
+      responses:
+        '200':
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          bookings:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ClassBooking'
+              example:
+                success: true
+                data:
+                  bookings:
+                    - id: "booking-456"
+                      user_id: "user-123"
+                      class_id: "class-123"
+                      credits_used: 1
+                      booking_status: "confirmed"
+                      type: "credits"
+                      created_at: "2024-01-27T10:30:00.000Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Bookings
+      summary: Create a new class booking
+      description: |
+        Books a fitness class for the authenticated user. This endpoint:
+        
+        **Features**:
+        - Uses atomic transactions to ensure consistency
+        - Supports both credits and tourist passes
+        - Implements FIFO credit consumption
+        - Checks class capacity and user eligibility
+        - Prevents double booking
+        
+        **Business Rules**:
+        - Tourist passes take priority over credits
+        - Account must not be frozen
+        - Class must not be at capacity
+        - User cannot book same class twice
+        
+        **Rate Limiting**: 30 bookings per hour per user
+      operationId: createBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - class_id
+                - user_email
+              properties:
+                class_id:
+                  type: string
+                  format: uuid
+                  description: UUID of the class to book
+                user_email:
+                  type: string
+                  format: email
+                  description: Email of the user making the booking
+            example:
+              class_id: "class-123"
+              user_email: "john@example.com"
+      responses:
+        '200':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      booking:
+                        $ref: '#/components/schemas/ClassBooking'
+                      remainingCredits:
+                        type: integer
+                        description: User's remaining credit balance
+                      usedTouristPass:
+                        type: boolean
+                        description: Whether a tourist pass was used
+                      touristPassRemaining:
+                        type: integer
+                        nullable: true
+                        description: Remaining tourist pass uses
+              example:
+                success: true
+                booking:
+                  id: "booking-789"
+                  user_id: "user-123"
+                  class_id: "class-123"
+                  credits_used: 1
+                  booking_status: "confirmed"
+                  type: "credits"
+                remainingCredits: 24
+                usedTouristPass: false
+                touristPassRemaining: null
+        '400':
+          description: Booking validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              examples:
+                insufficient_credits:
+                  summary: Not enough credits
+                  value:
+                    success: false
+                    error: "Insufficient credits. Need 1 but have 0 active credits"
+                class_full:
+                  summary: Class at capacity
+                  value:
+                    success: false
+                    error: "Class is full"
+                already_booked:
+                  summary: Already booked
+                  value:
+                    success: false
+                    error: "You have already booked this class"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Account frozen or other restriction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                success: false
+                error: "Account is frozen. Please unfreeze your account to book classes."
+        '404':
+          description: Class or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /bookings/{id}/cancel:
+    post:
+      tags:
+        - Bookings
+      summary: Cancel a booking
+      description: |
+        Cancels an existing booking and handles credit refunds based on timing:
+        - **More than 24h before class**: Full credit refund
+        - **12-24h before class**: 50% credit refund  
+        - **Less than 12h before class**: No refund
+        
+        Tourist pass bookings follow different refund rules.
+      operationId: cancelBooking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Booking ID to cancel
+      responses:
+        '200':
+          description: Booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      refunded_credits:
+                        type: integer
+                        description: Number of credits refunded
+                      refund_reason:
+                        type: string
+                        description: Explanation of refund policy applied
+        '404':
+          description: Booking not found or not cancellable
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /bookings/{id}/attendance:
+    post:
+      tags:
+        - Bookings
+      summary: Mark attendance for a booking
+      description: |
+        Records attendance for a completed class booking. 
+        Used by studio staff or automated check-in systems.
+        
+        **Access**: Requires studio staff or admin privileges
+      operationId: markAttendance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Booking ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attended:
+                  type: boolean
+                  description: Whether the user attended the class
+                notes:
+                  type: string
+                  maxLength: 500
+                  description: Optional attendance notes
+      responses:
+        '200':
+          description: Attendance recorded successfully
+        '404':
+          description: Booking not found
+        '403':
+          description: Not authorized to mark attendance
+
+  # Credits Management
+  /credits:
+    get:
+      tags:
+        - Credits
+      summary: Get user's credit balance
+      description: |
+        Returns the current credit balance for the authenticated user.
+        
+        **Caching**: Results cached for 5 minutes for performance
+      operationId: getUserCredits
+      responses:
+        '200':
+          description: Credit balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          credits:
+                            type: integer
+                            description: Current credit balance
+              example:
+                success: true
+                data:
+                  credits: 25
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: User profile not found
+
+    post:
+      tags:
+        - Credits
+      summary: Add credits to user account
+      description: |
+        Adds credits to a user's account after payment verification.
+        
+        **Security**: 
+        - Verifies payment with Stripe before adding credits
+        - User can only add credits to their own account
+        - All transactions are logged for audit
+        
+        **Rate Limiting**: 10 credit purchases per hour per user
+      operationId: addUserCredits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_email
+                - credits_to_add
+              properties:
+                user_email:
+                  type: string
+                  format: email
+                  description: Email of user receiving credits
+                credits_to_add:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  description: Number of credits to add
+                payment_intent_id:
+                  type: string
+                  description: Stripe payment intent ID for verification
+            example:
+              user_email: "john@example.com"
+              credits_to_add: 10
+              payment_intent_id: "pi_1234567890"
+      responses:
+        '200':
+          description: Credits added successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success:
+                            type: boolean
+                          new_credits:
+                            type: integer
+                            description: New total credit balance
+                          added_credits:
+                            type: integer
+                            description: Number of credits added
+        '400':
+          description: Invalid credit amount or payment verification failed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Cannot add credits for different user
+
+  /credits/breakdown:
+    get:
+      tags:
+        - Credits
+      summary: Get detailed credit breakdown
+      description: |
+        Returns detailed information about user's credits including:
+        - Active credits by expiration date
+        - Credit history and transactions
+        - Subscription vs purchased credits
+        - Tourist pass information
+      operationId: getCreditBreakdown
+      responses:
+        '200':
+          description: Credit breakdown retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /credits/topup:
+    post:
+      tags:
+        - Credits
+      summary: Purchase credit top-up
+      description: |
+        Initiates a credit purchase flow by creating a Stripe payment session.
+        
+        **Process**:
+        1. Creates Stripe checkout session
+        2. Redirects user to payment page
+        3. Webhooks handle credit addition after payment
+      operationId: createCreditTopup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - credits
+              properties:
+                credits:
+                  type: integer
+                  minimum: 5
+                  maximum: 100
+                  description: Number of credits to purchase
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: Stripe checkout URL
+
+  # Payment Processing
+  /create-payment-intent:
+    post:
+      tags:
+        - Payments
+      summary: Create Stripe payment intent
+      description: |
+        Creates a payment intent for credit purchases or subscriptions.
+        
+        **Security**: All payment data is handled by Stripe - no card details stored
+      operationId: createPaymentIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - currency
+              properties:
+                amount:
+                  type: integer
+                  description: Amount in cents
+                currency:
+                  type: string
+                  enum: [usd]
+                  default: usd
+                description:
+                  type: string
+                  description: Payment description
+      responses:
+        '200':
+          description: Payment intent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /stripe/webhooks:
+    post:
+      tags:
+        - Payments
+      summary: Stripe webhook endpoint
+      description: |
+        Handles Stripe webhook events for payment processing:
+        
+        **Supported Events**:
+        - `checkout.session.completed` - Completes credit purchase
+        - `invoice.payment_succeeded` - Processes subscription payments
+        - `payment_intent.succeeded` - Handles successful payments
+        
+        **Security**: Webhook signature verification required
+      operationId: handleStripeWebhook
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Stripe webhook event payload
+      parameters:
+        - name: stripe-signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Stripe webhook signature for verification
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        '400':
+          description: Invalid signature or malformed payload
+        '500':
+          description: Webhook processing failed
+
+  # Admin Endpoints
+  /admin/verify-role:
+    get:
+      tags:
+        - Admin
+      summary: Verify admin role
+      description: Verifies that the current user has admin privileges
+      operationId: verifyAdminRole
+      responses:
+        '200':
+          description: User has admin role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isAdmin:
+                    type: boolean
+                  role:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: User does not have admin privileges
+
+  /admin/gyms:
+    get:
+      tags:
+        - Admin
+      summary: List all gyms
+      description: |
+        Retrieves all gyms in the system with their details and connection status.
+        
+        **Admin Only**: Requires admin role
+      operationId: listGyms
+      responses:
+        '200':
+          description: Gyms retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Gym'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Admin
+      summary: Create new gym
+      description: |
+        Creates a new gym in the system.
+        
+        **Admin Only**: Requires admin role
+      operationId: createGym
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+              properties:
+                name:
+                  type: string
+                  description: Gym name
+                email:
+                  type: string
+                  format: email
+                  description: Gym contact email
+                phone:
+                  type: string
+                  description: Gym phone number
+                location:
+                  type: string
+                  description: Gym location/address
+      responses:
+        '200':
+          description: Gym created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Gym'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/gyms/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get gym by ID
+      description: Retrieves detailed information about a specific gym
+      operationId: getGymById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Gym details retrieved successfully
+        '404':
+          description: Gym not found
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/gyms/{id}/pricing:
+    get:
+      tags:
+        - Admin
+      summary: Get gym pricing configuration
+      operationId: getGymPricing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pricing configuration retrieved
+
+    post:
+      tags:
+        - Admin
+      summary: Update gym pricing
+      operationId: updateGymPricing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pricing updated successfully
+
+  /admin/studios:
+    get:
+      tags:
+        - Admin
+      summary: List all studios
+      description: Retrieves all fitness studios with detailed information
+      operationId: listStudios
+      responses:
+        '200':
+          description: Studios retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Studio'
+
+  # Account Management
+  /account/freeze:
+    post:
+      tags:
+        - Account
+      summary: Freeze user account
+      description: |
+        Temporarily freezes the user's account, preventing new bookings
+        but preserving existing bookings and credits.
+      operationId: freezeAccount
+      responses:
+        '200':
+          description: Account frozen successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /account/unfreeze:
+    post:
+      tags:
+        - Account
+      summary: Unfreeze user account
+      description: Reactivates a frozen account, allowing new bookings
+      operationId: unfreezeAccount
+      responses:
+        '200':
+          description: Account unfrozen successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Tourist Pass
+  /tourist-pass/purchase:
+    post:
+      tags:
+        - Tourist Pass
+      summary: Purchase tourist pass
+      description: |
+        Tourist passes provide unlimited access to classes for a limited time period.
+        Perfect for visitors to Los Cabos.
+      operationId: purchaseTouristPass
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                duration_days:
+                  type: integer
+                  enum: [3, 7, 14]
+                  description: Duration of the tourist pass
+      responses:
+        '200':
+          description: Tourist pass purchase initiated
+
+  /tourist-pass/validate:
+    post:
+      tags:
+        - Tourist Pass
+      summary: Validate tourist pass
+      description: Validates if a user has an active tourist pass
+      operationId: validateTouristPass
+      responses:
+        '200':
+          description: Tourist pass validation result
+
+  # Monitoring and Analytics
+  /monitoring/metrics:
+    get:
+      tags:
+        - Monitoring
+      summary: System performance metrics
+      description: |
+        Returns system performance metrics for monitoring dashboards:
+        - API response times
+        - Error rates
+        - Active user counts
+        - Booking statistics
+        
+        **Admin Only**: Sensitive performance data
+      operationId: getSystemMetrics
+      responses:
+        '200':
+          description: Metrics retrieved successfully
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /monitoring/alerts:
+    get:
+      tags:
+        - Monitoring
+      summary: System alerts
+      description: Returns current system alerts and warnings
+      operationId: getSystemAlerts
+      responses:
+        '200':
+          description: Alerts retrieved successfully
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from authentication
+    
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+      description: NextAuth session cookie
+
+  schemas:
+    # Core Domain Models
+    UserProfile:
+      type: object
+      required:
+        - id
+        - email
+        - user_type
+        - credits
+        - subscription_tier
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+        email:
+          type: string
+          format: email
+          description: User's email address
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: User's full display name
+        user_type:
+          type: string
+          enum: [member, instructor, studio_owner]
+          description: User's role in the system
+        credits:
+          type: integer
+          minimum: 0
+          description: Current credit balance
+        subscription_tier:
+          type: string
+          enum: [free, basic, premium, unlimited]
+          description: User's subscription level
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Account creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last profile update timestamp
+      example:
+        id: "user-123"
+        email: "john@example.com"
+        full_name: "John Doe"
+        user_type: "member"
+        credits: 25
+        subscription_tier: "premium"
+        created_at: "2024-01-15T08:00:00.000Z"
+        updated_at: "2024-01-27T10:30:00.000Z"
+
+    Studio:
+      type: object
+      required:
+        - id
+        - name
+        - owner_id
+        - location
+        - amenities
+        - rating
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique studio identifier
+        name:
+          type: string
+          maxLength: 100
+          description: Studio name
+        owner_id:
+          type: string
+          format: uuid
+          description: ID of the studio owner
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: Studio description
+        location:
+          type: object
+          required:
+            - lat
+            - lng
+            - address
+            - neighborhood
+          properties:
+            lat:
+              type: number
+              format: double
+              description: Latitude coordinate
+            lng:
+              type: number
+              format: double
+              description: Longitude coordinate
+            address:
+              type: string
+              description: Full street address
+            neighborhood:
+              type: string
+              description: Area/neighborhood name
+        amenities:
+          type: array
+          items:
+            type: string
+          description: List of available amenities
+        rating:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 5
+          description: Average studio rating
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+      example:
+        id: "studio-456"
+        name: "Cabo Wellness Studio"
+        owner_id: "owner-789"
+        description: "Premium fitness studio in the heart of Cabo"
+        location:
+          lat: 22.8909
+          lng: -109.9124
+          address: "123 Marina Blvd, Cabo San Lucas"
+          neighborhood: "Marina District"
+        amenities: ["Parking", "Showers", "Equipment Rental", "Water Station"]
+        rating: 4.8
+
+    ClassItem:
+      type: object
+      required:
+        - id
+        - studio_id
+        - name
+        - class_type
+        - start_time
+        - duration
+        - max_capacity
+        - credit_cost
+        - difficulty_level
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique class identifier
+        studio_id:
+          type: string
+          format: uuid
+          description: ID of the studio hosting the class
+        name:
+          type: string
+          maxLength: 100
+          description: Class name/title
+        instructor_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the class instructor
+        class_type:
+          type: string
+          description: Type of fitness class
+          enum: [yoga, pilates, strength, cardio, dance, martial-arts, aqua, outdoor]
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: Detailed class description
+        start_time:
+          type: string
+          format: date-time
+          description: Class start time (ISO 8601)
+        duration:
+          type: integer
+          minimum: 15
+          maximum: 180
+          description: Class duration in minutes
+        max_capacity:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Maximum number of participants
+        credit_cost:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Credits required to book this class
+        difficulty_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Class difficulty level
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        # Extended fields for UI
+        studio:
+          allOf:
+            - $ref: '#/components/schemas/Studio'
+          nullable: true
+          description: Studio details (populated in responses)
+        current_bookings:
+          type: integer
+          nullable: true
+          description: Number of confirmed bookings (populated in responses)
+      example:
+        id: "class-123"
+        studio_id: "studio-456"
+        name: "Morning Yoga Flow"
+        instructor_id: "instructor-789"
+        class_type: "yoga"
+        description: "Energizing vinyasa flow to start your day"
+        start_time: "2024-01-28T07:00:00.000Z"
+        duration: 60
+        max_capacity: 20
+        credit_cost: 1
+        difficulty_level: "beginner"
+        current_bookings: 12
+        studio:
+          name: "Cabo Wellness Studio"
+          location:
+            address: "123 Marina Blvd, Cabo San Lucas"
+
+    ClassBooking:
+      type: object
+      required:
+        - user_id
+        - class_id
+        - credits_used
+        - booking_status
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Unique booking identifier
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who made the booking
+        class_id:
+          type: string
+          format: uuid
+          description: ID of the booked class
+        credits_used:
+          type: integer
+          minimum: 0
+          description: Number of credits used for this booking
+        booking_status:
+          type: string
+          enum: [confirmed, cancelled, completed, no-show]
+          description: Current status of the booking
+        type:
+          type: string
+          enum: [credits, tourist_pass]
+          description: Payment method used for booking
+        payment_status:
+          type: string
+          enum: [pending, paid, refunded]
+          description: Payment status of the booking
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Booking creation timestamp
+        # Extended fields for UI
+        class:
+          allOf:
+            - $ref: '#/components/schemas/ClassItem'
+          nullable: true
+          description: Class details (populated in responses)
+      example:
+        id: "booking-789"
+        user_id: "user-123"
+        class_id: "class-123"
+        credits_used: 1
+        booking_status: "confirmed"
+        type: "credits"
+        payment_status: "paid"
+        created_at: "2024-01-27T10:30:00.000Z"
+
+    PaymentIntent:
+      type: object
+      required:
+        - id
+        - amount
+        - status
+        - client_secret
+      properties:
+        id:
+          type: string
+          description: Stripe payment intent ID
+        amount:
+          type: integer
+          description: Amount in cents
+        status:
+          type: string
+          enum: [requires_payment_method, requires_confirmation, requires_action, processing, requires_capture, canceled, succeeded]
+          description: Current payment status
+        client_secret:
+          type: string
+          description: Client secret for frontend payment completion
+      example:
+        id: "pi_1234567890"
+        amount: 2000
+        status: "requires_payment_method"
+        client_secret: "pi_1234567890_secret_xyz"
+
+    Gym:
+      type: object
+      required:
+        - id
+        - name
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique gym identifier
+        name:
+          type: string
+          maxLength: 100
+          description: Gym name
+        location:
+          type: string
+          nullable: true
+          description: Gym location
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Gym contact email
+        phone:
+          type: string
+          nullable: true
+          description: Gym phone number
+        stripe_connect_id:
+          type: string
+          nullable: true
+          description: Stripe Connect account ID
+        connect_onboarded_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Stripe Connect onboarding completion timestamp
+        created_at:
+          type: string
+          format: date-time
+          description: Gym creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last update timestamp
+      example:
+        id: "gym-123"
+        name: "Los Cabos Fitness Center"
+        location: "Downtown Cabo San Lucas"
+        email: "info@cabofitness.com"
+        phone: "+52-624-123-4567"
+        created_at: "2024-01-15T08:00:00.000Z"
+
+    # Response Schemas
+    ApiResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          nullable: true
+          description: Response data (varies by endpoint)
+        error:
+          type: string
+          nullable: true
+          description: Error message if success is false
+        message:
+          type: string
+          nullable: true
+          description: Additional information or success message
+      example:
+        success: true
+        message: "Operation completed successfully"
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+        - version
+        - environment
+        - uptime
+        - responseTime
+        - components
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          description: Overall system health status
+        timestamp:
+          type: string
+          format: date-time
+          description: Health check timestamp
+        version:
+          type: string
+          description: Application version
+        environment:
+          type: string
+          enum: [development, staging, production]
+          description: Current environment
+        uptime:
+          type: integer
+          description: System uptime in seconds
+        responseTime:
+          type: integer
+          description: Total health check response time in milliseconds
+        components:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/HealthComponent'
+          description: Health status of individual system components
+        memory:
+          type: object
+          nullable: true
+          properties:
+            used:
+              type: integer
+              description: Used memory in MB
+            total:
+              type: integer
+              description: Total memory in MB
+            percentage:
+              type: integer
+              description: Memory usage percentage
+
+    HealthComponent:
+      type: object
+      required:
+        - name
+        - status
+      properties:
+        name:
+          type: string
+          description: Component name
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          description: Component health status
+        responseTime:
+          type: integer
+          nullable: true
+          description: Component response time in milliseconds
+        error:
+          type: string
+          nullable: true
+          description: Error message if component is unhealthy
+        details:
+          type: object
+          nullable: true
+          description: Additional component-specific details
+
+    # Error Response Schemas
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          nullable: true
+          description: Error code for programmatic handling
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+      example:
+        success: false
+        error: "Validation failed"
+        code: "VALIDATION_ERROR"
+        details:
+          field: "email"
+          message: "Invalid email format"
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid input or request format
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Invalid request parameters"
+            code: "BAD_REQUEST"
+
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Authentication required"
+            code: "UNAUTHORIZED"
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Insufficient permissions"
+            code: "FORBIDDEN"
+
+    NotFound:
+      description: Not Found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Resource not found"
+            code: "NOT_FOUND"
+
+    InternalServerError:
+      description: Internal Server Error - Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Internal server error"
+            code: "INTERNAL_ERROR"
+
+    RateLimitExceeded:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Rate limit exceeded"
+            code: "RATE_LIMIT_EXCEEDED"
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Request limit per time window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Requests remaining in current window
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: Time when rate limit resets (Unix timestamp)
+
+  parameters:
+    PaginationLimit:
+      name: limit
+      in: query
+      description: Maximum number of items to return
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    PaginationOffset:
+      name: offset
+      in: query
+      description: Number of items to skip
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+    RequestId:
+      name: X-Request-ID
+      in: header
+      description: Unique request identifier for tracing
+      schema:
+        type: string
+        format: uuid
+
+  examples:
+    HealthySystem:
+      summary: All systems operational
+      value:
+        status: healthy
+        timestamp: "2024-01-27T10:00:00.000Z"
+        version: "1.0.0"
+        environment: "production"
+        uptime: 86400
+        responseTime: 150
+        components:
+          database:
+            name: "Supabase Database"
+            status: healthy
+            responseTime: 45
+            details:
+              connection: "active"
+              url: "https://[REDACTED].supabase.co"
+          redis:
+            name: "Redis Cache"
+            status: healthy
+            responseTime: 12
+            details:
+              connection: "active"
+              memory:
+                used: "2.4MB"
+                peak: "5.1MB"
+          stripe:
+            name: "Stripe API"
+            status: healthy
+            responseTime: 89
+            details:
+              accountId: "acct_1234567890"
+              country: "MX"
+              currency: "usd"
+
+    BookingSuccess:
+      summary: Successful booking
+      value:
+        success: true
+        booking:
+          id: "booking-789"
+          user_id: "user-123"
+          class_id: "class-456"
+          credits_used: 1
+          booking_status: "confirmed"
+          type: "credits"
+          payment_status: "paid"
+          created_at: "2024-01-27T15:30:00.000Z"
+        remainingCredits: 24
+        usedTouristPass: false
+        touristPassRemaining: null
+
+tags:
+  - name: Health
+    description: System health monitoring and status endpoints
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Profile
+    description: User profile management
+  - name: Classes
+    description: Fitness class catalog and information
+  - name: Bookings
+    description: Class booking and reservation management
+  - name: Credits
+    description: Credit balance and transaction management
+  - name: Payments
+    description: Payment processing with Stripe integration
+  - name: Admin
+    description: Administrative operations (admin only)
+  - name: Account
+    description: Account management features
+  - name: Tourist Pass
+    description: Tourist pass purchase and validation
+  - name: Monitoring
+    description: System monitoring and analytics
+
+externalDocs:
+  description: Cabo Fit Pass Documentation
+  url: https://docs.cabofitpass.com

@@ -203,9 +203,9 @@ export default function HomePage() {
             </Button>
           </div>
           
-          {/* Try the Demo Button */}
-          <div className="mb-8">
-            <Link href="/dashboard">
+          {/* Demo Buttons */}
+          <div className="mb-8 space-y-4">
+            <Link href="/en/dashboard?demo=true">
               <Button
                 variant="outline"
                 size="lg"
@@ -216,6 +216,19 @@ export default function HomePage() {
                 {tCta('tryDemo')}
               </Button>
             </Link>
+            
+            <div className="text-center">
+              <Link href="/en/admin?demo=true">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="relative z-10 h-10 rounded-lg shadow-md px-4 font-medium border-orange-300 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                  data-cta="try-admin-demo"
+                >
+                  Try Admin Demo
+                </Button>
+              </Link>
+            </div>
           </div>
           
           {/* Trust Row */}
@@ -399,7 +412,7 @@ export default function HomePage() {
             {tSections('demoDescription')}
           </p>
           
-          <Link href="/dashboard">
+          <Link href="/en/dashboard?demo=true">
             <Button
               variant="outline"
               size="lg"

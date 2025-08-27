@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { NavigationHeader } from '@/components/layout/navigation-header'
@@ -251,6 +252,7 @@ function PricingBanner() {
 
 export default function PricingPage() {
   const router = useRouter()
+  const { showInfo } = useToast()
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
   const [selectedSubscription, setSelectedSubscription] = useState<string | null>(null)
   const [pricingType, setPricingType] = useState<'credits' | 'subscription'>('credits')
@@ -281,13 +283,13 @@ export default function PricingPage() {
       return
     }
     
-    // For demo purposes, just show an alert
+    // For demo purposes, just show a toast
     if (type === 'credit') {
       const package_ = CREDIT_PACKAGES.find(p => p.id === id)
-      alert(`Demo: Would purchase ${package_?.name} for $${package_?.price}`)
+      showInfo(`Demo: Would purchase ${package_?.name} for $${package_?.price}`)
     } else {
       const subscription = SUBSCRIPTION_TIERS.find(s => s.id === id)
-      alert(`Demo: Would subscribe to ${subscription?.name} for $${subscription?.price}/month`)
+      showInfo(`Demo: Would subscribe to ${subscription?.name} for $${subscription?.price}/month`)
     }
   }
 

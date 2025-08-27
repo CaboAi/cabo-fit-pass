@@ -20,11 +20,11 @@ export async function GET(): Promise<NextResponse> {
     // Check if user is admin
     const { data: profile } = await supabase
       .from('profiles')
-      .select('user_type')
+      .select('role')
       .eq('email', session.user.email)
       .single()
 
-    if (!profile || profile.user_type !== 'studio_owner') {
+    if (!profile || profile.role !== 'gym_owner') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
         { status: 403 }
@@ -89,11 +89,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Check if user is admin
     const { data: profile } = await supabase
       .from('profiles')
-      .select('user_type')
+      .select('role')
       .eq('email', session.user.email)
       .single()
 
-    if (!profile || profile.user_type !== 'studio_owner') {
+    if (!profile || profile.role !== 'gym_owner') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
         { status: 403 }
@@ -168,11 +168,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     // Check if user is admin
     const { data: profile } = await supabase
       .from('profiles')
-      .select('user_type')
+      .select('role')
       .eq('email', session.user.email)
       .single()
 
-    if (!profile || profile.user_type !== 'studio_owner') {
+    if (!profile || profile.role !== 'gym_owner') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
         { status: 403 }

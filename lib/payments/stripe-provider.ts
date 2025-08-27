@@ -11,19 +11,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-07-30.basil',
 })
 
-async function getStripe() {
-  const Stripe = (await import("stripe")).default
-  const key = process.env.STRIPE_SECRET_KEY
-  if (!key) throw new Error("STRIPE_SECRET_KEY missing")
-  return new Stripe(key, { apiVersion: "2023-10-16" })
-}
-
 export class StripeProvider implements PaymentProvider {
-  // Remove constructor and private stripe property
   
   async createCustomer(email: string, metadata?: Record<string, string>): Promise<PaymentCustomer> {
-    const stripe = await getStripe()
-
     const customer = await stripe.customers.create({
       email,
       metadata
@@ -38,8 +28,6 @@ export class StripeProvider implements PaymentProvider {
   
   async getCustomer(customerId: string): Promise<PaymentCustomer | null> {
     try {
-      const stripe = await getStripe()
-
       const customer = await stripe.customers.retrieve(customerId)
       
       if (customer.deleted) {
@@ -71,8 +59,6 @@ export class StripeProvider implements PaymentProvider {
     cancelUrl: string
     metadata: Record<string, string>
   }): Promise<CheckoutSession> {
-    const stripe = await getStripe()
-
     const sessionParams: any = {
       payment_method_types: ['card'],
       line_items: params.lineItems.map(item => ({
@@ -112,8 +98,6 @@ export class StripeProvider implements PaymentProvider {
   
   async getCheckoutSession(sessionId: string): Promise<CheckoutSession | null> {
     try {
-      const stripe = await getStripe()
-
       const session = await stripe.checkout.sessions.retrieve(sessionId)
       
       return {
@@ -135,8 +119,6 @@ export class StripeProvider implements PaymentProvider {
     priceId: string
     metadata?: Record<string, string>
   }): Promise<PaymentSubscription> {
-    const stripe = await getStripe()
-
     const subscription = await stripe.subscriptions.create({
       customer: params.customerId,
       items: [{ price: params.priceId }],
@@ -160,8 +142,6 @@ export class StripeProvider implements PaymentProvider {
     metadata?: Record<string, string>
     cancel?: boolean
   }): Promise<PaymentSubscription> {
-    const stripe = await getStripe()
-
     let subscription: any
     
     if (params.cancel) {
@@ -204,8 +184,6 @@ export class StripeProvider implements PaymentProvider {
   
   async getSubscription(subscriptionId: string): Promise<PaymentSubscription | null> {
     try {
-      const stripe = await getStripe()
-
       const subscription = await stripe.subscriptions.retrieve(subscriptionId)
       
       return {
@@ -233,8 +211,6 @@ export class StripeProvider implements PaymentProvider {
         return false
       }
       
-      const stripe = await getStripe()
-
       // Stripe will throw if signature is invalid
       stripe.webhooks.constructEvent(payload, signature, webhookSecret)
       return true

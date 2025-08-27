@@ -73,17 +73,26 @@ export interface PaymentProvider {
 
 // Factory function to get the appropriate payment provider
 export async function getPaymentProvider(): Promise<PaymentProvider> {
-  if (process.env.FEATURE_STRIPE !== 'true') {
+  // Enforce Stripe only in production
+  if (process.env.NODE_ENV === 'production') {
+    const { StripeProvider } = await import("./stripe-provider")
+    return new StripeProvider()
+  }
+  
+  // In development/test, allow mock provider if explicitly configured
+  if (process.env.PAYMENT_PROVIDER === 'mock') {
     const { MockProvider } = await import("./mock-provider")
     return new MockProvider()
   }
+  
+  // Default to Stripe in all environments
   const { StripeProvider } = await import("./stripe-provider")
   return new StripeProvider()
 }
 
 // Type guard to check if using mock provider
 export function isMockProvider(): boolean {
-  return process.env.FEATURE_STRIPE !== 'true' || process.env.PAYMENT_PROVIDER === 'mock'
+  return process.env.PAYMENT_PROVIDER === 'mock' && process.env.NODE_ENV !== 'production'
 }
 
 // Helper to generate consistent checkout metadata

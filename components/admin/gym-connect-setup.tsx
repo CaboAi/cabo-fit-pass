@@ -1,28 +1,65 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, AlertCircle, Clock, ExternalLink } from 'lucide-react'
+import { CheckCircle, AlertCircle, Clock, ExternalLink, Loader2 } from 'lucide-react'
+
+interface ConnectStatus {
+  hasConnectAccount: boolean
+  status: 'not_setup' | 'pending' | 'incomplete' | 'complete'
+  chargesEnabled: boolean
+  payoutsEnabled: boolean
+  requirements?: any
+  accountId?: string
+  detailsSubmitted?: boolean
+}
 
 interface GymConnectSetupProps {
   gymId: string
   gymName: string
-  currentStatus?: {
-    hasConnectAccount: boolean
-    status: string
-    chargesEnabled: boolean
-    payoutsEnabled: boolean
-  }
 }
 
-export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSetupProps) {
+export function GymConnectSetup({ gymId, gymName }: GymConnectSetupProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [status, setStatus] = useState(currentStatus)
+  const [isFetchingStatus, setIsFetchingStatus] = useState(true)
+  const [status, setStatus] = useState<ConnectStatus | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch status on component mount
+  useEffect(() => {
+    fetchStatus()
+  }, [gymId])
+
+  const fetchStatus = async () => {
+    try {
+      setIsFetchingStatus(true)
+      setError(null)
+      
+      const response = await fetch(`/api/connect/status/${gymId}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch status')
+      }
+      
+      const result = await response.json()
+      if (result.success) {
+        setStatus(result.data)
+      } else {
+        throw new Error(result.error || 'Failed to fetch status')
+      }
+    } catch (err) {
+      console.error('Error fetching status:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch status')
+    } finally {
+      setIsFetchingStatus(false)
+    }
+  }
 
   const handleOnboarding = async () => {
     setIsLoading(true)
+    setError(null)
     
     try {
       const response = await fetch('/api/connect/onboard', {
@@ -34,7 +71,8 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create onboarding session')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create onboarding session')
       }
 
       const { accountLinkUrl } = await response.json()
@@ -42,15 +80,19 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
       // Redirect to Stripe Connect onboarding
       window.location.href = accountLinkUrl
       
-    } catch (error) {
-      console.error('Onboarding error:', error)
-      alert('Failed to start onboarding. Please try again.')
+    } catch (err) {
+      console.error('Onboarding error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to start onboarding')
     } finally {
       setIsLoading(false)
     }
   }
 
   const getStatusIcon = () => {
+    if (isFetchingStatus) {
+      return <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+    }
+    
     switch (status?.status) {
       case 'complete':
         return <CheckCircle className="w-5 h-5 text-green-500" />
@@ -64,6 +106,10 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
   }
 
   const getStatusBadge = () => {
+    if (isFetchingStatus) {
+      return <Badge variant="outline">Loading...</Badge>
+    }
+    
     switch (status?.status) {
       case 'complete':
         return <Badge variant="default" className="bg-green-100 text-green-800">Complete</Badge>
@@ -76,7 +122,31 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
     }
   }
 
+  const getTransfersBadge = () => {
+    if (isFetchingStatus) {
+      return <Badge variant="outline" className="text-xs">Loading...</Badge>
+    }
+    
+    if (!status?.hasConnectAccount) {
+      return <Badge variant="outline" className="text-xs">Inactive</Badge>
+    }
+    
+    if (status.status === 'complete' && status.payoutsEnabled) {
+      return <Badge variant="default" className="bg-green-100 text-green-800 text-xs">Active</Badge>
+    }
+    
+    if (status.status === 'pending') {
+      return <Badge variant="secondary" className="text-xs">Pending</Badge>
+    }
+    
+    return <Badge variant="destructive" className="text-xs">Inactive</Badge>
+  }
+
   const getStatusDescription = () => {
+    if (isFetchingStatus) {
+      return 'Loading status...'
+    }
+    
     switch (status?.status) {
       case 'complete':
         return 'This gym can receive payouts and process payments.'
@@ -87,6 +157,41 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
       default:
         return 'Stripe Connect account not yet configured.'
     }
+  }
+
+  const getButtonText = () => {
+    if (isLoading) {
+      return 'Setting up...'
+    }
+    
+    if (status?.status === 'complete') {
+      return 'Manage Account'
+    }
+    
+    if (status?.hasConnectAccount) {
+      return 'Complete Setup'
+    }
+    
+    return 'Finish payouts setup'
+  }
+
+  if (error && !status) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-red-500" />
+            Error Loading Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={fetchStatus} variant="outline">
+            Retry
+          </Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -108,6 +213,10 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
               {getStatusBadge()}
             </div>
             <p className="text-sm text-gray-600">{getStatusDescription()}</p>
+          </div>
+          <div className="text-right">
+            <span className="text-xs text-gray-500 block mb-1">Transfers</span>
+            {getTransfersBadge()}
           </div>
         </div>
 
@@ -131,27 +240,24 @@ export function GymConnectSetup({ gymId, gymName, currentStatus }: GymConnectSet
         <div className="flex gap-2">
           <Button
             onClick={handleOnboarding}
-            disabled={isLoading}
+            disabled={isLoading || isFetchingStatus}
             className="flex items-center gap-2"
           >
             {isLoading ? (
-              'Setting up...'
-            ) : status?.status === 'complete' ? (
-              <>
-                <ExternalLink className="w-4 h-4" />
-                Manage Account
-              </>
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <>
-                <ExternalLink className="w-4 h-4" />
-                {status?.hasConnectAccount ? 'Complete Setup' : 'Start Setup'}
-              </>
+              <ExternalLink className="w-4 h-4" />
             )}
+            {getButtonText()}
           </Button>
           
           {status?.hasConnectAccount && (
-            <Button variant="outline" onClick={() => window.location.reload()}>
-              Refresh Status
+            <Button variant="outline" onClick={fetchStatus} disabled={isFetchingStatus}>
+              {isFetchingStatus ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                'Refresh Status'
+              )}
             </Button>
           )}
         </div>

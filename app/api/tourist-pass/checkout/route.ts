@@ -83,7 +83,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Get payment provider
-    const customerId = profile.stripe_customer_id
+    let customerId = profile.stripe_customer_id
     
     if (!customerId) {
       const customer = await paymentProvider.createCustomer(

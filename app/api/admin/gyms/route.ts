@@ -1,28 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const authError = await requireAdmin(request)
+    if (authError) return authError
 
-    // Check if user is admin (you'll need to implement this check)
     const supabase = createClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-    }
-
+    
     const { data: gyms, error } = await supabase
       .from('gyms')
       .select('*')
@@ -39,24 +25,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const authError = await requireAdmin(request)
+    if (authError) return authError
 
     const supabase = createClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-    }
-
     const gymData = await request.json()
+    
+    console.log('Creating gym with data:', gymData)
     
     const { data: gym, error } = await supabase
       .from('gyms')
@@ -64,7 +39,16 @@ export async function POST(request: NextRequest) {
       .select()
       .single()
 
+    console.log('Supabase response:', { data: gym, error })
+    console.log('Gym object keys:', Object.keys(gym || {}))
+    console.log('Gym ID value:', gym?.id)
+
     if (error) throw error
+
+    if (!gym || !gym.id) {
+      console.error('No gym ID returned:', gym)
+      throw new Error('Failed to create gym - no ID returned')
+    }
 
     return NextResponse.json({ success: true, data: gym })
   } catch (error) {

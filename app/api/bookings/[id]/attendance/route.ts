@@ -57,7 +57,7 @@ export async function POST(
 
     // Check if user is gym owner or has instructor role
     const hasPermission = gym.owner_id === profile.id || 
-                         profile.user_type === 'instructor' ||
+                         profile.role === 'gym_owner' ||
                          profile.role === 'admin'
     
     if (!hasPermission) {

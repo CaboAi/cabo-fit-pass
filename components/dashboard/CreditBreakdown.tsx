@@ -43,6 +43,27 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
 
   const fetchCreditData = async () => {
     try {
+      // Check if we're in demo mode
+      const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demo-session')
+      
+      if (isDemoMode) {
+        // Use demo data
+        const demoCreditBreakdown: CreditBreakdown = {
+          total: 15,
+          expiring: [
+            {
+              amount: 10,
+              expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+            }
+          ],
+          nonExpiring: 5
+        }
+        setCreditBreakdown(demoCreditBreakdown)
+        setTouristPass(null) // No active tourist pass in demo
+        setLoading(false)
+        return
+      }
+
       const [creditsResponse, touristResponse] = await Promise.all([
         fetch('/api/credits/breakdown'),
         fetch('/api/tourist-pass/status')
@@ -82,13 +103,13 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
 
   if (loading) {
     return (
-      <Card>
+      <Card className="bg-surface-secondary border-border">
         <CardHeader>
-          <CardTitle>Credit Status</CardTitle>
+          <CardTitle className="text-text-primary">Credit Status</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-24">
-            <div className="text-gray-500">Loading...</div>
+            <div className="text-text-secondary">Loading...</div>
           </div>
         </CardContent>
       </Card>
@@ -97,16 +118,16 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
 
   if (error) {
     return (
-      <Card>
+      <Card className="bg-surface-secondary border-border">
         <CardHeader>
-          <CardTitle>Credit Status</CardTitle>
+          <CardTitle className="text-text-primary">Credit Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-red-600">{error}</div>
+          <div className="text-error">{error}</div>
           <Button 
             variant="outline" 
             onClick={fetchCreditData}
-            className="mt-2"
+            className="mt-2 border-primary/20 text-primary hover:bg-primary/10"
           >
             Retry
           </Button>
@@ -118,10 +139,10 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
   return (
     <div className="space-y-6">
       {/* Credit Overview */}
-      <Card>
+      <Card className="bg-surface-secondary border-border">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Coins className="h-5 w-5 text-green-600" />
+          <CardTitle className="flex items-center space-x-2 text-text-primary">
+            <Coins className="h-5 w-5 text-primary" />
             <span>Credit Balance</span>
           </CardTitle>
         </CardHeader>
@@ -129,12 +150,12 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-3xl font-bold text-primary">
                   {creditBreakdown?.total || 0}
                 </div>
-                <div className="text-sm text-gray-600">Total Active Credits</div>
+                <div className="text-sm text-text-secondary">Total Active Credits</div>
               </div>
-              <Button onClick={onPurchaseCredits}>
+              <Button onClick={onPurchaseCredits} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Purchase Credits
               </Button>
             </div>
@@ -144,8 +165,8 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Non-expiring credits:</span>
-                    <span className="font-medium">{creditBreakdown.nonExpiring}</span>
+                    <span className="text-sm text-text-secondary">Non-expiring credits:</span>
+                    <span className="font-medium text-primary">{creditBreakdown.nonExpiring}</span>
                   </div>
                   
                   {creditBreakdown.expiring.map((entry, index) => {
@@ -155,7 +176,7 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
                     return (
                       <div key={index} className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-text-secondary">
                             Expires {formatDate(entry.expires_at)}:
                           </span>
                           {isExpiringSoon && (
@@ -163,9 +184,9 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
                           )}
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-medium">{entry.amount}</span>
+                          <span className="font-medium text-text-primary">{entry.amount}</span>
                           {isExpiringSoon && (
-                            <Badge variant="outline" className="text-orange-600">
+                            <Badge variant="outline" className="text-warning border-warning/20">
                               {daysUntil} days
                             </Badge>
                           )}
@@ -177,14 +198,14 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
 
                 {/* Next Expiry Alert */}
                 {creditBreakdown.expiring.length > 0 && (
-                  <div className="bg-orange-50 p-4 rounded-lg">
+                  <div className="bg-warning/10 border border-warning/20 p-4 rounded-lg">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Clock className="h-4 w-4 text-orange-600" />
-                      <span className="text-sm font-medium text-orange-800">
+                      <Clock className="h-4 w-4 text-warning" />
+                      <span className="text-sm font-medium text-text-primary">
                         Next Expiry
                       </span>
                     </div>
-                    <div className="text-sm text-orange-700">
+                    <div className="text-sm text-text-secondary">
                       {creditBreakdown.expiring[0].amount} credits expire on{' '}
                       {formatDate(creditBreakdown.expiring[0].expires_at)}
                     </div>
@@ -197,10 +218,10 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
       </Card>
 
       {/* Tourist Pass Status */}
-      <Card>
+      <Card className="bg-surface-secondary border-border">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
+          <CardTitle className="flex items-center space-x-2 text-text-primary">
+            <Calendar className="h-5 w-5 text-secondary" />
             <span>Tourist Pass</span>
           </CardTitle>
         </CardHeader>
@@ -209,39 +230,39 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-secondary">
                     {touristPass.classesRemaining}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-text-secondary">
                     Classes Remaining
                   </div>
                 </div>
-                <Badge className="bg-blue-100 text-blue-800">
+                <Badge className="bg-secondary/20 text-secondary border-secondary/30">
                   Active
                 </Badge>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
                 <div className="text-center">
-                  <div className="text-lg font-semibold">{touristPass.classesUsed}</div>
-                  <div className="text-sm text-gray-600">Used</div>
+                  <div className="text-lg font-semibold text-text-primary">{touristPass.classesUsed}</div>
+                  <div className="text-sm text-text-secondary">Used</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold">{touristPass.classesTotal}</div>
-                  <div className="text-sm text-gray-600">Total</div>
+                  <div className="text-lg font-semibold text-text-primary">{touristPass.classesTotal}</div>
+                  <div className="text-sm text-text-secondary">Total</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-medium text-red-600">
+                  <div className="text-sm font-medium text-error">
                     {formatDate(touristPass.endsAt)}
                   </div>
-                  <div className="text-sm text-gray-600">Expires</div>
+                  <div className="text-sm text-text-secondary">Expires</div>
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-surface-primary rounded-full h-2">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-secondary h-2 rounded-full transition-all duration-300"
                   style={{ 
                     width: `${(touristPass.classesUsed / touristPass.classesTotal) * 100}%` 
                   }}
@@ -250,10 +271,10 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
             </div>
           ) : (
             <div className="text-center py-6">
-              <div className="text-gray-500 mb-4">
+              <div className="text-text-secondary mb-4">
                 No active tourist pass
               </div>
-              <Button variant="outline" onClick={onPurchaseTouristPass}>
+              <Button variant="outline" onClick={onPurchaseTouristPass} className="border-primary/20 text-primary hover:bg-primary/10">
                 Purchase Tourist Pass
               </Button>
             </div>
@@ -261,24 +282,33 @@ export function CreditBreakdown({ onPurchaseCredits, onPurchaseTouristPass }: Cr
         </CardContent>
       </Card>
 
-      {/* Quick Stats */}
-      <Card>
+      {/* Credit Top-Up Options */}
+      <Card className="bg-surface-secondary border-border">
         <CardHeader>
-          <CardTitle>Account Summary</CardTitle>
+          <CardTitle className="text-text-primary">Credit Top-Up Options</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
-                {(creditBreakdown?.total || 0) + (touristPass?.classesRemaining || 0)}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer" onClick={onPurchaseCredits}>
+              <div className="text-2xl font-bold text-primary">
+                10
               </div>
-              <div className="text-sm text-gray-600">Total Available</div>
+              <div className="text-sm text-text-secondary">Credits</div>
+              <div className="text-xs text-text-tertiary mt-1">Starter Pack</div>
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">
-                {touristPass ? 1 : 0}
+            <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer" onClick={onPurchaseCredits}>
+              <div className="text-2xl font-bold text-primary">
+                25
               </div>
-              <div className="text-sm text-gray-600">Active Passes</div>
+              <div className="text-sm text-text-secondary">Credits</div>
+              <div className="text-xs text-text-tertiary mt-1">Standard Pack</div>
+            </div>
+            <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer" onClick={onPurchaseCredits}>
+              <div className="text-2xl font-bold text-primary">
+                50
+              </div>
+              <div className="text-sm text-text-secondary">Credits</div>
+              <div className="text-xs text-text-tertiary mt-1">Premium Pack</div>
             </div>
           </div>
         </CardContent>

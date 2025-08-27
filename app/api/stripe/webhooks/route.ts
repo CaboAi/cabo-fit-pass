@@ -4,25 +4,60 @@ import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { CreditManager } from '@/lib/credits/credit-rules'
 import { validateWebhookSignature } from '@/lib/stripe/security'
+import { createComponentLogger, extractRequestContext } from '@/lib/logger'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-07-30.basil',
 })
 
 export async function POST(request: NextRequest) {
+  const logger = createComponentLogger('stripe-webhooks')
+  const startTime = Date.now()
+  const requestContext = extractRequestContext(request)
+  
   try {
     const body = await request.text()
     const signature = headers().get('stripe-signature')
 
+    logger.info('Stripe webhook received', {
+      ...requestContext,
+      action: 'webhook-receive',
+      metadata: { hasSignature: !!signature }
+    })
+
     if (!signature) {
+      logger.warn('Missing Stripe webhook signature', {
+        ...requestContext,
+        action: 'validate-signature',
+        errorCode: 'MISSING_SIGNATURE'
+      })
       return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
     }
 
     // Verify webhook signature
     const event = validateWebhookSignature(body, signature)
     if (!event) {
+      logger.error('Invalid Stripe webhook signature', {
+        ...requestContext,
+        action: 'validate-signature',
+        errorCode: 'INVALID_SIGNATURE'
+      })
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
+
+    const eventLogger = logger.child({
+      ...requestContext,
+      metadata: {
+        eventId: event.id,
+        eventType: event.type,
+        created: event.created
+      }
+    })
+
+    eventLogger.info('Processing Stripe webhook event', {
+      action: 'process-webhook',
+      metadata: { eventType: event.type }
+    })
 
     const supabase = createClient()
     const creditManager = new CreditManager(supabase)
@@ -30,34 +65,60 @@ export async function POST(request: NextRequest) {
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session, creditManager, supabase)
+        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session, creditManager, supabase, eventLogger)
         break
       
       case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice, creditManager, supabase)
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice, creditManager, supabase, eventLogger)
         break
       
       case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent, creditManager, supabase)
+        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent, creditManager, supabase, eventLogger)
         break
       
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        eventLogger.info('Unhandled Stripe event type', {
+          action: 'skip-event',
+          metadata: { eventType: event.type }
+        })
     }
+
+    const duration = Date.now() - startTime
+    eventLogger.info('Stripe webhook processed successfully', {
+      action: 'webhook-complete',
+      duration,
+      statusCode: 200
+    })
 
     return NextResponse.json({ received: true })
 
   } catch (error) {
-    console.error('Webhook error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Stripe webhook processing failed', {
+      ...requestContext,
+      action: 'process-webhook',
+      duration,
+      statusCode: 500,
+      errorCode: 'WEBHOOK_PROCESSING_FAILED'
+    }, error instanceof Error ? error : new Error('Unknown error'))
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
   }
 }
 
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session, creditManager: CreditManager, supabase: any) {
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session, creditManager: CreditManager, supabase: any, logger: any) {
   const { mode, itemType, plan, userId } = session.metadata || {}
   
+  logger.info('Processing checkout completed', {
+    action: 'checkout-completed',
+    metadata: { mode, itemType, plan, userId, sessionId: session.id }
+  })
+  
   if (!userId) {
-    console.error('No userId in session metadata')
+    logger.error('No userId in session metadata', {
+      action: 'checkout-completed',
+      errorCode: 'MISSING_USER_ID',
+      metadata: { sessionId: session.id }
+    })
     return
   }
 
@@ -87,7 +148,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, creditM
   }
 }
 
-async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, creditManager: CreditManager, supabase: any) {
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, creditManager: CreditManager, supabase: any, logger?: any) {
   // Use the correct property for latest Stripe version
   const subscriptionId = (invoice as any).subscription_id || (invoice as any).subscription
   
@@ -101,7 +162,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, creditMana
   }
 }
 
-async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent, creditManager: CreditManager, supabase: any) {
+async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent, creditManager: CreditManager, supabase: any, logger?: any) {
   // Redundant handling for payment success
   const { userId, itemType, plan } = paymentIntent.metadata || {}
   

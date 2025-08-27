@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
-import stripe, { STRIPE_CONNECT_CONFIG } from '@/lib/stripe'
+import stripe from '@/lib/stripe'
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
     // Create account link for onboarding
     const accountLink = await stripe.accountLinks.create({
       account: connectAccountId,
-      refresh_url: STRIPE_CONNECT_CONFIG.refreshUrl,
-      return_url: STRIPE_CONNECT_CONFIG.returnUrl,
+      refresh_url: process.env.CONNECT_REFRESH_URL || 'http://localhost:3000/admin/gym-pricing',
+      return_url: process.env.CONNECT_RETURN_URL || 'http://localhost:3000/admin/gym-pricing',
       type: 'account_onboarding',
       collect: 'eventually_due',
     })

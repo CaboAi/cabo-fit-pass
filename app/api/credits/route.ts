@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { ApiResponse } from '@/types'
+import { cache, CACHE_TTL, invalidateCache } from '@/lib/cache'
+import { createComponentLogger } from '@/lib/logger'
 
 interface CreditUpdateRequest {
   user_email: string
@@ -17,8 +19,16 @@ interface CreditUpdateResponse {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<CreditUpdateResponse>>> {
+  const logger = createComponentLogger('credits')
+  const startTime = Date.now()
+  
   try {
     const session = await getServerSession(authOptions)
+    
+    logger.info('Credit update requested', {
+      action: 'update-credits',
+      metadata: { userId: session?.user?.email }
+    })
     
     if (!session?.user?.email) {
       return NextResponse.json({ 
@@ -81,12 +91,37 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       .single()
     
     if (updateError || !updatedProfile) {
-      console.error('Error updating credits:', updateError)
+      logger.error('Error updating credits', {
+        action: 'update-credits',
+        errorCode: 'CREDIT_UPDATE_FAILED',
+        metadata: { userId: user_email, creditsToAdd: credits_to_add }
+      }, new Error(updateError?.message || 'Update failed'))
       return NextResponse.json({ 
         success: false, 
         error: 'Failed to update credits' 
       }, { status: 500 })
     }
+
+    // Invalidate user cache and credit cache
+    await Promise.all([
+      invalidateCache.user(user_email),
+      cache.user.credits(user_email).invalidate()
+    ])
+
+    // Cache updated credits
+    await cache.user.credits(user_email).set({ credits: newCreditAmount }, CACHE_TTL.MEDIUM)
+
+    const duration = Date.now() - startTime
+    logger.info('Credits updated successfully', {
+      action: 'update-credits',
+      duration,
+      statusCode: 200,
+      metadata: { 
+        userId: user_email, 
+        newCredits: newCreditAmount, 
+        addedCredits: credits_to_add 
+      }
+    })
 
     return NextResponse.json({
       success: true,
@@ -98,7 +133,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     })
 
   } catch (error) {
-    console.error('Credits API error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Credits API error', {
+      action: 'update-credits',
+      duration,
+      statusCode: 500,
+      errorCode: 'CREDITS_API_EXCEPTION'
+    }, error instanceof Error ? error : new Error('Unknown error'))
     return NextResponse.json({ 
       success: false, 
       error: 'Internal server error' 
@@ -107,8 +148,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 }
 
 export async function GET(): Promise<NextResponse<ApiResponse<{ credits: number }>>> {
+  const logger = createComponentLogger('credits')
+  const startTime = Date.now()
+  
   try {
     const session = await getServerSession(authOptions)
+    
+    logger.info('Credit fetch requested', {
+      action: 'fetch-credits',
+      metadata: { userId: session?.user?.email }
+    })
     
     if (!session?.user?.email) {
       return NextResponse.json({ 
@@ -117,9 +166,26 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ credits: number 
       }, { status: 401 })
     }
 
+    // Try to get credits from cache first
+    const cachedCredits = await cache.user.credits(session.user.email).get()
+    if (cachedCredits) {
+      const duration = Date.now() - startTime
+      logger.info('Credits served from cache', {
+        action: 'fetch-credits',
+        duration,
+        statusCode: 200,
+        metadata: { userId: session.user.email, credits: cachedCredits.credits, source: 'cache' }
+      })
+      
+      return NextResponse.json({
+        success: true,
+        data: { credits: cachedCredits.credits }
+      })
+    }
+
     const supabase = createClient()
 
-    // Get user profile
+    // Get user profile from database
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('credits')
@@ -127,11 +193,27 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ credits: number 
       .single()
     
     if (error || !profile) {
+      logger.error('Error fetching user credits', {
+        action: 'fetch-credits',
+        errorCode: 'CREDITS_FETCH_FAILED',
+        metadata: { userId: session.user.email }
+      }, new Error(error?.message || 'Profile not found'))
       return NextResponse.json({ 
         success: false, 
         error: 'User profile not found' 
       }, { status: 404 })
     }
+
+    // Cache the credits data
+    await cache.user.credits(session.user.email).set({ credits: profile.credits }, CACHE_TTL.MEDIUM)
+
+    const duration = Date.now() - startTime
+    logger.info('Credits fetched successfully from database and cached', {
+      action: 'fetch-credits',
+      duration,
+      statusCode: 200,
+      metadata: { userId: session.user.email, credits: profile.credits, source: 'database' }
+    })
 
     return NextResponse.json({
       success: true,
@@ -139,7 +221,13 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ credits: number 
     })
 
   } catch (error) {
-    console.error('Credits GET API error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Credits GET API error', {
+      action: 'fetch-credits',
+      duration,
+      statusCode: 500,
+      errorCode: 'CREDITS_GET_API_EXCEPTION'
+    }, error instanceof Error ? error : new Error('Unknown error'))
     return NextResponse.json({ 
       success: false, 
       error: 'Internal server error' 

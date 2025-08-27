@@ -10,18 +10,37 @@ import {
   spendCreditsFIFO,
   getActiveCredits 
 } from '@/utils/credits'
+import { createComponentLogger, extractUserContext } from '@/lib/logger'
 
 export async function POST(request: Request) {
+  const logger = createComponentLogger('bookings')
+  const startTime = Date.now()
+  
   try {
     const body = await request.json()
     const { class_id, user_email } = body
 
+    logger.info('Booking request started', {
+      action: 'create-booking',
+      metadata: { class_id, user_email }
+    })
+
     // Input validation
     if (!class_id || typeof class_id !== 'string' || class_id.trim().length === 0) {
+      logger.warn('Invalid class_id provided', {
+        action: 'validate-input',
+        errorCode: 'INVALID_CLASS_ID',
+        metadata: { class_id }
+      })
       return NextResponse.json({ error: 'Invalid class_id provided' }, { status: 400 })
     }
 
     if (!user_email || typeof user_email !== 'string' || !user_email.includes('@')) {
+      logger.warn('Invalid email address provided', {
+        action: 'validate-input',
+        errorCode: 'INVALID_EMAIL',
+        metadata: { user_email }
+      })
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
     }
 
@@ -30,8 +49,14 @@ export async function POST(request: Request) {
     const sanitizedEmail = user_email.trim().toLowerCase()
 
     const session = await getServerSession(authOptions)
+    const userContext = extractUserContext(session)
+    const requestLogger = logger.child({ ...userContext, userId: session?.user?.email })
     
     if (!session?.user?.email) {
+      requestLogger.warn('Unauthorized booking attempt', {
+        action: 'auth-check',
+        errorCode: 'UNAUTHORIZED'
+      })
       return NextResponse.json({ 
         success: false, 
         error: 'Unauthorized' 
@@ -88,7 +113,14 @@ export async function POST(request: Request) {
     if (touristPass) {
       // Use tourist pass instead of credits
       usedTouristPass = true
-      console.log(`Using tourist pass ${touristPass.id} for booking`)
+      requestLogger.info('Using tourist pass for booking', {
+        action: 'use-tourist-pass',
+        resource: 'tourist_passes',
+        metadata: { 
+          touristPassId: touristPass.id,
+          classId: sanitizedClassId 
+        }
+      })
     } else {
       // Check if user has enough credits using FIFO system
       const activeCredits = await getActiveCredits(profile.id)
@@ -109,7 +141,12 @@ export async function POST(request: Request) {
       .eq('booking_status', 'confirmed')
 
     if (countError) {
-      console.error('Error checking class capacity:', countError)
+      requestLogger.error('Error checking class capacity', {
+        action: 'check-capacity',
+        resource: 'bookings',
+        errorCode: 'CAPACITY_CHECK_FAILED',
+        metadata: { classId: sanitizedClassId }
+      }, new Error(countError.message))
       return NextResponse.json({ 
         success: false, 
         error: 'Failed to check class availability' 
@@ -147,7 +184,12 @@ export async function POST(request: Request) {
       try {
         await consumeTouristPass(touristPass.id)
       } catch (error) {
-        console.error('Failed to consume tourist pass:', error)
+        requestLogger.error('Failed to consume tourist pass', {
+          action: 'consume-tourist-pass',
+          resource: 'tourist_passes',
+          errorCode: 'TOURIST_PASS_CONSUMPTION_FAILED',
+          metadata: { touristPassId: touristPass.id }
+        }, error instanceof Error ? error : new Error('Unknown error'))
         return NextResponse.json({ 
           success: false, 
           error: 'Failed to use tourist pass' 
@@ -178,7 +220,16 @@ export async function POST(request: Request) {
       .single()
 
     if (bookingError) {
-      console.error('Error creating booking:', bookingError)
+      requestLogger.error('Error creating booking', {
+        action: 'create-booking',
+        resource: 'bookings',
+        errorCode: 'BOOKING_CREATION_FAILED',
+        metadata: { 
+          classId: sanitizedClassId,
+          creditsUsed: creditsSpent,
+          usedTouristPass 
+        }
+      }, new Error(bookingError.message))
       // TODO: Rollback credit/pass consumption if booking fails
       return NextResponse.json({ 
         success: false, 
@@ -207,8 +258,27 @@ export async function POST(request: Request) {
       })
 
     if (auditError) {
-      console.error('Failed to create audit log:', auditError)
+      requestLogger.error('Failed to create audit log', {
+        action: 'create-audit-log',
+        resource: 'credit_audit_log',
+        errorCode: 'AUDIT_LOG_CREATION_FAILED',
+        metadata: { bookingId: booking.id }
+      }, new Error(auditError.message))
     }
+
+    const duration = Date.now() - startTime
+    requestLogger.info('Booking created successfully', {
+      action: 'create-booking',
+      duration,
+      statusCode: 200,
+      metadata: {
+        bookingId: booking.id,
+        classId: sanitizedClassId,
+        creditsUsed: creditsSpent,
+        remainingCredits,
+        usedTouristPass
+      }
+    })
 
     return NextResponse.json({
       success: true,
@@ -219,7 +289,13 @@ export async function POST(request: Request) {
     })
 
   } catch (error) {
-    console.error('Booking API error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Booking API error', {
+      action: 'create-booking',
+      duration,
+      statusCode: 500,
+      errorCode: 'BOOKING_API_EXCEPTION'
+    }, error instanceof Error ? error : new Error('Unknown error'))
     return NextResponse.json({ 
       success: false, 
       error: 'Internal server error' 
@@ -228,10 +304,23 @@ export async function POST(request: Request) {
 }
 
 export async function GET(): Promise<NextResponse<ApiResponse<{ bookings: ClassBooking[] }>>> {
+  const logger = createComponentLogger('bookings')
+  const startTime = Date.now()
+  
   try {
     const session = await getServerSession(authOptions)
+    const userContext = extractUserContext(session)
+    const requestLogger = logger.child({ ...userContext, userId: session?.user?.email })
+    
+    requestLogger.info('Fetching user bookings', {
+      action: 'fetch-bookings'
+    })
     
     if (!session?.user?.email) {
+      requestLogger.warn('Unauthorized attempt to fetch bookings', {
+        action: 'auth-check',
+        errorCode: 'UNAUTHORIZED'
+      })
       return NextResponse.json({ 
         success: false, 
         error: 'Unauthorized' 
@@ -263,12 +352,26 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ bookings: ClassB
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching bookings:', error)
+      requestLogger.error('Error fetching bookings', {
+        action: 'fetch-bookings',
+        resource: 'bookings',
+        errorCode: 'BOOKINGS_FETCH_FAILED'
+      }, new Error(error.message))
       return NextResponse.json({
         success: false,
         error: 'Failed to fetch bookings'
       }, { status: 500 })
     }
+
+    const duration = Date.now() - startTime
+    requestLogger.info('Bookings fetched successfully', {
+      action: 'fetch-bookings',
+      duration,
+      statusCode: 200,
+      metadata: {
+        bookingsCount: bookings?.length || 0
+      }
+    })
 
     return NextResponse.json({
       success: true,
@@ -276,7 +379,13 @@ export async function GET(): Promise<NextResponse<ApiResponse<{ bookings: ClassB
     })
 
   } catch (error) {
-    console.error('Bookings GET API error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Bookings GET API error', {
+      action: 'fetch-bookings',
+      duration,
+      statusCode: 500,
+      errorCode: 'BOOKINGS_GET_EXCEPTION'
+    }, error instanceof Error ? error : new Error('Unknown error'))
     return NextResponse.json({
       success: false,
       error: 'Internal server error'

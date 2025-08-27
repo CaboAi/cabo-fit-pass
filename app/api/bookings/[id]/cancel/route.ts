@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { addRefund, addPenalty, getActiveCredits } from '@/utils/credits'
 import { CANCELLATION_POLICY } from '@/lib/billing'
+import { invalidateCache } from '@/lib/cache'
+import { createComponentLogger } from '@/lib/logger'
 
 interface CancelResponse {
   success: boolean
@@ -17,8 +19,16 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
+  const logger = createComponentLogger('booking-cancel')
+  const startTime = Date.now()
+  
   try {
     const session = await getServerSession(authOptions)
+    
+    logger.info('Booking cancellation requested', {
+      action: 'cancel-booking',
+      metadata: { bookingId: params.id, userId: session?.user?.email }
+    })
     
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -173,8 +183,22 @@ export async function POST(
       })
 
     if (auditError) {
-      console.error('Failed to create audit log:', auditError)
+      logger.error('Failed to create audit log', {
+        action: 'cancel-booking',
+        errorCode: 'AUDIT_LOG_FAILED',
+        metadata: { bookingId, userId: profile.id }
+      }, new Error(auditError.message))
     }
+
+    // Invalidate relevant caches after successful cancellation
+    await Promise.all([
+      // Invalidate user-related caches (credits changed)
+      invalidateCache.user(session.user.email),
+      // Invalidate class-related caches (class availability changed)
+      invalidateCache.class(booking.class_id),
+      // Invalidate classes list cache (booking count changed)
+      invalidateCache.classes()
+    ])
 
     // Prepare response message
     let message = ''
@@ -185,6 +209,21 @@ export async function POST(
     } else {
       message = 'Booking cancelled successfully.'
     }
+
+    const duration = Date.now() - startTime
+    logger.info('Booking cancelled successfully and caches invalidated', {
+      action: 'cancel-booking',
+      duration,
+      statusCode: 200,
+      metadata: {
+        bookingId,
+        userId: profile.id,
+        classId: booking.class_id,
+        refundCredits,
+        penaltyCredits,
+        hoursUntilStart
+      }
+    })
 
     const response: CancelResponse = {
       success: true,
@@ -197,7 +236,14 @@ export async function POST(
     return NextResponse.json(response)
 
   } catch (error) {
-    console.error('Cancellation API error:', error)
+    const duration = Date.now() - startTime
+    logger.error('Booking cancellation error', {
+      action: 'cancel-booking',
+      duration,
+      statusCode: 500,
+      errorCode: 'BOOKING_CANCELLATION_EXCEPTION',
+      metadata: { bookingId: params.id }
+    }, error instanceof Error ? error : new Error('Unknown error'))
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
