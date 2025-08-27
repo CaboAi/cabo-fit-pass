@@ -40,8 +40,8 @@ export const authOptions: NextAuthOptions = {
             await supabase.from('profiles').insert({
               id: newUser.id,
               email: newUser.email,
-              credits: 10, // Give new users 10 credits
-              subscription_tier: 'basic'
+              credits: 10,
+              role: 'user'
             })
 
             return {
@@ -51,10 +51,18 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
+          // For existing users, fetch their profile to get role
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role, full_name')
+            .eq('email', user.email)
+            .single()
+
           return {
             id: user.id,
             email: user.email,
-            name: user.email?.split('@')[0] || 'User'
+            name: profile?.full_name || user.email?.split('@')[0] || 'User',
+            role: profile?.role || 'user'
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -70,12 +78,16 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.role = user.role
+        token.email = user.email
       }
       return token
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string
+        session.user.role = token.role as string
+        session.user.email = token.email as string
       }
       return session
     }

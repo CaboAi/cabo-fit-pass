@@ -1,0 +1,198 @@
+/* Enhanced Accessibility Styles for Cabo Fit Pass */
+
+/* High Contrast Focus Indicators */
+.focus-visible {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* Improved button focus for keyboard users */
+.btn-fitness-primary:focus-visible,
+.btn-fitness-secondary:focus-visible,
+.btn-fitness-outline:focus-visible {
+  @apply ring-2 ring-primary ring-offset-2 ring-offset-background outline-none;
+}
+
+/* Ensure sufficient color contrast for text */
+.text-contrast-safe {
+  /* Fallback colors that meet WCAG AA */
+  --text-primary-safe: 255 255 255;
+  --text-secondary-safe: 229 229 229;
+  --text-tertiary-safe: 163 163 163;
+  
+  color: rgb(var(--text-primary-safe));
+}
+
+/* Safe gradient text with fallback */
+.gradient-fitness-text-safe {
+  background: linear-gradient(135deg, #ff6b00, #3b82f6);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  /* Fallback for browsers that don't support background-clip: text */
+  color: #ff6b00;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50;
+  @apply bg-primary text-primary-foreground px-4 py-2 rounded-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-foreground focus:ring-offset-2;
+}
+
+/* Ensure interactive elements have minimum size */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Better focus indicators for form controls */
+.input-fitness:focus,
+.input-fitness-search:focus {
+  @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card-fitness {
+    @apply border-2 border-text-primary;
+  }
+  
+  .btn-fitness-primary {
+    @apply bg-primary text-primary-foreground border-2 border-primary;
+  }
+  
+  .btn-fitness-outline {
+    @apply border-2 border-primary;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin,
+  .animate-fitness-bounce,
+  .animate-fitness-glow,
+  .animate-fitness-gradient,
+  .transition-all,
+  .transition-colors,
+  .transition-shadow,
+  .transition-transform {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Focus-within for form groups */
+.form-group:focus-within {
+  @apply ring-1 ring-primary ring-offset-1 ring-offset-background rounded-lg;
+}
+
+/* Improved error states */
+.error-state {
+  @apply border-error ring-1 ring-error;
+}
+
+.error-text {
+  @apply text-error flex items-center gap-2;
+}
+
+/* Success states */
+.success-state {
+  @apply border-success ring-1 ring-success;
+}
+
+.success-text {
+  @apply text-success flex items-center gap-2;
+}
+
+/* Better loading states */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ensure adequate spacing for touch interfaces */
+.touch-spacing > * + * {
+  margin-top: 8px;
+}
+
+.touch-spacing-lg > * + * {
+  margin-top: 16px;
+}
+
+/* Force minimum contrast for important text */
+.text-high-contrast {
+  color: #ffffff !important;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Accessible card hover states */
+.card-fitness:hover,
+.card-fitness:focus-within {
+  @apply shadow-fitness-md border-primary/30;
+  transform: translateY(-1px);
+}
+
+/* Better visual hierarchy */
+.heading-accessible {
+  @apply font-heading font-semibold leading-tight;
+  letter-spacing: -0.01em;
+}
+
+/* Accessible form labels */
+.label-accessible {
+  @apply block text-sm font-medium mb-1;
+  @apply text-text-primary;
+}
+
+/* Required field indicator */
+.required-indicator {
+  @apply text-error ml-1;
+  content: "*";
+}
+
+/* Tooltip styling */
+.tooltip {
+  @apply absolute z-50 px-3 py-2 text-sm bg-surface border border-border rounded-lg shadow-lg;
+  @apply max-w-xs text-center;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+  
+  .print-break-after {
+    break-after: page;
+  }
+}

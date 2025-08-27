@@ -172,14 +172,14 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-background via-background-secondary to-background-tertiary py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="max-w-screen-sm mx-auto px-4 sm:px-6 lg:px-8 mb-12">
           <Hero
             heading={tHero('title')}
             subheading={tHero('subtitle')}
           />
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-screen-sm mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button
               onClick={() => setIsAuthDialogOpen(true)}
@@ -203,6 +203,34 @@ export default function HomePage() {
             </Button>
           </div>
           
+          {/* Demo Buttons */}
+          <div className="mb-8 space-y-4">
+            <Link href="/en/dashboard?demo=true">
+              <Button
+                variant="outline"
+                size="lg"
+                className="relative z-10 w-full h-12 md:w-auto md:h-11 rounded-xl animate-bounce shadow-lg px-6 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground"
+                data-cta="try-demo-hero"
+                aria-label={tAria('tryDemo')}
+              >
+                {tCta('tryDemo')}
+              </Button>
+            </Link>
+            
+            <div className="text-center">
+              <Link href="/en/admin?demo=true">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="relative z-10 h-10 rounded-lg shadow-md px-4 font-medium border-orange-300 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                  data-cta="try-admin-demo"
+                >
+                  Try Admin Demo
+                </Button>
+              </Link>
+            </div>
+          </div>
+          
           {/* Trust Row */}
           <div className="text-center">
             <p className="text-sm text-text-tertiary mb-4">{tHero('trustText')}</p>
@@ -219,7 +247,7 @@ export default function HomePage() {
 
       {/* Services Grid */}
       <section className="py-20 bg-surface-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-sm mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
               Popular Categories
@@ -234,7 +262,7 @@ export default function HomePage() {
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-sm mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
               {tSections('howItWorks')}
@@ -244,7 +272,7 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 space-y-6">
             {[
               {
                 icon: Search,
@@ -384,7 +412,7 @@ export default function HomePage() {
             {tSections('demoDescription')}
           </p>
           
-          <Link href="/dashboard">
+          <Link href="/en/dashboard?demo=true">
             <Button
               variant="outline"
               size="lg"

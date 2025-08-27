@@ -2,6 +2,7 @@
 
 import { Coins, Plus, TrendingUp, Star, Zap } from "lucide-react"
 import { useState } from 'react'
+import { useToast } from '@/hooks/use-toast'
 
 interface CreditDisplayProps {
   currentCredits: number
@@ -14,6 +15,7 @@ export function CreditDisplay({
   onPurchaseCredits,
   onCreditsUpdate 
 }: CreditDisplayProps) {
+  const { showSuccess } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [showQuickPurchase, setShowQuickPurchase] = useState(false)
 
@@ -23,7 +25,7 @@ export function CreditDisplay({
       const newCredits = currentCredits + amount
       onCreditsUpdate?.(newCredits)
       setIsLoading(false)
-      alert(`Added ${amount} credits! Total: ${newCredits}`)
+      showSuccess(`Added ${amount} credits! Total: ${newCredits}`)
     }, 1000)
   }
 
@@ -92,7 +94,8 @@ export function CreditDisplay({
                 <button 
                   onClick={() => handleQuickAdd(5)}
                   disabled={isLoading}
-                  className="inline-flex items-center justify-center rounded-md text-xs h-8 px-3 border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center justify-center rounded-md text-xs min-h-[44px] min-w-[44px] px-3 border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 disabled:opacity-50 transition-colors"
+                  aria-label="Add 5 credits quickly"
                 >
                   {isLoading ? '...' : (
                     <>
@@ -105,7 +108,8 @@ export function CreditDisplay({
               
               <button 
                 onClick={onPurchaseCredits}
-                className="inline-flex items-center justify-center rounded-md text-sm h-9 px-4 bg-orange-600 text-white hover:bg-orange-700 transition-colors shadow-sm"
+                className="inline-flex items-center justify-center rounded-md text-sm min-h-[44px] min-w-[44px] px-4 bg-orange-600 text-white hover:bg-orange-700 transition-colors shadow-sm"
+                aria-label="Purchase more credits"
               >
                 <TrendingUp className="h-4 w-4 mr-1" />
                 Buy More

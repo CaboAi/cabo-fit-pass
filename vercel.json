@@ -8,5 +8,11 @@
     "app/api/**/*": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/payouts/run",
+      "schedule": "0 9 */14 * *"
+    }
+  ]
 }
