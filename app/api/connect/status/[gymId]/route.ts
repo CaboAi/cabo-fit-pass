@@ -11,21 +11,60 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Check for demo mode via referrer or special header
+    const isDemoMode = request.headers.get('referer')?.includes('?demo=true') || 
+                      request.headers.get('x-demo-mode') === 'true'
+    
+    if (!isDemoMode) {
+      if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      const supabase = createClient()
+      
+      // Check if user is admin
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('email', session.user.email)
+        .single()
+
+      if (profile?.role !== 'admin') {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+      }
     }
 
-    const supabase = createClient()
-    
-    // Check if user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    // For demo mode, return mock data
+    if (isDemoMode) {
+      // Check if demo onboarding has been "completed"
+      const demoOnboardingComplete = request.headers.get('x-demo-complete') === 'true'
+      
+      if (demoOnboardingComplete) {
+        return NextResponse.json({
+          success: true,
+          data: {
+            hasConnectAccount: true,
+            status: 'complete',
+            requirements: null,
+            accountId: 'acct_demo_123456789',
+            chargesEnabled: true,
+            payoutsEnabled: true,
+            detailsSubmitted: true
+          }
+        })
+      }
+      
+      return NextResponse.json({
+        success: true,
+        data: {
+          hasConnectAccount: false,
+          status: 'not_setup',
+          requirements: null,
+          chargesEnabled: false,
+          payoutsEnabled: false,
+          detailsSubmitted: false
+        }
+      })
     }
 
     // Get gym details

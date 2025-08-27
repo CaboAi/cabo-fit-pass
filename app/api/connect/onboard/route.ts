@@ -7,15 +7,28 @@ import stripe from '@/lib/stripe'
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { gymId } = await request.json()
     
     if (!gymId) {
       return NextResponse.json({ error: 'Gym ID is required' }, { status: 400 })
+    }
+
+    // Check for demo mode via referrer or special header
+    const isDemoMode = request.headers.get('referer')?.includes('?demo=true') || 
+                      request.headers.get('x-demo-mode') === 'true'
+    
+    // For demo mode, return mock onboarding URL
+    if (isDemoMode) {
+      return NextResponse.json({
+        success: true,
+        accountLinkUrl: 'https://connect.stripe.com/oauth/authorize?response_type=code&client_id=demo&scope=read_write&demo=true',
+        connectAccountId: 'acct_demo_123456789',
+        isNewAccount: true
+      })
+    }
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const supabase = createClient()

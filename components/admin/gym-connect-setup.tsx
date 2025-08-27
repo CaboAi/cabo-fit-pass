@@ -37,7 +37,19 @@ export function GymConnectSetup({ gymId, gymName }: GymConnectSetupProps) {
       setIsFetchingStatus(true)
       setError(null)
       
-      const response = await fetch(`/api/connect/status/${gymId}`)
+      // Check if we're in demo mode
+      const isDemoMode = typeof window !== 'undefined' && 
+        (window.location.href.includes('?demo=true') || 
+         localStorage.getItem('demo-admin-session') === 'true')
+      
+      const headers: HeadersInit = {}
+      if (isDemoMode) {
+        headers['x-demo-mode'] = 'true'
+      }
+      
+      const response = await fetch(`/api/connect/status/${gymId}`, {
+        headers
+      })
       
       if (!response.ok) {
         throw new Error('Failed to fetch status')
@@ -62,11 +74,21 @@ export function GymConnectSetup({ gymId, gymName }: GymConnectSetupProps) {
     setError(null)
     
     try {
+      // Check if we're in demo mode
+      const isDemoMode = typeof window !== 'undefined' && 
+        (window.location.href.includes('?demo=true') || 
+         localStorage.getItem('demo-admin-session') === 'true')
+      
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      if (isDemoMode) {
+        headers['x-demo-mode'] = 'true'
+      }
+      
       const response = await fetch('/api/connect/onboard', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ gymId }),
       })
 
@@ -76,6 +98,14 @@ export function GymConnectSetup({ gymId, gymName }: GymConnectSetupProps) {
       }
 
       const { accountLinkUrl } = await response.json()
+      
+      // For demo mode, show alert instead of redirecting
+      if (isDemoMode) {
+        alert('Demo Mode: In a real environment, this would redirect to Stripe Connect onboarding.\n\nStripe Connect Account ID: acct_demo_123456789\n\nDemo onboarding completed!')
+        // Refresh status to show updated state
+        setTimeout(() => fetchStatus(), 1000)
+        return
+      }
       
       // Redirect to Stripe Connect onboarding
       window.location.href = accountLinkUrl
