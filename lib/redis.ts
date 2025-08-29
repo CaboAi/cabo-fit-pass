@@ -80,6 +80,11 @@ export const REDIS_KEYS = {
   USER_BOOKINGS: (userId: string) => `user:bookings:${userId}`,
   CLASS_BOOKINGS: (classId: string) => `class:bookings:${classId}`,
   
+  // Performance-critical booking cache keys
+  BOOKING_COUNT: (classId: string) => `booking:count:${classId}`,
+  CLASS_CAPACITY: (classId: string) => `class:capacity:${classId}`,
+  USER_BOOKING_CHECK: (userId: string, classId: string) => `booking:check:${userId}:${classId}`,
+  
   // Studios
   STUDIOS_LIST: 'studios:list',
   STUDIO_DETAIL: (studioId: string) => `studio:detail:${studioId}`,
@@ -96,6 +101,12 @@ export const CACHE_TTL = {
   MEDIUM: 900,     // 15 minutes
   LONG: 3600,      // 1 hour
   VERY_LONG: 86400, // 24 hours
+  
+  // Performance-optimized TTLs for booking operations
+  BOOKING_COUNT: 30,    // 30 seconds - booking counts change frequently
+  CLASS_DATA: 300,      // 5 minutes - class info changes infrequently  
+  USER_PROFILE: 600,    // 10 minutes - user profiles change rarely
+  CAPACITY_CHECK: 15,   // 15 seconds - class capacity is critical
 } as const
 
 // Utility function to generate cache tags for invalidation
@@ -105,6 +116,173 @@ export function generateCacheTags(entity: string, ids: string[] = []): string[] 
     tags.push(`${entity}:${id}`)
   })
   return tags
+}
+
+// High-performance caching utilities for booking operations
+export const bookingCache = {
+  // Cache booking count with automatic database fallback
+  async getBookingCount(classId: string, fetchFn: () => Promise<number>): Promise<{ count: number; cached: boolean }> {
+    const key = REDIS_KEYS.BOOKING_COUNT(classId)
+    
+    try {
+      // Try cache first
+      const cachedCount = await redis.get(key)
+      if (cachedCount !== null) {
+        logger.info('Booking count cache hit', {
+          action: 'cache-hit',
+          resource: 'booking-count',
+          metadata: { classId, count: cachedCount }
+        })
+        return { count: Number(cachedCount), cached: true }
+      }
+      
+      // Cache miss - fetch from database
+      const count = await fetchFn()
+      
+      // Cache the result with short TTL
+      await redis.set(key, count.toString(), { ex: CACHE_TTL.BOOKING_COUNT })
+      
+      logger.info('Booking count cached', {
+        action: 'cache-set',
+        resource: 'booking-count',
+        metadata: { classId, count, ttl: CACHE_TTL.BOOKING_COUNT }
+      })
+      
+      return { count, cached: false }
+      
+    } catch (error) {
+      logger.warn('Booking count cache error, falling back to database', {
+        action: 'cache-error',
+        resource: 'booking-count',
+        metadata: { classId }
+      }, error instanceof Error ? error : new Error('Unknown cache error'))
+      
+      // Fallback to direct database call
+      const count = await fetchFn()
+      return { count, cached: false }
+    }
+  },
+  
+  // Cache class data for booking operations
+  async getClassData<T>(classId: string, fetchFn: () => Promise<T>): Promise<{ data: T; cached: boolean }> {
+    const key = REDIS_KEYS.CLASS_DETAIL(classId)
+    
+    try {
+      // Try cache first
+      const cachedData = await redis.get(key)
+      if (cachedData !== null) {
+        logger.info('Class data cache hit', {
+          action: 'cache-hit',
+          resource: 'class-data',
+          metadata: { classId }
+        })
+        return { data: JSON.parse(cachedData), cached: true }
+      }
+      
+      // Cache miss - fetch from database
+      const data = await fetchFn()
+      
+      // Cache the result
+      await redis.set(key, JSON.stringify(data), { ex: CACHE_TTL.CLASS_DATA })
+      
+      logger.info('Class data cached', {
+        action: 'cache-set',
+        resource: 'class-data',
+        metadata: { classId, ttl: CACHE_TTL.CLASS_DATA }
+      })
+      
+      return { data, cached: false }
+      
+    } catch (error) {
+      logger.warn('Class data cache error, falling back to database', {
+        action: 'cache-error',
+        resource: 'class-data',
+        metadata: { classId }
+      }, error instanceof Error ? error : new Error('Unknown cache error'))
+      
+      // Fallback to direct database call
+      const data = await fetchFn()
+      return { data, cached: false }
+    }
+  },
+  
+  // Cache user profile for booking operations
+  async getUserProfile<T>(userId: string, fetchFn: () => Promise<T>): Promise<{ profile: T; cached: boolean }> {
+    const key = REDIS_KEYS.USER_PROFILE(userId)
+    
+    try {
+      // Try cache first
+      const cachedProfile = await redis.get(key)
+      if (cachedProfile !== null) {
+        logger.info('User profile cache hit', {
+          action: 'cache-hit',
+          resource: 'user-profile',
+          metadata: { userId }
+        })
+        return { profile: JSON.parse(cachedProfile), cached: true }
+      }
+      
+      // Cache miss - fetch from database
+      const profile = await fetchFn()
+      
+      // Cache the result
+      await redis.set(key, JSON.stringify(profile), { ex: CACHE_TTL.USER_PROFILE })
+      
+      logger.info('User profile cached', {
+        action: 'cache-set',
+        resource: 'user-profile',
+        metadata: { userId, ttl: CACHE_TTL.USER_PROFILE }
+      })
+      
+      return { profile, cached: false }
+      
+    } catch (error) {
+      logger.warn('User profile cache error, falling back to database', {
+        action: 'cache-error',
+        resource: 'user-profile',
+        metadata: { userId }
+      }, error instanceof Error ? error : new Error('Unknown cache error'))
+      
+      // Fallback to direct database call
+      const profile = await fetchFn()
+      return { profile, cached: false }
+    }
+  },
+  
+  // Invalidate cache when bookings are created/updated
+  async invalidateBookingCache(classId: string, userId?: string): Promise<void> {
+    try {
+      const keysToInvalidate = [
+        REDIS_KEYS.BOOKING_COUNT(classId),
+        REDIS_KEYS.CLASS_CAPACITY(classId),
+        REDIS_KEYS.CLASS_BOOKINGS(classId)
+      ]
+      
+      if (userId) {
+        keysToInvalidate.push(
+          REDIS_KEYS.USER_PROFILE(userId),
+          REDIS_KEYS.USER_BOOKINGS(userId),
+          REDIS_KEYS.USER_BOOKING_CHECK(userId, classId)
+        )
+      }
+      
+      // Delete all related cache keys
+      await Promise.all(keysToInvalidate.map(key => redis.del(key)))
+      
+      logger.info('Booking cache invalidated', {
+        action: 'cache-invalidate',
+        resource: 'booking-cache',
+        metadata: { classId, userId, keysInvalidated: keysToInvalidate.length }
+      })
+      
+    } catch (error) {
+      logger.error('Failed to invalidate booking cache', {
+        action: 'cache-invalidate-error',
+        resource: 'booking-cache',
+        metadata: { classId, userId }
+      }, error instanceof Error ? error : new Error('Unknown cache error'))
+    }
+  }
 }
 
 // Environment validation
