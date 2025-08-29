@@ -88,7 +88,7 @@ export function CreditDisplay({
             Quick Top-Up
           </div>
           <div className="grid grid-cols-3 gap-2">
-            {[5, 10, 20].map((credits) => (
+            {[10, 25, 50].map((credits) => (
               <button
                 key={credits}
                 onClick={() => {
@@ -96,10 +96,10 @@ export function CreditDisplay({
                   onPurchaseCredits()
                 }}
                 disabled={isUpdating}
-                className="px-4 py-3 rounded-lg font-medium transition-all disabled:opacity-50 animate-fade-in bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 hover:border-blue-400 hover:shadow-md"
+                className="px-4 py-3 rounded-lg font-medium transition-all disabled:opacity-50 animate-fade-in bg-primary hover:bg-primary/90 text-primary-foreground border border-primary/20 hover:border-primary/50 hover:shadow-md"
                 style={{ animationDelay: `${credits * 0.1}s` }}
               >
-                <span className="relative z-10 text-white">+{credits}</span>
+                <span className="relative z-10">+{credits}</span>
               </button>
             ))}
           </div>

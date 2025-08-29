@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { X, CreditCard, Star, Zap } from 'lucide-react'
 import { CREDIT_PACKAGES } from '@/lib/stripe'
+import { useToast } from '@/hooks/use-toast'
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -12,6 +13,7 @@ interface PaymentModalProps {
 }
 
 export function PaymentModal({ isOpen, onClose, onPurchaseComplete, currentCredits }: PaymentModalProps) {
+  const { showSuccess, showError } = useToast()
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -34,11 +36,11 @@ export function PaymentModal({ isOpen, onClose, onPurchaseComplete, currentCredi
         onPurchaseComplete(totalCredits)
         onClose()
         
-        alert(`¡Pago exitoso! Se agregaron ${totalCredits} créditos a tu cuenta.`)
+        showSuccess(`Payment successful! ${totalCredits} credits added to your account.`)
       }
     } catch (error) {
       console.error('Payment error:', error)
-      alert('Error al procesar el pago. Inténtalo de nuevo.')
+      showError('Payment processing failed. Please try again.')
     } finally {
       setIsProcessing(false)
       setSelectedPackage(null)
@@ -62,7 +64,8 @@ export function PaymentModal({ isOpen, onClose, onPurchaseComplete, currentCredi
           </div>
           <button
             onClick={onClose}
-            className="p-2 sm:p-3 hover:bg-surface-tertiary rounded-xl sm:rounded-2xl transition-colors text-text-secondary hover:text-text-primary flex-shrink-0 ml-2"
+            className="p-2 sm:p-3 hover:bg-surface-tertiary rounded-xl sm:rounded-2xl transition-colors text-text-secondary hover:text-text-primary flex-shrink-0 ml-2 min-w-[44px] min-h-[44px]"
+            aria-label="Close payment modal"
           >
             <X className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>

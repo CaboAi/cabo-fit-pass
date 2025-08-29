@@ -12,6 +12,7 @@ import {
   LogOut,
   Building2
 } from 'lucide-react'
+import { Logo } from '@/components/ui/logo'
 
 interface NavigationHeaderProps {
   profile?: {
@@ -31,11 +32,11 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
   const locale = pathname.startsWith('/es') ? 'es' : 'en'
 
   const navigationItems = [
-    { path: '/dashboard', label: 'Classes', icon: Calendar, localized: false },
-    { path: '/studio', label: 'Studios', icon: Activity, localized: false },
-    { path: '/studio-management', label: 'Manage Studio', icon: Building2, localized: false },
+    { path: '/dashboard', label: 'Classes', icon: Calendar, localized: true },
+    { path: '/studio', label: 'Studios', icon: Activity, localized: true },
+    { path: '/studio-management', label: 'Manage Studio', icon: Building2, localized: true },
     { path: '/pricing', label: 'Pricing', icon: CreditCard, localized: true },
-    { path: '/profile', label: 'Profile', icon: User, localized: false }
+    { path: '/profile', label: 'Profile', icon: User, localized: true }
   ]
 
   const getNavItemClass = (isActive: boolean, isMobile: boolean = false) => {
@@ -68,18 +69,33 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 -z-10"></div>
       <div className="relative max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Mobile Navigation Button - Left */}
+          {/* Logo - Left */}
+          <div className="flex items-center">
+            <button
+              onClick={() => router.push(`/${locale}/dashboard`)}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              aria-label="Go to dashboard"
+            >
+              <Logo variant="light" size="sm" showText={false} />
+              <div className="hidden sm:block">
+                <span className="text-lg font-bold text-white">Cabo Fit Pass</span>
+                <div className="text-xs text-white/70">Fitness Marketplace</div>
+              </div>
+            </button>
+          </div>
+
+          {/* Mobile Navigation Button - Right on mobile, hidden on desktop */}
           <div className="lg:hidden">
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
-              className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-surface-tertiary"
+              className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-surface-tertiary min-w-[44px] min-h-[44px]"
+              aria-label={showMobileNav ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={showMobileNav}
+              aria-controls="mobile-navigation"
             >
               {showMobileNav ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-
-          {/* Desktop spacer for mobile */}
-          <div className="lg:hidden flex-1"></div>
 
           {/* Centered Navigation - Desktop */}
           <div className="hidden lg:flex items-center">
@@ -95,6 +111,8 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
                       key={item.path}
                       onClick={() => handleNavigation(item.path, item.localized)}
                       className={getNavItemClass(isActive)}
+                      aria-label={`Navigate to ${item.label}`}
+                      aria-current={isActive ? 'page' : undefined}
                     >
                       <Icon className="w-5 h-5" />
                       <span className="hidden xl:inline">{item.label}</span>
@@ -115,9 +133,9 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
               <div className="relative">
                 <div className="absolute inset-0 gradient-fitness-primary rounded-full blur opacity-75 -z-10"></div>
                 <button 
-                  onClick={() => handleNavigation('/profile', false)}
-                  className="relative w-10 h-10 gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground font-bold hover:scale-105 transition-transform z-10"
-                  title="View Profile"
+                  onClick={() => handleNavigation('/profile', true)}
+                  className="relative min-w-[44px] min-h-[44px] gradient-fitness-primary rounded-full flex items-center justify-center text-primary-foreground font-bold hover:scale-105 transition-transform z-10"
+                  aria-label={`View profile for ${profile.name || profile.email}`}
                 >
                   {profile.email?.charAt(0).toUpperCase() || 'U'}
                 </button>
@@ -125,8 +143,8 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
               {onSignOut && (
                 <button
                   onClick={onSignOut}
-                  className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-                  title="Sign Out"
+                  className="p-2 text-text-secondary hover:text-text-primary transition-colors min-w-[44px] min-h-[44px]"
+                  aria-label="Sign out of your account"
                 >
                   <LogOut className="w-5 h-5" />
                 </button>
@@ -137,7 +155,12 @@ export function NavigationHeader({ profile, onSignOut }: NavigationHeaderProps) 
 
         {/* Mobile Navigation Menu */}
         {showMobileNav && (
-          <div className="lg:hidden bg-surface-secondary backdrop-blur-xl border-t border-border mt-6 rounded-2xl">
+          <div 
+            id="mobile-navigation"
+            className="lg:hidden bg-surface-secondary backdrop-blur-xl border-t border-border mt-6 rounded-2xl"
+            role="navigation"
+            aria-label="Mobile navigation menu"
+          >
             <div className="p-4">
               <nav className="space-y-2">
                 {navigationItems.map((item) => {

@@ -133,3 +133,15 @@ export interface ClassFormData {
   difficulty_level: 'beginner' | 'intermediate' | 'advanced'
   instructor_id?: string
 }
+
+export interface Gym {
+  id: string
+  name: string
+  location?: string
+  email?: string
+  phone?: string
+  stripe_connect_id?: string
+  connect_onboarded_at?: string
+  created_at: string
+  updated_at?: string
+}

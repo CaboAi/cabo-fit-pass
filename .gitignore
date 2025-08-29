@@ -49,3 +49,5 @@ Thumbs.db
 .claude/
 .cursor/
 cabo-fit-pass-volo/
+logs/
+.env.local
